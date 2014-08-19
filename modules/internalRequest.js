@@ -4,7 +4,7 @@ var Promise = require("es6-promise").Promise;
 
 var productSearchModule = require('./productSearch/searchUtil');
 var trumfTermsAndConditionsModule = require('./terms_caching/terms_cacher');
-var persistenceSyncModule = require('./synchronize/service');
+var persistenceSyncModule = require('./synchronize/request-adapter');
 
 var localServices = [
 	{name : 'persistenceSynchronize', method : persistenceSyncModule.synchronize},

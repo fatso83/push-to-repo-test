@@ -6,42 +6,36 @@ var log4js = require('log4js'),
 
 logger.setLevel(log4js.levels.TRACE);
 
-exports.synchronize = function (requestBody, callback) {
+module.exports = {
 
-	var chainId, userId, clientData;
+	synchronize : function (chainId, userId, clientData, callback) {
+		logger.info('Synchronizing data');
 
-	chainId = request.chainId;
-	userId = requestBody.servicepath.match(/.*\/([0-9]+)$/)[1]
-	clientData = requestBody.payload;
+		storage.getUserData(chainId, userId, function(err, serverData) {
+			var result;
 
-	logger.info('Synchronizing data');
-
-	storage.getUserData(chainId, userId, function (err, serverData) {
-		var result;
-
-		userDb = serverData;
-		try {
-			result = synchronize(clientData);
-		} catch (error) {
-			callback(error);
-			return;
-		}
-
-		storage.setUserData(chainId, userId, userDb, function (err) {
-			if (err) {
-				callback(err);
+			userDb = serverData;
+			try {
+				result = synchronize(clientData);
+			} catch(error) {
+				callback(error);
+				return;
 			}
 
-			callback(null, result);
+			storage.setUserData(chainId, userId, userDb, function(err) {
+				if(err) callback(err);
+
+				callback(null, result);
+			});
 		});
-	});
-};
+	},
 
-/** DI/testing purposes */
-var setStorage = function (storageImpl) {
-	storage = storageImpl;
-};
+	/** DI/testing purposes */
+	setStorage : function (storageImpl) {
+		storage = storageImpl;
+	}
 
+};
 
 /**
  * Receive changes from the client
@@ -160,11 +154,7 @@ function key (obj) { return obj.key; }
 var isInDB = function (key) { return userDb.hasOwnProperty(key) };
 var isNotInDB = not(isInDB);
 
-function assert (cond, msg) {
-	if (!cond) {
-		throw new Error('Assertion failed: ' + msg);
-	}
-}
+function assert (cond, msg) { if (!cond) throw new Error('Assertion failed: ' + msg); }
 
 /**
  * A conflicting change is an update where
@@ -257,8 +247,8 @@ var updateDatabase = loggable(function updateDatabase (unConflictingKeys, update
 	return updatesFromClientWithNewVersion;
 });
 
-function getObject (key, listOfUpdates) {
-	return listOfUpdates.filter(function (o) { return o.key === key; })[0];
+function getObject(key, listOfUpdates) {
+	return listOfUpdates.filter( function( o) { return o.key === key; })[0];
 }
 
 // For debug/logging purposes
@@ -303,9 +293,7 @@ function itemFromList (list) {
 
 function findInListWithKey (theKey, list) {
 	var idx = list.map(key).indexOf(theKey);
-	if (idx === -1) {
-		throw Error('Should have found a value');
-	}
+	if (idx === -1) throw Error('Should have found a value');
 	return list[idx];
 }
 
