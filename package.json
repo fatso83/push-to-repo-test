@@ -12,6 +12,7 @@
     "express": "^4.8.3",
     "log4js": "^0.6.17",
     "morgan": "^1.2.2",
-    "request": "^2.40.0"
+    "request": "^2.40.0",
+    "azure-storage": "~0.3.2"
   }
 }

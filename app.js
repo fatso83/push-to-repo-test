@@ -10,8 +10,15 @@ var express = require('express'),
 
 // Routes
 var request = require('./routes/request');
-
+var productSearch = require('./routes/productSearch');
+var synchronize = require('./routes/synchronize_router');
+var trumfTerms = require('./routes/trumfTerms');
 var index = require('./routes/index');
+
+// Setup the search module
+var searchUtil = require('./modules/productSearch/searchUtil');
+// Start loading data when the server starts
+searchUtil.loadData();
 
 var app = express();
 var server = require('http').createServer(app);
@@ -34,6 +41,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 // TODO: App Routes
 app.use('/', index);
 app.use('/request', request);
+app.use('/productsearch', productSearch);
+app.use('/synchronize', synchronize);
+app.use('/trumf_terms_conditions', trumfTerms);
 
 // Catch 404 and forwarding to error handler
 app.use(function (req, res, next) {
