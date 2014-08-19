@@ -1,5 +1,7 @@
 "use strict";
 
+var Promise = require("es6-promise").Promise;
+
 var chainDataModel = require('./model');
 var titleSearch = require('./titleSearch');
 var dataUtils = require('./utils/dataUtil');
@@ -7,7 +9,7 @@ var dataUtils = require('./utils/dataUtil');
 var log4js = require('log4js');
 var logger = log4js.getLogger('/productSearch/searchUtil');
 
-if(process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'production') {
 	logger.setLevel(log4js.levels.OFF);
 } else {
 	logger.setLevel(log4js.levels.DEBUG);
@@ -31,23 +33,59 @@ var createEmptyOutput = function () {
 	];
 };
 
+// Handles incoming searches
+exports.search = function (request, callback) {
+	var serviceName = request.servicename;
+	var chainID = request.chainId;
+	var query = request.payload.query;
+	var config = request.payload.config || {};
+
+	var result;
+	switch (serviceName) {
+		case 'productSearchProducts':
+			result = getProductsByTitle(query, chainID, config);
+			break;
+		case 'productSearchGroups':
+			result = getGroupsByTitle(query, chainID, config);
+			break;
+
+		case 'productSearchBoth':
+			result = combinedSearch(query, chainID, config);
+			break;
+
+		case 'productSearchGetProductsForGroup':
+			result = getProductsForGroup(query, chainID);
+			break;
+
+		case 'productSearchGetAllCategories':
+			result = getAllCategories(chainID);
+			break;
+
+		case 'productSearchGetProductById':
+			result = getProductById(query, chainID);
+			break;
+
+	}
+	callback(result);
+};
+
 // Loads the data
 exports.loadData = function () {
 	chainDataModel.loadData();
 };
 
-exports.updateData = function() {
+exports.updateData = function () {
 	chainDataModel.updateStorageData();
 };
 
-exports.getProductById = function(productId, chainid) {
+var getProductById = function (productId, chainid) {
 	var collection = chainDataModel.getDataCollectionByChainId(chainid);
 
 	var prods = collection.productstore;
 	var i = prods.length;
 
-	while(i--) {
-		if(parseInt(prods[i].id, 10) === parseInt(productId, 10)) {
+	while (i--) {
+		if (parseInt(prods[i].id, 10) === parseInt(productId, 10)) {
 			var out = createEmptyOutput();
 			out[0].shoppinglistgroups[0].products.push(prods[i]);
 			return out;
@@ -61,7 +99,7 @@ exports.getProductById = function(productId, chainid) {
  * @param {Number} chainid The id of the chain
  * @returns {Array<Category> | boolean} An array containing all categories
  */
-exports.getAllCategories = function(chainid) {
+var getAllCategories = function (chainid) {
 	var collection = chainDataModel.getDataCollectionByChainId(chainid);
 	return collection.categoriesstore;
 };
@@ -72,7 +110,7 @@ exports.getAllCategories = function(chainid) {
  * @param {Number} chainid The id of the chain
  * @returns {Array<Category> | boolean} An array containing a generic category with the groups and the products
  */
-exports.getProductsForGroup = function (query, chainid) {
+var getProductsForGroup = function (query, chainid) {
 	var collection = chainDataModel.getDataCollectionByChainId(chainid);
 
 	if (!collection) {
@@ -114,7 +152,7 @@ exports.getProductsForGroup = function (query, chainid) {
  * @param {Number} [config.maxNumberOfGroups=10] The max number of groups within each category to output
  * @returns {Array<Categories> | boolean}
  */
-exports.getGroupsByTitle = function (query, chainid, config) {
+var getGroupsByTitle = function (query, chainid, config) {
 	// get the correct data for this chain
 	var collection = chainDataModel.getDataCollectionByChainId(chainid);
 
@@ -148,7 +186,7 @@ exports.getGroupsByTitle = function (query, chainid, config) {
  * @param {Number} [config.maxNumberOfProducts=10] The max number of products within each group to output
  * @returns {Array<Categories> | boolean}
  */
-exports.getProductsByTitle = function (query, chainid, config) {
+var getProductsByTitle = function (query, chainid, config) {
 	// get the correct data for this chain
 	var collection = chainDataModel.getDataCollectionByChainId(chainid);
 
@@ -221,9 +259,9 @@ exports.getProductsByTitle = function (query, chainid, config) {
 	while (i--) {
 		// ..set up an empty category
 		generatedCategory = {
-			title : categories[i].title,
-			id: categories[i].id,
-			sortIndex: categories[i].sortIndex,
+			title              : categories[i].title,
+			id                 : categories[i].id,
+			sortIndex          : categories[i].sortIndex,
 			shoppinglistgroups : []
 		};
 		groups = categories[i].shoppinglistgroups;
@@ -303,7 +341,7 @@ exports.getProductsByTitle = function (query, chainid, config) {
  * @param {Number} [config.maxNumberOfProducts=10] The max number of products within each group to output
  * @returns {Array<Categories> | boolean}
  */
-exports.combinedSearch = function (query, chainid, config) {
+var combinedSearch = function (query, chainid, config) {
 	var collection = chainDataModel.getDataCollectionByChainId(chainid);
 
 	if (!collection) {
@@ -416,9 +454,9 @@ exports.combinedSearch = function (query, chainid, config) {
 				if (parseInt(groups[j].groupid, 10) === inputID) {
 					// Create an output category object
 					output = {
-						title : categories[i].title,
-						id: categories[i].id,
-						sortIndex: categories[i].sortIndex,
+						title              : categories[i].title,
+						id                 : categories[i].id,
+						sortIndex          : categories[i].sortIndex,
 						shoppinglistgroups : []
 					};
 					// Add an array of group ids to the output category
