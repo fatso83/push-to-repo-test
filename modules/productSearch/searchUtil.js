@@ -66,7 +66,11 @@ exports.search = function (request, callback) {
 			break;
 
 	}
-	callback(result);
+	if (result) {
+		callback(result, null);
+	} else {
+		callback({error:"Search error"}, true);
+	}
 };
 
 // Loads the data
