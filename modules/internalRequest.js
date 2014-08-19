@@ -4,9 +4,10 @@ var Promise = require("es6-promise").Promise;
 
 var productSearchModule = require('./productSearch/searchUtil');
 var trumfTermsAndConditionsModule = require('./terms_caching/terms_cacher');
+var persistenceSyncModule = require('./synchronize/service');
 
 var localServices = [
-	{name : 'persistenceSynchronize', method : null},
+	{name : 'persistenceSynchronize', method : persistenceSyncModule.synchronize},
 	{name : 'trumfProfile_termsAndConditions', method : trumfTermsAndConditionsModule.fetch},
 	{name : 'productSearchProducts', method : productSearchModule.search},
 	{name : 'productSearchGroups', method : productSearchModule.search},
@@ -29,7 +30,7 @@ exports.isLocalService = function (requestBody) {
 };
 
 exports.makeRequest = function (requestBody) {
-	logger.debug('Resolving internally');
+	logger.debug('Resolving internally', requestBody);
 
 	return new Promise(function (resolve, reject) {
 		function getMethod (serviceName) {
