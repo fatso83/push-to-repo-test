@@ -56,9 +56,15 @@ exports.makeRequest = function (requestBody) {
 		var method = getMethod(requestBody.servicename);
 
 		if (method) {
-			method(requestBody, function (response) {
-				responseObj.response.data = response;
-				resolve(responseObj);
+			method(requestBody, function (response, error) {
+				if(error) {
+					responseObj.response.data = error;
+					responseObj.response.code = 500;
+					reject(error);
+				} else {
+					responseObj.response.data = response;
+					resolve(responseObj);
+				}
 			});
 		} else {
 			responseObj.response.code = 500;
