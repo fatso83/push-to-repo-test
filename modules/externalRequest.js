@@ -14,25 +14,13 @@ exports.makeRequest = function (requestData, callback) {
 		isOauth = true;
 	}
 
-	if (requestData.isMockup) {
-		if (isOauth) {
-			baseURL = "https://preprod.oauth.norgesgruppen.no/";
-		} else {
-			if(requestData.environment === 'local') {
-				baseURL = "http://localhost:3000/";
-			} else {
-				baseURL = "http://ngmockupservices.azurewebsites.net/";
-			}
-
-		}
-	} else if (requestData.environment === 'preproduction' || requestData.environment === 'local') {
+	if (requestData.environment === 'preproduction' || requestData.environment === 'local') {
 		if (isOauth) {
 			baseURL = "https://preprod.oauth.norgesgruppen.no/";
 		} else {
 			baseURL = "https://preprod.service-dk.norgesgruppen.no/";
 		}
-	} else if (requestData.environment === 'production' ||
-		requestData.environment === 'localProd' || requestData.environment === 'mockupProd') {
+	} else if (requestData.environment === 'production') {
 		if (isOauth) {
 			baseURL = "https://oauth.norgesgruppen.no/";
 		} else {
