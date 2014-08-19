@@ -11,7 +11,6 @@ var express = require('express'),
 // Routes
 var request = require('./routes/request');
 var synchronize = require('./routes/synchronize_router');
-var trumfTerms = require('./routes/trumfTerms');
 var index = require('./routes/index');
 
 // Setup the search module
@@ -41,7 +40,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 app.use('/request', request);
 app.use('/synchronize', synchronize);
-app.use('/trumf_terms_conditions', trumfTerms);
 
 // Catch 404 and forwarding to error handler
 app.use(function (req, res, next) {

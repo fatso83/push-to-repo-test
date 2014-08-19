@@ -47,20 +47,19 @@ function old () {
 	return (Date.now() - cacheTime) > ONE_HOUR;
 }
 
-module.exports = {
-	fetch : function (callback) {
+exports.fetch = function (requestBody, callback) {
 
-		if (!termsCache || old()) {
-			fetchTermsAndConditions(function (err) {
-				if (err) {
-					console.error(err);
-				} else {
-					callback(null, termsCache || 'Waiting for update');
-				}
-			})
-		}
-		else {
-			callback(null, termsCache)
-		}
+	if (!termsCache || old()) {
+		fetchTermsAndConditions(function (err) {
+			if (err) {
+				console.error(err);
+			} else {
+				callback({data : termsCache || 'Waiting for update'});
+			}
+		})
+	}
+	else {
+		callback({data : termsCache});
 	}
 };
+

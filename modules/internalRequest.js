@@ -3,9 +3,11 @@ var logger = log4js.getLogger('Internal Request Resolver');
 var Promise = require("es6-promise").Promise;
 
 var productSearchModule = require('./productSearch/searchUtil');
+var trumfTermsAndConditionsModule = require('./terms_caching/terms_cacher');
 
 var localServices = [
 	{name : 'persistenceSynchronize', method : null},
+	{name : 'trumfProfile_termsAndConditions', method : trumfTermsAndConditionsModule.fetch},
 	{name : 'productSearchProducts', method : productSearchModule.search},
 	{name : 'productSearchGroups', method : productSearchModule.search},
 	{name : 'productSearchBoth', method : productSearchModule.search},
