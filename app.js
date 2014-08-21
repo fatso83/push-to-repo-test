@@ -10,7 +10,6 @@ var express = require('express'),
 
 // Routes
 var request = require('./routes/request');
-var synchronize = require('./routes/synchronize_router');
 var index = require('./routes/index');
 
 // Setup the search module
@@ -39,7 +38,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 // TODO: App Routes
 app.use('/', index);
 app.use('/request', request);
-app.use('/synchronize', synchronize);
 
 // Catch 404 and forwarding to error handler
 app.use(function (req, res, next) {
