@@ -76,10 +76,11 @@ exports.makeRequest = function (requestData, callback) {
 		}
 
 		try {
-			logger.debug('Got response from service, status ');
+			logger.debug('Got response from service, status', response.statusCode);
+			logger.debug('The response is of type', typeof body);
 
 			responseObj.response.code = response.statusCode;
-			responseObj.response.data = body;
+			responseObj.response.data = JSON.parse(body);
 
 			callback(responseObj);
 		} catch (err) {
