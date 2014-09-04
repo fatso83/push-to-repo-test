@@ -3,7 +3,7 @@
 // This will cache ProductDetailList calls for users whom are not logged in
 
 var request = require('request');
-var hash = require('hash-string');
+var crypto = require('crypto');
 var basicToken = 'Basic J8ed0(tyAop206%JHP';
 var pdlCache = [];
 var ONE_HOUR = 60 * 60 * 1000;
@@ -82,7 +82,7 @@ exports.fetch = function (requestBody, callback) {
 		}
 	});
 
-	hashKey = hash.hashCode(requestBody.servicepath + requestToken);
+	hashKey = crypto.createHash('sha256').update(requestBody.servicepath + requestToken).digest('base64');
 	cacheObj = getCacheByKey(hashKey);
 
 	if (cacheObj && !old(cacheObj.cacheTime)) {
