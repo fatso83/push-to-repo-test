@@ -32,7 +32,7 @@ function fetchDataFromServer (requestBody, cacheObj, callback) {
 	var options = {
 		url     : uri,
 		headers : headers,
-		method  : 'POST',
+		method  : requestBody.servicemethod,
 		json    : requestBody.payload
 	};
 	request(options, function (error, response, body) {
@@ -81,6 +81,7 @@ exports.fetch = function (requestBody, callback) {
 	redisCache.get(hashKey, function (reply) {
 		cacheObj = reply || null;
 		if (reply.status === "success" && cacheObj && !old(cacheObj.cacheTime)) {
+			logger.trace('----> Returning cache');
 			callback(cacheObj.data, null);
 		} else {
 			cacheObj = {
@@ -89,6 +90,7 @@ exports.fetch = function (requestBody, callback) {
 				data      : null,
 				isNew     : true
 			};
+			logger.trace('Getting data from server');
 			fetchDataFromServer(requestBody, cacheObj, function (response, error) {
 				callback(response, error);
 			});
