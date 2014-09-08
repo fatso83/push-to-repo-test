@@ -6,6 +6,7 @@ var productSearchModule = require('./productSearch/searchUtil');
 var trumfTermsAndConditionsModule = require('./terms_caching/terms_cacher');
 var persistenceSyncModule = require('./synchronize/request-adapter');
 var productDetailsCacheModule = require('./productDetails_caching/pdl_cacher');
+var cachedServiceModule = require('./cachedService');
 
 var localServices = [
 	{name : 'persistenceSynchronize', method : persistenceSyncModule.synchronize},
@@ -16,7 +17,7 @@ var localServices = [
 	{name : 'productSearchGetProductsForGroup', method : productSearchModule.search},
 	{name : 'productSearchGetAllCategories', method : productSearchModule.search},
 	{name : 'productSearchGetProductById', method : productSearchModule.search},
-	{name : 'productDetails2', method: productDetailsCacheModule.fetch}
+	{name : 'productDetails2', method: cachedServiceModule.fetch}
 ];
 
 exports.isLocalService = function (requestBody) {
