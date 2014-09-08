@@ -2,10 +2,13 @@
 
 // This will cache ProductDetailList calls for users whom are not logged in
 
+var log4js = require('log4js');
+var logger = log4js.getLogger('Module PDL Cache');
+
 var request = require('request');
 var crypto = require('crypto');
+var redisCache = require('./../redisCache');
 var basicToken = 'Basic J8ed0(tyAop206%JHP';
-var pdlCache = [];
 var ONE_HOUR = 60 * 60 * 1000;
 
 var hashObject = {
@@ -34,7 +37,6 @@ function fetchProductDetails (requestBody, cacheObj, callback) {
 		method  : 'POST',
 		json    : requestBody.payload
 	};
-
 	request(options, function (error, response, body) {
 		if (error) {
 			callback(null, {error : "Server malfunction"});
@@ -45,9 +47,10 @@ function fetchProductDetails (requestBody, cacheObj, callback) {
 
 				if (cacheObj.isNew) {
 					cacheObj.isNew = false;
-					pdlCache.push(cacheObj);
+					redisCache.cache(cacheObj.key, cacheObj, function (reply) {
+						console.log('Did cache result', reply);
+					});
 				}
-
 				callback(body, null);
 			} else {
 				callback(null, {error : body});
@@ -60,18 +63,6 @@ function old (time) {
 	return (Date.now() - time) > ONE_HOUR;
 }
 
-function getCacheByKey (key) {
-	var i = pdlCache.length;
-
-	while (i--) {
-		if (pdlCache[i].key === key) {
-			return pdlCache[i];
-		}
-	}
-
-	return false;
-}
-
 exports.fetch = function (requestBody, callback) {
 	var requestToken, hashKey, cacheObj;
 
@@ -82,21 +73,22 @@ exports.fetch = function (requestBody, callback) {
 		}
 	});
 
-	hashKey = crypto.createHash('sha256').update(requestBody.servicepath + requestToken).digest('base64');
-	cacheObj = getCacheByKey(hashKey);
+	hashKey = crypto.createHash('sha256').update(requestBody.environment + requestBody.servicepath + requestToken).digest('base64');
 
-	if (cacheObj && !old(cacheObj.cacheTime)) {
-		callback(cacheObj.data, null);
-	}
-	else {
-		cacheObj = {
-			key       : hashKey,
-			cacheTime : null,
-			data      : null,
-			isNew     : true
-		};
-		fetchProductDetails(requestBody, cacheObj, function (response, error) {
-			callback(response, error);
-		});
-	}
+	redisCache.get(hashKey, function (reply) {
+		cacheObj = reply || null;
+		if (reply.status === "success" && cacheObj && !old(cacheObj.cacheTime)) {
+			callback(cacheObj.data, null);
+		} else {
+			cacheObj = {
+				key       : hashKey,
+				cacheTime : null,
+				data      : null,
+				isNew     : true
+			};
+			fetchProductDetails(requestBody, cacheObj, function (response, error) {
+				callback(response, error);
+			});
+		}
+	});
 };
