@@ -12,6 +12,9 @@ var express = require('express'),
 var request = require('./routes/request');
 var index = require('./routes/index');
 
+// Setup the Redis module
+var redis_mod = require('./modules/redisCache.js');
+
 // Setup the search module
 var searchUtil = require('./modules/productSearch/searchUtil');
 // Start loading data when the server starts
