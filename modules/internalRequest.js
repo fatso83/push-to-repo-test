@@ -17,7 +17,8 @@ var localServices = [
 	{name : 'productSearchGetProductsForGroup', method : productSearchModule.search},
 	{name : 'productSearchGetAllCategories', method : productSearchModule.search},
 	{name : 'productSearchGetProductById', method : productSearchModule.search},
-	{name : 'productDetails2', method: cachedServiceModule.fetch}
+	{name : 'productDetails2', method : cachedServiceModule.fetch},
+	{name : 'storesGetStore', method : cachedServiceModule.fetch}
 ];
 
 exports.isLocalService = function (requestBody) {
@@ -60,7 +61,7 @@ exports.makeRequest = function (requestBody) {
 
 		if (method) {
 			method(requestBody, function (response, error) {
-				if(error) {
+				if (error) {
 					responseObj.response.data = error;
 					responseObj.response.code = 500;
 					reject(error);
