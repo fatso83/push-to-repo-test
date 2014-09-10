@@ -80,11 +80,18 @@ exports.makeRequest = function (requestData, callback) {
 			logger.debug('The response is of type', typeof body);
 
 			responseObj.response.code = response.statusCode;
-			responseObj.response.data = JSON.parse(body);
 
-			callback(responseObj);
+			if (typeof body === 'string') {
+				responseObj.response.data = JSON.parse(body);
+			} else {
+				responseObj.response.data = body;
+			}
 		} catch (err) {
 			logger.error('Caught error processing request', err);
+			responseObj.response.code = 500;
+			responseObj.response.data = {error : "Error processing response from NGT service"};
 		}
+
+		callback(responseObj);
 	});
 };
