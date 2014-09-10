@@ -15,7 +15,7 @@ var hashObject = {
 	data      : {}
 };
 
-function fetchDataFromServer (requestBody, cacheObj, callback) {
+function fetchDataFromServer (requestBody, callback) {
 	var uri = "";
 	if (requestBody.environment === 'production') {
 		uri = "https://service-dk.norgesgruppen.no/" + requestBody.servicepath;
@@ -40,15 +40,6 @@ function fetchDataFromServer (requestBody, cacheObj, callback) {
 			callback(null, {error : "Server malfunction"});
 		} else {
 			if (response.statusCode === 200) {
-				cacheObj.data = body;
-				cacheObj.cacheTime = Date.now();
-
-				if (cacheObj.isNew) {
-					cacheObj.isNew = false;
-					redisCache.cache(cacheObj.key, cacheObj, function (reply) {
-						console.log('Did cache result', reply);
-					});
-				}
 				callback(body, null);
 			} else {
 				callback(null, {error : body});
@@ -76,22 +67,31 @@ exports.fetch = function (requestBody, callback) {
 		payload = JSON.stringify(requestBody.payload);
 	}
 
-	hashKey = crypto.createHash('sha256').update(requestBody.environment + requestBody.servicepath + requestToken + payload).digest('base64');
+	hashKey = crypto.createHash('sha256').update('service_cache' + requestBody.environment + requestBody.servicepath + requestToken + payload).digest('base64');
+	logger.debug('The key is', hashKey);
 
 	redisCache.get(hashKey, function (reply) {
 		cacheObj = reply || null;
 		if (reply.status === "success" && cacheObj && !old(cacheObj.cacheTime)) {
-			logger.trace('----> Returning cache');
-			callback(cacheObj.data, null);
+			logger.trace('----> Returning cached result');
+			callback(cacheObj.data.data, null);
 		} else {
 			cacheObj = {
 				key       : hashKey,
 				cacheTime : null,
-				data      : null,
-				isNew     : true
+				data      : null
 			};
 			logger.trace('Getting data from server');
-			fetchDataFromServer(requestBody, cacheObj, function (response, error) {
+			fetchDataFromServer(requestBody, function (response, error) {
+
+				if(response) {
+					cacheObj.data = response;
+					cacheObj.cacheTime = Date.now();
+					redisCache.cache(cacheObj.key, cacheObj, function (reply) {
+						console.log('Did cache result', reply);
+					});
+				}
+
 				callback(response, error);
 			});
 		}
