@@ -67,14 +67,14 @@ exports.fetch = function (requestBody, callback) {
 		payload = JSON.stringify(requestBody.payload);
 	}
 
-	hashKey = crypto.createHash('sha256').update('service_cache' + requestBody.environment + requestBody.servicepath + requestToken + payload).digest('base64');
+	hashKey = 'service_cache_' + crypto.createHash('sha256').update(requestBody.environment + requestBody.servicepath + requestToken + payload).digest('base64');
 	logger.debug('The key is', hashKey);
 
 	redisCache.get(hashKey, function (reply) {
 		cacheObj = reply || null;
 		if (reply.status === "success" && cacheObj && !old(cacheObj.cacheTime)) {
 			logger.trace('----> Returning cached result');
-			callback(cacheObj.data.data, null);
+			callback(cacheObj.data.response, null);
 		} else {
 			cacheObj = {
 				key       : hashKey,
@@ -85,7 +85,7 @@ exports.fetch = function (requestBody, callback) {
 			fetchDataFromServer(requestBody, function (response, error) {
 
 				if(response) {
-					cacheObj.data = response;
+					cacheObj.response = response;
 					cacheObj.cacheTime = Date.now();
 					redisCache.cache(cacheObj.key, cacheObj, function (reply) {
 						console.log('Did cache result', reply);
