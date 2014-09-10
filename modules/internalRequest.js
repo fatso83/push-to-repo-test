@@ -18,7 +18,8 @@ var localServices = [
 	{name : 'productSearchGetAllCategories', method : productSearchModule.search},
 	{name : 'productSearchGetProductById', method : productSearchModule.search},
 	{name : 'productDetails2', method : cachedServiceModule.fetch},
-	{name : 'storesGetStore', method : cachedServiceModule.fetch}
+	{name : 'storesGetStore', method : cachedServiceModule.fetch},
+	{name : 'brandMatch', method : cachedServiceModule.fetch}
 ];
 
 exports.isLocalService = function (requestBody) {
