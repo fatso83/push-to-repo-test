@@ -67,7 +67,7 @@ exports.fetch = function (requestBody, callback) {
 		payload = JSON.stringify(requestBody.payload);
 	}
 
-	hashKey = 'service_cache_' + crypto.createHash('sha256').update(requestBody.environment + requestBody.servicepath + requestToken + payload).digest('base64');
+	hashKey = 'service_cache_' + (requestBody.environment || "") + "_" + crypto.createHash('sha256').update(requestBody.servicepath + requestToken + payload).digest('base64');
 	logger.debug('The key is', hashKey);
 
 	redisCache.get(hashKey, function (reply) {
