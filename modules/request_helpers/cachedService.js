@@ -1,5 +1,7 @@
 'use strict';
 
+var externalRequest = require('./externalRequest');
+
 var log4js = require('log4js');
 var logger = log4js.getLogger('Module Service Cacher');
 
@@ -15,45 +17,13 @@ var hashObject = {
 	data      : {}
 };
 
-function fetchDataFromServer (requestBody, callback) {
-	var uri = "";
-	if (requestBody.environment === 'production') {
-		uri = "https://service-dk.norgesgruppen.no/" + requestBody.servicepath;
-	} else {
-		uri = "https://preprod.service-dk.norgesgruppen.no/" + requestBody.servicepath;
-	}
-
-
-	var headers = {};
-	requestBody.headers.forEach(function (header) {
-		var h = Object.keys(header);
-		headers[h[0]] = header[h[0]];
-	});
-	var options = {
-		url     : uri,
-		headers : headers,
-		method  : requestBody.servicemethod,
-		json    : requestBody.payload
-	};
-	request(options, function (error, response, body) {
-		if (error) {
-			callback(null, {error : "Server malfunction"});
-		} else {
-			if (response.statusCode === 200) {
-				callback(body, null);
-			} else {
-				callback(null, {error : body});
-			}
-		}
-	}.bind(this));
-}
-
 function old (time) {
 	return (Date.now() - time) > ONE_HOUR;
 }
 
 exports.fetch = function (requestBody, callback) {
-	var requestToken, hashKey, cacheObj;
+	var requestToken, hashKey, cacheObj, error;
+	error = null;
 
 	requestToken = basicToken;
 	requestBody.headers.forEach(function (header) {
@@ -63,11 +33,11 @@ exports.fetch = function (requestBody, callback) {
 	});
 
 	var payload = "";
-	if(requestBody.payload) {
+	if (requestBody.payload) {
 		payload = JSON.stringify(requestBody.payload);
 	}
 
-	hashKey = 'service_cache_' + (requestBody.environment || "") + "_" + crypto.createHash('sha256').update(requestBody.servicepath + requestToken + payload).digest('base64');
+	hashKey = 'ng_service_cache_' + (requestBody.environment || "") + "_" + crypto.createHash('sha256').update(requestBody.servicepath + requestToken + payload).digest('base64');
 	logger.debug('The key is', hashKey);
 
 	redisCache.get(hashKey, function (reply) {
@@ -79,20 +49,24 @@ exports.fetch = function (requestBody, callback) {
 			cacheObj = {
 				key       : hashKey,
 				cacheTime : null,
-				data      : null
+				response  : null
 			};
-			logger.trace('Getting data from server');
-			fetchDataFromServer(requestBody, function (response, error) {
-
-				if(response) {
-					cacheObj.response = response;
-					cacheObj.cacheTime = Date.now();
-					redisCache.cache(cacheObj.key, cacheObj, function (reply) {
-						console.log('Did cache result', reply);
-					});
+			logger.trace('Getting data from server (using external request)');
+			externalRequest.makeRequest(requestBody, function(responseObj) {
+				logger.trace('Got data from server');
+				var code = responseObj.response.code;
+				if(code === 200 || code === 201 || code === 204) {
+					if(responseObj.response.data) {
+						cacheObj.response = responseObj.response.data;
+						cacheObj.cacheTime = Date.now();
+						redisCache.cache(cacheObj.key, cacheObj, function (reply) {
+							logger.trace('Did cache result', reply);
+						});
+					}
+				} else {
+					error = {error: cacheObj.response};
 				}
-
-				callback(response, error);
+				callback(cacheObj.response, error);
 			});
 		}
 	});
