@@ -2,10 +2,9 @@ var log4js = require('log4js');
 var logger = log4js.getLogger('Internal Request Resolver');
 var Promise = require("es6-promise").Promise;
 
-var productSearchModule = require('./productSearch/searchUtil');
-var trumfTermsAndConditionsModule = require('./terms_caching/terms_cacher');
-var persistenceSyncModule = require('./synchronize/request-adapter');
-var productDetailsCacheModule = require('./productDetails_caching/pdl_cacher');
+var productSearchModule = require('./../productSearch/searchUtil');
+var trumfTermsAndConditionsModule = require('./../terms_caching/terms_cacher');
+var persistenceSyncModule = require('./../synchronize/request-adapter');
 var cachedServiceModule = require('./cachedService');
 
 var localServices = [

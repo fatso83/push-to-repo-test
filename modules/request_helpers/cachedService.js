@@ -5,7 +5,7 @@ var logger = log4js.getLogger('Module Service Cacher');
 
 var request = require('request');
 var crypto = require('crypto');
-var redisCache = require('./redisCache');
+var redisCache = require('./../redisCache');
 var basicToken = 'Basic J8ed0(tyAop206%JHP';
 var ONE_HOUR = 60 * 60 * 1000;
 

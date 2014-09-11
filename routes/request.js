@@ -1,8 +1,9 @@
 var express = require('express');
-var extRequest = require('./../modules/externalRequest');
-var intRequest = require('./../modules/internalRequest');
 var router = express.Router();
 var cors = require('cors');
+
+var requestHandler = require('./../modules/requestHandler');
+
 var log4js = require('log4js');
 var logger = log4js.getLogger('Root Request Router');
 
@@ -16,25 +17,9 @@ router.get('/', cors(), function (req, res) {
 router.post('/', cors(), function (req, res) {
 	var body = req.body;
 
-	// See if this is a local service
-	if (intRequest.isLocalService(body)) {
-		// It's local
-		logger.debug('INTERNAL REQUEST');
-		intRequest.makeRequest(body).then(function (data) {
-				logger.debug('Got internal response');
-				res.json(data);
-			}, function (error) {
-				res.status(500).json(error);
-			}
-		);
-	} else {
-		// This is an external service (like NGT)
-		logger.debug('EXTERNAL REQUEST');
-		extRequest.makeRequest(body, function (response) {
-			logger.debug('Got external response');
-			res.json(response);
-		});
-	}
+	requestHandler.handleRequest(body, function(result) {
+		res.status(result.response.code || 500).json(result);
+	});
 });
 
 module.exports = router;
