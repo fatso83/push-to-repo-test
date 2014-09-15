@@ -82,7 +82,11 @@ exports.makeRequest = function (requestData, callback) {
 			responseObj.response.code = response.statusCode;
 
 			if (typeof body === 'string') {
-				responseObj.response.data = JSON.parse(body);
+				try {
+					responseObj.response.data = JSON.parse(body);
+				} catch (err) {
+					responseObj.response.data = body;
+				}
 			} else {
 				responseObj.response.data = body;
 			}
