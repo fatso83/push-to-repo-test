@@ -26,20 +26,19 @@ exports.handleRequest = function(body, callback) {
 	// See if this is a local service
 	if (intRequest.isLocalService(body)) {
 		// It's local
-		logger.debug('INTERNAL REQUEST');
+		logger.trace('INTERNAL REQUEST');
 		intRequest.makeRequest(body).then(function (data) {
 				logger.debug('Got internal response');
 				callback(data);
 			}, function (error) {
-				logger.debug('Got internal error');
+				logger.debug('Got internal error', error);
 				callback(error);
 			}
 		);
 	} else {
 		// This is an external service (like NGT)
-		logger.debug('EXTERNAL REQUEST');
+		logger.trace('EXTERNAL REQUEST');
 		extRequest.makeRequest(body, function (response) {
-			logger.debug('Got external response');
 			callback(response);
 		});
 	}

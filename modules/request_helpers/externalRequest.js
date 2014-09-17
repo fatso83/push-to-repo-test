@@ -49,6 +49,7 @@ exports.makeRequest = function (requestData, callback) {
 	var options = {
 		uri     : baseURL + requestData.servicepath,
 		headers : headers,
+		timeout : 25000, // Timeout after 25 sec
 		method  : requestData.servicemethod || 'GET'
 	};
 
@@ -69,15 +70,20 @@ exports.makeRequest = function (requestData, callback) {
 
 		if (error) {
 			logger.error('Got error', asJson(error));
-			responseObj.response.status = 500;
-			responseObj.response.data = {message : "Server not found"};
+			if (error.code && error.code === "ETIMEDOUT") {
+				responseObj.response.code = 408;
+				responseObj.response.data = {message : "Request timeout"};
+			} else {
+				responseObj.response.code = 500;
+				responseObj.response.data = {message : "Server not found"};
+			}
+
 			callback(responseObj);
 			return;
 		}
 
 		try {
 			logger.debug('Got response from service, status', response.statusCode);
-			logger.debug('The response is of type', typeof body);
 
 			responseObj.response.code = response.statusCode;
 

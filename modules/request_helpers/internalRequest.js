@@ -64,7 +64,8 @@ exports.makeRequest = function (requestBody) {
 			method(requestBody, function (response, error) {
 				if (error) {
 					responseObj.response.data = error;
-					responseObj.response.code = 500;
+					responseObj.response.code = error.code || 500;
+					responseObj.response.origin = error.origin || 'internal';
 					reject(error);
 				} else {
 					responseObj.response.data = response;
