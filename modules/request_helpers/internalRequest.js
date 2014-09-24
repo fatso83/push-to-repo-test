@@ -63,10 +63,10 @@ exports.makeRequest = function (requestBody) {
 		if (method) {
 			method(requestBody, function (response, error) {
 				if (error) {
-					responseObj.response.data = error;
+					responseObj.response.data = error.data || {};
 					responseObj.response.code = error.code || 500;
 					responseObj.response.origin = error.origin || 'internal';
-					reject(error);
+					reject(responseObj);
 				} else {
 					responseObj.response.data = response;
 					resolve(responseObj);
