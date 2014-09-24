@@ -64,7 +64,7 @@ exports.fetch = function (requestBody, callback) {
 						});
 					}
 				} else {
-					error = responseObj;
+					error = responseObj.response;
 				}
 				callback(cacheObj.response, error);
 			});
