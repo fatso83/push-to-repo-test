@@ -14,8 +14,10 @@ var callbackObj = {
 
 var redis_lib = require("redis");
 
-var cli = redis_lib.createClient(6379, 'ngredisdev.redis.cache.windows.net',
-	{auth_pass : 'ZY7TKQzjxnRt+YWXB3TmpnIApCpVeFbowu107WKqwIc=', return_buffers : true});
+logger.trace('Initializing redis');
+
+var cli = redis_lib.createClient(6379, 'ngredis.redis.cache.windows.net',
+	{auth_pass : 'wLas7WOEZDEzNbMMYmUv2scGPrtGfuPyVIWA/LJqpyU=', return_buffers : true});
 
 
 function on_error (error) {
@@ -24,8 +26,20 @@ function on_error (error) {
 function on_connect () {
 	logger.trace('Redis connected');
 }
+function on_drain () {
+	logger.trace('Redis drain');
+}
+function on_idle () {
+	logger.trace('Redis idle');
+}
+function on_end () {
+	logger.trace('Redis end');
+}
 cli.on('connect', on_connect);
 cli.on('error', on_error);
+cli.on('drain', on_drain);
+cli.on('idle', on_idle);
+cli.on('end', on_end);
 
 /**
  * Save data to redis cache
