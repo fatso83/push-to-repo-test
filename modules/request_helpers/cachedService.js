@@ -9,7 +9,7 @@ var request = require('request');
 var crypto = require('crypto');
 var redisCache = require('./../redisCache');
 var basicToken = 'Basic J8ed0(tyAop206%JHP';
-var ONE_HOUR = 60 * 60 * 1000;
+var CACHE_TIME = (60 * 60 * 1000) * 24; // One day
 
 var hashObject = {
 	key       : "",
@@ -18,7 +18,7 @@ var hashObject = {
 };
 
 function old (time) {
-	return (Date.now() - time) > ONE_HOUR;
+	return (Date.now() - time) > CACHE_TIME;
 }
 
 exports.fetch = function (requestBody, callback) {
