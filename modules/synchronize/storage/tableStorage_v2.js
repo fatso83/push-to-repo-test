@@ -103,9 +103,10 @@ function chainName(id) {
 function initialize(callback) {
     createTables(function (error, result) {
         if (!error) {
-            logger.trace('Tables following tables have been created ' + result);
+            logger.trace('The following tables have been created ' + result);
             callback(null);
         } else {
+            logger.error('Error when creating tables');
             callback(error);
         }
     });
@@ -138,10 +139,10 @@ function getUserData(chainId, userId, callback) {
                 }
                 userData[entries[i].RowKey._] = entityValue;
             }
-            logger.trace('Done getting user data from Table Storage');
+            logger.trace('Finished retrieval from Table Storage');
             callback(null, userData);
         } else {
-            logger.trace('Done getting user data from Table Storage');
+            logger.error('Error retrieving data from Table Storage');
             callback(error, {});
         }
     });
@@ -163,8 +164,10 @@ function setUserData(chainId, userId, data, callback) {
     transaction.start(utils.objectLength(data));
     transaction.on('completed', function (error) {
         if (!error) {
+            logger.trace('Finished inserting or replacing data in Table Storage');
             callback(null);
         } else {
+            logger.error('Error when inserting or replacing data in Table Storage');
             callback(error);
         }
     });
@@ -197,8 +200,10 @@ function removeUserData(chainId, userId, callback) {
         transaction.start(utils.objectLength(data));
         transaction.on('completed', function (error) {
             if (!error) {
+                logger.trace('Finished removing data in Table Storage');
                 callback(null);
             } else {
+                logger.error('Error when removing data in Table Storage');
                 callback(error);
             }
         });

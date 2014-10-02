@@ -50,6 +50,10 @@ describe('Synchronize table storage', function () {
                 {
                     key: 'fooBar',
                     data: mockDataV1
+                },
+                {
+                    key: 'mockMe',
+                    data: mockDataV1
                 }
             ]
         };
@@ -57,7 +61,7 @@ describe('Synchronize table storage', function () {
         service.synchronize(chainId2, userId, clientState, function (error, result) {
 
             assert.isNull(error, 'Synchronize service failed');
-            assert.equal(result.updated.length, 1);
+            assert.equal(result.updated.length, 2);
             assert.equal(result.updated[0].key, 'fooBar');
             assert.equal(result.updated[0].version, 1);
             assert.equal(result.updated[0].data, mockDataV1);
@@ -77,14 +81,19 @@ describe('Synchronize table storage', function () {
                     key: 'fooBar',
                     version: 1,
                     data: mockDataV2
+                },{
+                    key: 'mockMe',
+                    version: 1,
+                    data: mockDataV2
                 }
+
             ]
         };
 
         service.synchronize(chainId2, userId, clientState, function (error, result) {
 
             assert.isNull(error, 'Synchronize service failed');
-            assert.equal(result.updated.length, 1);
+            assert.equal(result.updated.length, 2);
             assert.equal(result.updated[0].key, 'fooBar');
             assert.equal(result.updated[0].version, 2);
             assert.equal(result.updated[0].data, mockDataV2);
@@ -102,6 +111,10 @@ describe('Synchronize table storage', function () {
             updated: [
                 {
                     key: 'fooBar',
+                    version: 0,
+                    data: mockDataV1
+                },{
+                    key: 'mockMe',
                     version: 0,
                     data: mockDataV1
                 }
@@ -148,6 +161,10 @@ describe('Synchronize table storage', function () {
                     key: 'fooBar',
                     version: 1,
                     data: mockDataV3
+                },{
+                    key: 'mockMe',
+                    version: 1,
+                    data: mockDataV3
                 }
             ]
         };
@@ -158,7 +175,7 @@ describe('Synchronize table storage', function () {
 
             assert.equal(result.updated.length, 0);
             assert.equal(result.removedKeys.length, 0);
-            assert.equal(result.conflicts.length, 1);
+            assert.equal(result.conflicts.length, 2);
 
             done();
         });
