@@ -1,9 +1,10 @@
-var azure = require('azure-storage');
-var tableSvc = azure.createTableService('ngts',
-    'dxEw64oOI9iGCVuVbTILwEem+4Eq9rBZDsV37UR+B7OvJ3WZZ4jocivJ0QOVpe/ayab5Ek8tzUwQDTk21Qobkw==');
-
-var persistentUserStorageTableName = 'PersistentUserStorage';
-var Promise = require("es6-promise").Promise;
+var azure = require('azure-storage'),
+    tableSvc = azure.createTableService('ngts',
+    'dxEw64oOI9iGCVuVbTILwEem+4Eq9rBZDsV37UR+B7OvJ3WZZ4jocivJ0QOVpe/ayab5Ek8tzUwQDTk21Qobkw=='),
+    persistentUserStorageTableName = 'PersistentUserStorage',
+    Promise = require("es6-promise").Promise,
+    log4js = require('log4js'),
+    logger = log4js.getLogger('Synchronize Service');
 
 module.exports = {
 
@@ -30,6 +31,8 @@ module.exports = {
      */
     getUserData: function (chainId, userId, callback) {
 
+        logger.trace('Getting user data from Table Storage');
+
         tableSvc.retrieveEntity(persistentUserStorageTableName, chainId, userId, null, function (error, result, response) {
             if (!error) {
                 var data;
@@ -40,9 +43,12 @@ module.exports = {
                     return;
                 }
 
+                logger.trace('Done getting user data from Table Storage');
+
                 callback(null, data);
             } else {
                 // result does not contain entity
+                logger.trace('Done getting user data from Table Storage');
                 callback(null, {});
             }
         });
@@ -57,6 +63,8 @@ module.exports = {
      */
     setUserData: function (chainId, userId, data, callback) {
 
+        logger.trace('Setting user data in Table Storage');
+
         if (typeof data == 'object')
             data = JSON.stringify(data);
 
@@ -70,8 +78,7 @@ module.exports = {
         tableSvc.insertOrReplaceEntity(persistentUserStorageTableName, userStorage, function (error, result, response) {
 
             if (!error) {
-                // Entity updated
-                console.log('Entity updated');
+                logger.trace('Done setting user data in Table Storage');
                 callback(null);
             } else {
                 callback(error);
@@ -85,18 +92,18 @@ module.exports = {
      * @param {string} userId
      * @param callback
      */
-    removeUserData: function(chainId, userId, callback){
+    removeUserData: function (chainId, userId, callback) {
 
-        var entGen = azure.TableUtilities.entityGenerator;
+        logger.trace('Removing user data from Table Storage');
+
         var userStorage = {
-            PartitionKey: entGen.String(chainId),
-            RowKey: entGen.String(userId)
+            PartitionKey: {'_': chainId},
+            RowKey: {'_': userId}
         };
 
         tableSvc.deleteEntity(persistentUserStorageTableName, userStorage, function (error, result, response) {
             if (!error) {
-                // Entity updated
-                console.log('Entity updated');
+                logger.trace('Done removing user data from Table Storage');
                 callback(null);
             } else {
                 callback(error);
