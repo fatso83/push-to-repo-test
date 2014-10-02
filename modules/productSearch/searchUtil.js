@@ -12,7 +12,7 @@ var logger = log4js.getLogger('/productSearch/searchUtil');
 if (process.env.NODE_ENV === 'production') {
 	logger.setLevel(log4js.levels.OFF);
 } else {
-	logger.setLevel(log4js.levels.DEBUG);
+	logger.setLevel(log4js.levels.ALL);
 }
 
 var createEmptyOutput = function () {
@@ -66,10 +66,10 @@ exports.search = function (request, callback) {
 			break;
 
 	}
-	if (result) {
-		callback(result, null);
+	if (result.status === 'success') {
+		callback(result.data, null);
 	} else {
-		callback({error:"Search error"}, true);
+		callback(null, result);
 	}
 };
 
@@ -92,37 +92,41 @@ var getProductById = function (productId, chainid) {
 		if (parseInt(prods[i].id, 10) === parseInt(productId, 10)) {
 			var out = createEmptyOutput();
 			out[0].shoppinglistgroups[0].products.push(prods[i]);
-			return out;
+			return {status : "success", data : out};
 		}
 	}
-	return false;
+	return {status : 'error', code : 404, data : 'Could not find the product with the id ' + productId.toString()};
 };
 
 /**
  * Returns an array of all the categories with its sub groups
  * @param {Number} chainid The id of the chain
- * @returns {Array<Category> | boolean} An array containing all categories
+ * @returns {Object} An array containing all categories
  */
 var getAllCategories = function (chainid) {
 	var collection = chainDataModel.getDataCollectionByChainId(chainid);
-	return collection.categoriesstore;
+	return {status: "success", data: collection.categoriesstore};
 };
 
 /**
  * Returns all the products for the supplied group
  * @param {Number | String} query The is of the group to find
  * @param {Number} chainid The id of the chain
- * @returns {Array<Category> | boolean} An array containing a generic category with the groups and the products
+ * @returns {Object} An array containing a generic category with the groups and the products
  */
 var getProductsForGroup = function (query, chainid) {
 	var collection = chainDataModel.getDataCollectionByChainId(chainid);
 
+	var output = {status: "success", data: null};
+
 	if (!collection) {
-		return false;
+		output.status = "error";
+		return output;
 	}
 
 	if (collection.productstore.length < 1) {
-		return createEmptyOutput();
+		output.data = createEmptyOutput();
+		return output;
 	}
 
 	var col = {
@@ -133,7 +137,8 @@ var getProductsForGroup = function (query, chainid) {
 	var groupID = parseInt(query, 10);
 	var group = chainDataModel.fetchGroupById(query, collection);
 	if (!group.groupid) {
-		return col;
+		output.data = col;
+		return output;
 	}
 	group.products = [];
 
@@ -144,7 +149,8 @@ var getProductsForGroup = function (query, chainid) {
 	});
 
 	col.shoppinglistgroups.push(group);
-	return [col];
+	output.data = [col];
+	return output;
 };
 
 /**
@@ -154,14 +160,17 @@ var getProductsForGroup = function (query, chainid) {
  * @param {Object} [config] Configuration
  * @param {Boolean} [config.includePartialMatches=false] Should the search include partial matches
  * @param {Number} [config.maxNumberOfGroups=10] The max number of groups within each category to output
- * @returns {Array<Categories> | boolean}
+ * @returns {Object}
  */
 var getGroupsByTitle = function (query, chainid, config) {
 	// get the correct data for this chain
 	var collection = chainDataModel.getDataCollectionByChainId(chainid);
 
+	var output = {status: "success", data: null};
+
 	if (!collection) {
-		return false;
+		output.status = "error";
+		return output;
 	}
 
 	// Set config
@@ -172,9 +181,11 @@ var getGroupsByTitle = function (query, chainid, config) {
 	var res = titleSearch.findGroupsContainingTitle(query, collection, false, includePartialMatches);
 
 	// return the max number of groups set in config
-	return [
+	output.data = [
 		{title : "Generic category", shoppinglistgroups : res.slice(0, maxNumberOfGroups)}
 	];
+
+	return output;
 };
 
 /**
@@ -194,14 +205,17 @@ var getProductsByTitle = function (query, chainid, config) {
 	// get the correct data for this chain
 	var collection = chainDataModel.getDataCollectionByChainId(chainid);
 
+	var methodOutput = {status: "success", data: null};
 	if (!collection) {
-		return false;
+		methodOutput.status = "error";
+		return methodOutput;
 	}
 
 	// If there are no products (major fuckup)
 	if (collection.productstore.length < 1) {
 		// return an empty output
-		return createEmptyOutput();
+		methodOutput.data = createEmptyOutput();
+		return methodOutput;
 	}
 
 	// Set config
@@ -218,7 +232,7 @@ var getProductsByTitle = function (query, chainid, config) {
 	// If the output should NOT be grouped
 	if (!shouldGroupProducts) {
 		// ..return a generic category with a generic group containing the result products
-		return [
+		methodOutput.data = [
 			{
 				title              : "Generic category",
 				shoppinglistgroups : [
@@ -232,6 +246,8 @@ var getProductsByTitle = function (query, chainid, config) {
 				]
 			}
 		];
+
+		return methodOutput;
 	}
 
 	// At this stage the products should be placed inside of the
@@ -328,7 +344,8 @@ var getProductsByTitle = function (query, chainid, config) {
 	}
 
 	// return the data to be output
-	return output;
+	methodOutput.data = output;
+	return methodOutput;
 };
 
 /**
@@ -343,18 +360,21 @@ var getProductsByTitle = function (query, chainid, config) {
  * @param {Boolean} [config.combineSimilarProducts=false] Should products with the same title be combined
  * @param {Number} [config.maxNumberOfGroups=10] The max number of groups within each category to output
  * @param {Number} [config.maxNumberOfProducts=10] The max number of products within each group to output
- * @returns {Array<Categories> | boolean}
+ * @returns {Object}
  */
 var combinedSearch = function (query, chainid, config) {
 	var collection = chainDataModel.getDataCollectionByChainId(chainid);
 
+	var methodOutput = {status: "success", data: null};
 	if (!collection) {
-		return false;
+		methodOutput.status = "error";
+		return methodOutput;
 	}
 
 	// This operation requires both data sources
 	if (collection.productstore.length < 1) {
-		return createEmptyOutput();
+		methodOutput.data = createEmptyOutput();
+		return methodOutput;
 	}
 
 	// Configuration
@@ -429,9 +449,10 @@ var combinedSearch = function (query, chainid, config) {
 	// Return the result grouped but not categorized
 	// Strip away any groups exceeding the max number of allowed groups
 	if (!shouldCategorizeGroups) {
-		return [
+		methodOutput.data = [
 			{title : "Generic category", shoppinglistgroups : res_groups.slice(0, maxNumberOfGroups)}
 		];
+		return methodOutput;
 	}
 
 	// If we get here the the above result should also be categorized
@@ -534,6 +555,7 @@ var combinedSearch = function (query, chainid, config) {
 	}
 
 	// Return the categorized result
-	return outputCategories;
+	methodOutput.data = outputCategories;
+	return methodOutput;
 };
 

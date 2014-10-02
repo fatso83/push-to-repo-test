@@ -87,7 +87,7 @@ var appendCategoriesToProductsForCollection = function (collection) {
 				// If the group id matches the current products group id
 				if (groups[j].groupid === product.groupid) {
 					// .. save the category title into the product categoryName property
-					product.categoryname = categories[i].title;
+					product.category = categories[i];
 				}
 			}
 		}
