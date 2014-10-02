@@ -26,10 +26,21 @@ describe('Synchronize table storage', function () {
     };
 
     before(function (done) {
-        storage = require('../../../modules/synchronize/storage/tableStorage.js');
+        storage = require('../../../modules/synchronize/storage/tableStorage_v2.js');
         service = require('../../../modules/synchronize/service.js');
         service.setStorage(storage);
-        done();
+
+        storage.initialize(function (error) {
+            assert.isNull(error);
+            done();
+        });
+    });
+
+    after(function(done){
+        storage.removeUserData(chainId2, userId, function (error, result) {
+            assert.isNull(error);
+            done();
+        });
     });
 
     it('should update data in table storage', function (done) {
@@ -38,7 +49,6 @@ describe('Synchronize table storage', function () {
             updated: [
                 {
                     key: 'fooBar',
-                    version: 0,
                     data: mockDataV1
                 }
             ]
@@ -153,13 +163,4 @@ describe('Synchronize table storage', function () {
             done();
         });
     });
-
-    it('should remove test objects in table storage', function (done) {
-
-        storage.removeUserData(chainId2, userId, function (error, result) {
-            assert.isNull(error);
-            done();
-        });
-    });
-
 });

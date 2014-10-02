@@ -1,10 +1,10 @@
 var azure = require('azure-storage'),
-    tableSvc = azure.createTableService('ngts',
-    'dxEw64oOI9iGCVuVbTILwEem+4Eq9rBZDsV37UR+B7OvJ3WZZ4jocivJ0QOVpe/ayab5Ek8tzUwQDTk21Qobkw=='),
-    persistentUserStorageTableName = 'PersistentUserStorage',
+    config = require('../../config.js'),
+    tableSvc = azure.createTableService(config.tableStorage.account, config.tableStorage.key),
     Promise = require("es6-promise").Promise,
     log4js = require('log4js'),
-    logger = log4js.getLogger('Synchronize Service');
+    logger = log4js.getLogger('Synchronize Service'),
+persistentUserStorageTableName = 'PersistentUserStorage';
 
 module.exports = {
 
@@ -44,7 +44,6 @@ module.exports = {
                 }
 
                 logger.trace('Done getting user data from Table Storage');
-
                 callback(null, data);
             } else {
                 // result does not contain entity
@@ -58,7 +57,7 @@ module.exports = {
      *
      * @param {string} chainId
      * @param {string} userId
-     * @param data
+     * @param {obj} data
      * @param callback
      */
     setUserData: function (chainId, userId, data, callback) {

@@ -22,7 +22,7 @@ describe('Table storage', function () {
     };
 
     before(function (done) {
-        storage = require('../../../modules/synchronize/storage/tableStorage.js');
+        storage = require('../../../modules/synchronize/storage/tableStorage_v1.js');
         service = require('../../../modules/synchronize/service.js');
         service.setStorage(storage);
         done();
