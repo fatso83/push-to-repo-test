@@ -5,7 +5,7 @@ var azure = require('azure-storage'),
     logger = log4js.getLogger('Synchronize Service'),
     async = require('async'),
     Transaction = require('./transaction.js'),
-    utils = require('../../utils.js')
+    utils = require('../../utils.js');
 
 function createTable(name, callback) {
     service.createTableIfNotExists(name, function (error, result) {
@@ -75,31 +75,6 @@ function createTables(callback) {
     );
 }
 
-/**
- *
- * @param {string} id
- * @returns {string}
- */
-function chainName(id) {
-    switch (id) {
-        case config.tableStorage.table.spar.chainId:
-            return config.tableStorage.table.spar.name;
-            break;
-        case config.tableStorage.table.kiwi.chainId:
-            return config.tableStorage.table.kiwi.name;
-            break;
-        case config.tableStorage.table.meny.chainId:
-            return config.tableStorage.table.meny.name;
-            break;
-        case config.tableStorage.table.trumf.chainId:
-            return config.tableStorage.table.trumf.name;
-            break;
-        default:
-            return config.tableStorage.table.dev.name;
-            break;
-    }
-}
-
 function initialize(callback) {
     createTables(function (error, result) {
         if (!error) {
@@ -125,7 +100,7 @@ function getUserData(chainId, userId, callback) {
         .select(['RowKey', 'storage'])
         .where('PartitionKey eq ?', userId);
 
-    service.queryEntities(chainName(chainId), query, null, function (error, result, response) {
+    service.queryEntities(config.chainName(chainId), query, null, function (error, result, response) {
         if (!error) {
             var userData = {};
             var entries = result.entries;
@@ -136,6 +111,7 @@ function getUserData(chainId, userId, callback) {
                     entityValue = JSON.parse(entries[i].storage._);
                 } catch (error) {
                     callback(error);
+                    return;
                 }
                 userData[entries[i].RowKey._] = entityValue;
             }
@@ -151,7 +127,7 @@ function getUserData(chainId, userId, callback) {
 /**
  * //TODO: Consider using transaction with service.beginBatch()
  * //TODO: Split with batch with over 100 keys to support > 4MB
- * Current a limit of 1MB on each key/value (row).
+ * Currently there´s a limit of 1MB on each key/value (row).
  * @param {string} chainId
  * @param {string} userId
  * @param {obj} data
@@ -169,6 +145,7 @@ function setUserData(chainId, userId, data, callback) {
         } else {
             logger.error('Error when inserting or replacing data in Table Storage');
             callback(error);
+            return;
         }
     });
 
@@ -185,7 +162,7 @@ function setUserData(chainId, userId, data, callback) {
             storage: entGen.String(entityData)
         };
 
-        service.insertOrReplaceEntity(chainName(chainId), userEntity, function (error, result, response) {
+        service.insertOrReplaceEntity(config.chainName(chainId), userEntity, function (error, result, response) {
             transaction.commit(error);
         });
     }
@@ -205,6 +182,7 @@ function removeUserData(chainId, userId, callback) {
             } else {
                 logger.error('Error when removing data in Table Storage');
                 callback(error);
+                return;
             }
         });
 
@@ -217,7 +195,7 @@ function removeUserData(chainId, userId, callback) {
                     RowKey: entGen.String(i)
                 };
 
-                service.deleteEntity(chainName(chainId), userEntity, function (error, result, response) {
+                service.deleteEntity(config.chainName(chainId), userEntity, function (error, result, response) {
                     transaction.commit(error);
                 });
             }
