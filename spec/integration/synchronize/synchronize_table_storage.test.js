@@ -8,7 +8,7 @@ describe('Synchronize table storage', function () {
 
     var service,
         storage,
-        chainId2 = '2',
+        chainId2 = 'dev',
         userId = 'testUser';
 
     var mockDataV1 = {

@@ -1,6 +1,6 @@
 /**
  *
- * Transaction exposes a class which can be used to mimic the some functionality of a batch operation.
+ * Transaction exposes a class which can be used to mimic some functionality of a batch operation.
  * @type {exports.EventEmitter|*}
  */
 
@@ -22,13 +22,17 @@ function Transaction() {
 util.inherits(Transaction, EventEmitter);
 
 /**
- *
+ * Start a transaction containing x amount of operations.
  * @param {number} operations
  */
 Transaction.prototype.start = function (operations) {
     this.batchSize = operations;
 };
 
+/**
+ *
+ * @param error
+ */
 Transaction.prototype.commit = function (error) {
     this.completed += 1;
     if (error) {
