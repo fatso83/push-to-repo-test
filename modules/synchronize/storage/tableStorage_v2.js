@@ -64,6 +64,15 @@ function createTables(callback) {
                         callback(error);
                     }
                 })
+            }, function (callback) {
+                var name = config.tableStorage.logTableName;
+                createTable(name, function (error) {
+                    if (!error) {
+                        callback(null, name)
+                    } else {
+                        callback(error);
+                    }
+                })
             }
         ], function (error, results) {
             if (!error) {
@@ -103,17 +112,17 @@ function getUserData(chainId, userId, callback) {
     service.queryEntities(config.chainName(chainId), query, null, function (error, result, response) {
         if (!error) {
             var userData = {};
-            var entries = result.entries;
+            var userStorage = result.entries;
 
-            for (var i in entries) {
+            for (var key in userStorage) {
                 var entityValue;
                 try {
-                    entityValue = JSON.parse(entries[i].storage._);
+                    entityValue = JSON.parse(userStorage[key].storage._);
                 } catch (error) {
                     callback(error);
                     return;
                 }
-                userData[entries[i].RowKey._] = entityValue;
+                userData[userStorage[key].RowKey._] = entityValue;
             }
             logger.trace('Finished retrieval from Table Storage');
             callback(null, userData);
@@ -124,46 +133,66 @@ function getUserData(chainId, userId, callback) {
     });
 }
 
+function databaseLog(userId, key, errorMessage, logMessage) {
+
+    var entGen = azure.TableUtilities.entityGenerator;
+    var logEntity = {
+        PartitionKey: entGen.String(userId),
+        RowKey: entGen.String(key),
+        errorMessage: entGen.String(errorMessage),
+        logMessage: entGen.String(logMessage)
+    };
+
+    service.insertOrReplaceEntity(config.tableStorage.name, logEntity, function (error, result, response) {
+        if(error){
+            logger.error('Error when inserting or replacing data in Table Storage');
+        }
+    });
+}
+
 /**
- * //TODO: Consider using transaction with service.beginBatch()
- * //TODO: Split with batch with over 100 keys to support > 4MB
  * Currently there´s a limit of 1MB on each key/value (row).
  * @param {string} chainId
  * @param {string} userId
- * @param {obj} data
+ * @param {obj} userStorage
  * @param callback
  */
-function setUserData(chainId, userId, data, callback) {
+function setUserData(chainId, userId, userStorage, callback) {
     logger.trace('Setting user data in Table Storage');
 
     var transaction = new Transaction();
-    transaction.start(utils.objectLength(data));
+    transaction.start(Object.getOwnPropertyNames(userStorage).length);
     transaction.on('completed', function (error) {
         if (!error) {
             logger.trace('Finished inserting or replacing data in Table Storage');
             callback(null);
         } else {
             logger.error('Error when inserting or replacing data in Table Storage');
+            databaseLog(userId, error.key, 'Error when retrieving from Table Storage', error);
             callback(error);
             return;
         }
     });
 
-    for (var i in data) {
+    for (var key in userStorage) {
 
-        var entityData = data[i];
-        if (typeof data == 'object')
+        var entityData = userStorage[key];
+        if (typeof userStorage == 'object')
             entityData = JSON.stringify(entityData);
 
         var entGen = azure.TableUtilities.entityGenerator;
         var userEntity = {
             PartitionKey: entGen.String(userId),
-            RowKey: entGen.String(i),
+            RowKey: entGen.String(key),
             storage: entGen.String(entityData)
         };
 
         service.insertOrReplaceEntity(config.chainName(chainId), userEntity, function (error, result, response) {
             transaction.commit(error);
+
+            if(error){
+                databaseLog(userId, key, userStorage, error, 'Error when inserting or replacing entity');
+            }
         });
     }
 }
@@ -171,10 +200,10 @@ function setUserData(chainId, userId, data, callback) {
 function removeUserData(chainId, userId, callback) {
     logger.trace('Removing user data from Table Storage');
 
-    getUserData(chainId, userId, function (error, data) {
+    getUserData(chainId, userId, function (error, userStorage) {
 
         var transaction = new Transaction();
-        transaction.start(utils.objectLength(data));
+        transaction.start(Object.getOwnPropertyNames(userStorage).length);
         transaction.on('completed', function (error) {
             if (!error) {
                 logger.trace('Finished removing data in Table Storage');
@@ -187,16 +216,20 @@ function removeUserData(chainId, userId, callback) {
         });
 
         if (!error) {
-            for (var i in data) {
+            for (var key in userStorage) {
 
                 var entGen = azure.TableUtilities.entityGenerator;
                 var userEntity = {
                     PartitionKey: entGen.String(userId),
-                    RowKey: entGen.String(i)
+                    RowKey: entGen.String(key)
                 };
 
                 service.deleteEntity(config.chainName(chainId), userEntity, function (error, result, response) {
                     transaction.commit(error);
+
+                    if(error){
+                        databaseLog(userId, key, userStorage, error, 'Error when deleting');
+                    }
                 });
             }
         } else {

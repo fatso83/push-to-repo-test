@@ -24,7 +24,8 @@ var tableStorage = {
             name: 'UserStorageDev',
             chainId: 'any'
         }
-    }
+    },
+    logTableName: 'UserStorageLog'
 };
 
 module.exports = {
