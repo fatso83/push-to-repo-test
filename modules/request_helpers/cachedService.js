@@ -52,12 +52,12 @@ exports.fetch = function (requestBody, callback) {
 				response  : null
 			};
 			logger.trace('Getting data from server (using external request)');
-			externalRequest.makeRequest(requestBody, function(responseObj) {
-				logger.trace('Got data from server');
+			externalRequest.makeRequest(requestBody, function (responseObj) {
 				var code = responseObj.response.code;
-				if(code === 200 || code === 201 || code === 204) {
-					if(responseObj.response.data) {
+				if (code === 200 || code === 201 || code === 204) {
+					if (responseObj.response.data) {
 						cacheObj.response = responseObj.response.data;
+						cacheObj.response.origin = "internal";
 						cacheObj.cacheTime = Date.now();
 						redisCache.cache(cacheObj.key, cacheObj, function (reply) {
 							logger.trace('Did cache result', reply);
