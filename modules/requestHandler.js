@@ -7,8 +7,8 @@
  * Response object
  * @example
  * var responseObj = {
- *		serviceid : requestData.serviceid,
- *		socketid  : requestData.socketid || null,
+ *		serviceId : requestData.serviceid,
+ *		connectionId  : requestData.socketid || null,
  *		response  : {
  *			code   : 0,
  *			origin : 'ngt', // or internal

@@ -35,7 +35,7 @@ exports.isLocalService = function (requestBody) {
 };
 
 exports.makeRequest = function (requestBody) {
-	logger.debug('Resolving internally', requestBody);
+	logger.debug('Resolving internally');
 
 	return new Promise(function (resolve, reject) {
 		function getMethod (serviceName) {
@@ -49,9 +49,9 @@ exports.makeRequest = function (requestBody) {
 		}
 
 		var responseObj = {
-			serviceid : requestBody.serviceid,
-			socketid  : requestBody.socketid || null,
-			response  : {
+			serviceId    : requestBody.serviceId,
+			connectionId : requestBody.connectionId || null,
+			response     : {
 				code   : 200,
 				origin : 'internal',
 				data   : {}
@@ -69,6 +69,7 @@ exports.makeRequest = function (requestBody) {
 					reject(responseObj);
 				} else {
 					responseObj.response.data = response;
+					responseObj.response.origin = response.origin || 'internal';
 					resolve(responseObj);
 				}
 			});
