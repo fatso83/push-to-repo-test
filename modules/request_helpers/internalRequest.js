@@ -49,8 +49,8 @@ exports.makeRequest = function (requestBody) {
 		}
 
 		var responseObj = {
-			serviceid : requestBody.serviceid,
-			socketid  : requestBody.socketid || null,
+			serviceId : requestBody.serviceId,
+			connectionId  : requestBody.connectionId || null,
 			response  : {
 				code   : 200,
 				origin : 'internal',

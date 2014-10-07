@@ -31,8 +31,8 @@ exports.makeRequest = function (requestData, callback) {
 	}
 
 	var responseObj = {
-		serviceid : requestData.serviceid,
-		socketid  : requestData.socketid || null,
+		serviceId : requestData.serviceId,
+		connectionId  : requestData.connectionId || null,
 		response  : {
 			code   : 0,
 			origin : 'ngt',
