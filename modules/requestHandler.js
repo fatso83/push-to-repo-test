@@ -19,10 +19,32 @@
 
 var intRequest = require('./request_helpers/internalRequest');
 var extRequest = require('./request_helpers/externalRequest');
+var Utils = require('./Utils');
 var log4js = require('log4js');
 var logger = log4js.getLogger('Request Handler');
 
-exports.handleRequest = function(body, callback) {
+// Requires beta 11, which is the current released version
+var requiredMinimumFrameworkVersion = "5.0.0-beta11";
+
+exports.handleRequest = function (body, callback) {
+	var fwVersion = (body.frameworkVersion);
+
+	// If the caller Framework is too old
+	// Then flat out deny the request
+	if (!Utils.isMinimumRequiredVersion(fwVersion, requiredMinimumFrameworkVersion)) {
+		return callback({
+			serviceid : body.serviceid || "",
+			socketid  : body.socketid || null,
+			response  : {
+				code   : 403,
+				origin : 'internal',
+				data   : {
+					error : "The version of the Framework you are using is too old, please upgrade"
+				}
+			}
+		});
+	}
+
 	// See if this is a local service
 	if (intRequest.isLocalService(body)) {
 		// It's local
