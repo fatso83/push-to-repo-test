@@ -22,7 +22,7 @@ var extRequest = require('./request_helpers/externalRequest');
 var log4js = require('log4js');
 var logger = log4js.getLogger('Request Handler');
 
-exports.handleRequest = function(body, callback) {
+exports.handleRequest = function (body, callback) {
 	// See if this is a local service
 	if (intRequest.isLocalService(body)) {
 		// It's local

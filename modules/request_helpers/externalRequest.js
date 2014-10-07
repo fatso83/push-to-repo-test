@@ -31,9 +31,9 @@ exports.makeRequest = function (requestData, callback) {
 	}
 
 	var responseObj = {
-		serviceId : requestData.serviceId,
-		connectionId  : requestData.connectionId || null,
-		response  : {
+		serviceId    : requestData.serviceId,
+		connectionId : requestData.connectionId || null,
+		response     : {
 			code   : 0,
 			origin : 'ngt',
 			data   : {}
@@ -61,7 +61,7 @@ exports.makeRequest = function (requestData, callback) {
 
 	options.startTime = new Date().getTime();
 
-	logger.debug('<--- Request -->');
+	logger.debug('<--- External Request -->');
 	logger.debug(options);
 	logger.debug('<-------------->');
 
