@@ -24,7 +24,7 @@ var log4js = require('log4js');
 var logger = log4js.getLogger('Request Handler');
 
 // Requires beta 11, which is the current released version
-var requiredMinimumFrameworkVersion = "5.0.0-beta11";
+var requiredMinimumFrameworkVersion = "5.0.0-beta12";
 
 exports.handleRequest = function (body, callback) {
 	var fwVersion = (body.frameworkVersion);
