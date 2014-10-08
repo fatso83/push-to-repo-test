@@ -1,3 +1,6 @@
+var log4js = require('log4js');
+var logger = log4js.getLogger('Version Number Utils');
+
 function parseFrameworkVersion (versionString) {
 	if (!versionString) {
 		return {major : 0, minor : 0, bugfix : 0, beta : 0};
@@ -28,12 +31,13 @@ function isMinimumRequiredVersion (versionString, requiredVersionString) {
 
 	var currentVersion = versionString;
 	var requiredVersion = requiredVersionString;
-	console.log('Comparing', currentVersion, "to", requiredVersion);
+	logger.debug('Comparing', currentVersion, "to", requiredVersion);
 
 	if (typeof currentVersion === 'string') {
 		try {
 			currentVersion = parseFrameworkVersion(currentVersion);
 		} catch (err) {
+			logger.error('Could not parse the current version');
 			return false;
 		}
 	}
@@ -41,6 +45,7 @@ function isMinimumRequiredVersion (versionString, requiredVersionString) {
 		try {
 			requiredVersion = parseFrameworkVersion(requiredVersion);
 		} catch (err) {
+			logger.error('Could not parse the required version');
 			return false;
 		}
 	}
