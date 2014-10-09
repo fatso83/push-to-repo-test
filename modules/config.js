@@ -37,9 +37,12 @@ module.exports = {
      */
     chainName: function chainName(id) {
 
-        for(var i in tableStorage.table){
-            if(tableStorage.table[i].chainId === id)
-                return tableStorage.table[i].name;
+        if(typeof id === 'number')
+            id = id.toString();
+
+        for(var table in tableStorage.table){
+            if(tableStorage.table[table].chainId === id)
+                return tableStorage.table[table].name;
         }
 
         return tableStorage.table.dev.name;

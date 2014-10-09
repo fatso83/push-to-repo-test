@@ -1,7 +1,7 @@
 var log4js = require('log4js'),
 	logger = log4js.getLogger('Synchronize Service'),
 	loggable = require('./loggable')(logger),
-	storage = require('./storage/InMemStorage'),
+	storage = require('./storage/tableStorage_v2'),
 	userDb;
 
 logger.setLevel(log4js.levels.TRACE);
@@ -34,7 +34,6 @@ module.exports = {
 	setStorage : function (storageImpl) {
 		storage = storageImpl;
 	}
-
 };
 
 /**

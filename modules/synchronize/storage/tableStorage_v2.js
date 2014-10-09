@@ -103,7 +103,7 @@ function initialize(callback) {
  * @param callback
  */
 function getUserData(chainId, userId, callback) {
-    logger.trace('Getting user data from Table Storage');
+    logger.trace('Getting user data from Table Storage: chain: ' + chainId + ' user: ' + userId );
 
     var query = new azure.TableQuery()
         .select(['RowKey', 'storage'])
@@ -158,7 +158,7 @@ function databaseLog(userId, key, errorMessage, logMessage) {
  * @param callback
  */
 function setUserData(chainId, userId, userStorage, callback) {
-    logger.trace('Setting user data in Table Storage');
+    logger.trace('Setting user data in Table Storage: chain: ' + chainId + ' user: ' + userId );
 
     var transaction = new Transaction();
     transaction.start(Object.getOwnPropertyNames(userStorage).length);
