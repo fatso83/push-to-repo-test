@@ -50,7 +50,6 @@ exports.makeRequest = function (requestBody) {
 
 		var responseObj = {
 			serviceId    : requestBody.serviceId,
-			connectionId : requestBody.connectionId || null,
 			response     : {
 				code   : 200,
 				origin : 'internal',
