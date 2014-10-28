@@ -1,41 +1,60 @@
-var express = require('express');
-var request = require('request');
+var geolib = require('geolib');
+var repository = require('./data/kiwistores');
 
-var geo = require('./_geo');
+function getClosestStores( latitude, longitude, minNumberOfStores, maxNumberOfStores, maxDistance )
+{
+  /*
+  console.log(latitude);
+  console.log(longitude);
+  console.log(minNumberOfStores);
+  console.log(maxNumberOfStores);
+  console.log(maxDistance);
+  */
 
-var app = express();
+  var myPos = {"latitude" : latitude, "longitude" : longitude};
 
-app.use(function (req, res, next) {
+  var storeArray = repository.map(function (elem) {
+    return createStoreDistanceObject(elem, geolib.getDistance(myPos, elem.location)/1000);
+  });
 
-    // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', '*');
+  storeArray.sort(function(a, b) { return a.distance - b.distance; });
+  storeArray = filterByLimits(storeArray, minNumberOfStores, maxNumberOfStores, maxDistance);
+  return storeArray;  
 
-    next();
-});
+}
 
-app.use(function(req, res, next) {
-  for (var key in req.query)
-  { 
-    req.query[key.toLowerCase()] = req.query[key];
+function filterByLimits(storeArray, minNumberOfStores, maxNumberOfStores, maxDistance)
+{    
+
+  if( maxDistance == 0 && maxNumberOfStores == 0 || minNumberOfStores == storeArray.length)
+  {    
+    return storeArray;
   }
-  next();
-});
 
-// HELLO WORLD
-app.get('/', function(req, res) {
-  res.type('text/plain');
-  res.send('skynet is aware');
-});
+  for( i = minNumberOfStores; i < storeArray.length; i++)
+  {
+    // frontend expects distance in kilometers, in spite of passing metres in
+    if( maxDistance != 0 && storeArray[i].distance*1000 > maxDistance )
+      return storeArray.slice(0,i);
 
+    // using '+' ahead of 'i' in order to avoid string concat instead of sum
+    if( maxNumberOfStores != 0 && ( +i + 1  - minNumberOfStores) >= maxNumberOfStores)
+    {
+      //console.log(+i + " + 1 - " + minNumberOfStores + " = ");
+      //console.log(+i + 1 - minNumberOfStores);
+      return storeArray.slice(0,i);
+    }
+  }
+  return storeArray;
+}
+ 
+function createStoreDistanceObject(storeObject, distance)
+{
+    var distanceStore = {
+    "distance" : distance,
+    "store" : storeObject    
+  };
+  return distanceStore;
+}
 
-app.get('/dist/', function(req, res){
-    res.type('application/json');
-    res.send(geo.getClosestStores(req.query.latitude, req.query.longitude, req.query.minnumberofstores, req.query.maxnumberofstores, req.query.maxdistance));
-});
-
-app.get('*', function(req, res){
-  res.send('nobody\'s home', 404);
-});
-
-app.listen(process.env.PORT || 1337);
-
+exports.getClosestStores = getClosestStores;
