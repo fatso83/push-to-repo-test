@@ -1,6 +1,7 @@
 {
   "name": "NG-Azure-REST-API",
-  "version": "0.0.1",
+  "description" : "This REST API serves as a layer in front of the NGT services, dealing with the Framework specific request format and also doing caching of the NGT services",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "async": "^0.9.0",
