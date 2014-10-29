@@ -74,6 +74,7 @@ exports.makeRequest = function (requestBody) {
 			});
 		} else {
 			responseObj.response.code = 500;
+			responseObj.response.data = 'No service name supplied in request body';
 			reject(responseObj);
 		}
 	});
