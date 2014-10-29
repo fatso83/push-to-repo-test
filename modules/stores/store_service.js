@@ -1,7 +1,7 @@
 var geolib = require('geolib');
 var repository = require('./data/kiwistores');
 
-function getClosestStores( latitude, longitude, minNumberOfStores, maxNumberOfStores, maxDistance )
+function getClosestStores( latitude, longitude, minNumberOfStores, maxNumberOfStores, maxDistance, filter )
 {
   /*
   console.log(latitude);
@@ -18,9 +18,23 @@ function getClosestStores( latitude, longitude, minNumberOfStores, maxNumberOfSt
   });
 
   storeArray.sort(function(a, b) { return a.distance - b.distance; });
+  storeArray = filterByOpeninghours(storeArray, filter);
   storeArray = filterByLimits(storeArray, minNumberOfStores, maxNumberOfStores, maxDistance);
   return storeArray;  
 
+}
+
+function filterByOpeninghours(storeArray, filter)
+{
+  if( filter)
+  {
+    if( filter.toLowerCase() === "isopenlate")
+      return filterOnOpenLate(storeArray);
+    
+    if (filter.toLowerCase() === "isopensunday")
+      return filterOnOpenSunday(storeArray);
+  }
+  return storeArray;  
 }
 
 function filterByLimits(storeArray, minNumberOfStores, maxNumberOfStores, maxDistance)
@@ -55,6 +69,30 @@ function createStoreDistanceObject(storeObject, distance)
     "store" : storeObject    
   };
   return distanceStore;
+}
+
+function filterOnOpenLate(storeArray)
+{
+  return storeArray.filter( function( elem ) 
+  { 
+    if( elem && elem.store && elem.store.openinghours)
+    {
+      return elem.store.openinghours.isopenlate;
+    }
+    return false;
+  });
+}
+
+function filterOnOpenSunday(storeArray)
+{
+  return storeArray.filter( function( elem ) 
+  { 
+    if( elem && elem.store && elem.store.openinghours)
+    {
+      return elem.store.openinghours.isopenonsunday;
+    }    
+    return false;
+  });
 }
 
 exports.getClosestStores = getClosestStores;
