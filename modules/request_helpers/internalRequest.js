@@ -1,6 +1,5 @@
 var log4js = require('log4js');
 var logger = log4js.getLogger('Internal Request Resolver');
-var Promise = require("es6-promise").Promise;
 
 var productSearchModule = require('./../productSearch/searchUtil');
 var trumfTermsAndConditionsModule = require('./../terms_caching/terms_cacher');
@@ -34,10 +33,9 @@ exports.isLocalService = function (requestBody) {
 	return false;
 };
 
-exports.makeRequest = function (requestBody) {
+exports.makeRequest = function (requestBody, callback) {
 	logger.debug('Resolving internally');
 
-	return new Promise(function (resolve, reject) {
 		function getMethod (serviceName) {
 			var i = localServices.length;
 			while (i--) {
@@ -65,17 +63,16 @@ exports.makeRequest = function (requestBody) {
 					responseObj.response.data = error.data || {};
 					responseObj.response.code = error.code || 500;
 					responseObj.response.origin = error.origin || 'internal';
-					reject(responseObj);
+					callback(responseObj);
 				} else {
 					responseObj.response.data = response;
 					responseObj.response.origin = response.origin || 'internal';
-					resolve(responseObj);
+					callback(responseObj);
 				}
 			});
 		} else {
 			responseObj.response.code = 500;
 			responseObj.response.data = 'No service name supplied in request body';
-			reject(responseObj);
+			callback(responseObj);
 		}
-	});
 };

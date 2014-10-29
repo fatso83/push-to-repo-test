@@ -1,7 +1,5 @@
 "use strict";
 
-var Promise = require("es6-promise").Promise;
-
 var chainDataModel = require('./model');
 var titleSearch = require('./titleSearch');
 var dataUtils = require('./utils/dataUtil');

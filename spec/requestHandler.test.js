@@ -11,6 +11,7 @@ loggerNames.forEach(function(name){
 });
 
 describe('requestHandler', function () {
+    var requestData = {serviceName: 'someExternalService', frameworkVersion: '5.0.0'};
     var handler;
     var internalRequestStub;
     var externalRequestStub;
@@ -36,16 +37,12 @@ describe('requestHandler', function () {
 
     it('should route a "local service" to an internal request', function (done) {
         internalRequestStub.isLocalService = sinon.stub().returns(true);
-        var stub = internalRequestStub.makeRequest = sinon.stub().returns(require('es6-promise').Promise.resolve('test')); //done;
-
-        handler.handleRequest({serviceName: 'someLocalService', frameworkVersion : '5.0.0'}, function (data) {
-            expect(stub.called).to.be.true;
-            done();
-        });
+        internalRequestStub.makeRequest = function(data) { done(); };
+        
+        handler.handleRequest(requestData, sinon.stub() );
     });
 
     it('should route a "non local service" (NGT) as an external request', function (done) {
-        var requestData = {serviceName: 'someExternalService', frameworkVersion: '5.0.0'};
         internalRequestStub.isLocalService = sinon.stub().returns(false);
         externalRequestStub.makeRequest = function(data) { done(); };
 
