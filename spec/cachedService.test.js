@@ -4,7 +4,7 @@ var expect = require('chai').expect;
 var l4j = require('log4js');
 
 // turn off logging
-var loggerNames = ['Version Number Utils', 'Request Handler'];
+var loggerNames = ['Module Service Cacher', 'Version Number Utils', 'Request Handler'];
 loggerNames.forEach(function (name) {
     var logger = l4j.getLogger(name);
     logger.setLevel(l4j.levels.OFF);

@@ -4,7 +4,9 @@ var log4js = require('log4js'),
     chai = require('chai'),
     assert = chai.assert;
 
-describe('Synchronize table storage', function () {
+describe('slow.Synchronize table storage', function () {
+
+    this.timeout(10000);
 
     var service,
         storage,
@@ -30,17 +32,12 @@ describe('Synchronize table storage', function () {
         service = require('../../../modules/synchronize/service.js');
         service.setStorage(storage);
 
-        storage.initialize(function (error) {
-            assert.isNull(error);
-            done();
-        });
+        logger.setLevel(log4js.levels.OFF);
+        storage.initialize(done);
     });
 
     after(function(done){
-        storage.removeUserData(chainId2, userId, function (error, result) {
-            assert.isNull(error);
-            done();
-        });
+        storage.removeUserData(chainId2, userId, done);
     });
 
     it('should update data in table storage', function (done) {
@@ -59,8 +56,8 @@ describe('Synchronize table storage', function () {
         };
 
         service.synchronize(chainId2, userId, clientState, function (error, result) {
+            error && done(error);
 
-            assert.isNull(error, 'Synchronize service failed');
             assert.equal(result.updated.length, 2);
             assert.equal(result.updated[0].key, 'fooBar');
             assert.equal(result.updated[0].version, 1);
@@ -92,7 +89,8 @@ describe('Synchronize table storage', function () {
 
         service.synchronize(chainId2, userId, clientState, function (error, result) {
 
-            assert.isNull(error, 'Synchronize service failed');
+            if(error) done(error);
+
             assert.equal(result.updated.length, 2);
             assert.equal(result.updated[0].key, 'fooBar');
             assert.equal(result.updated[0].version, 2);
@@ -147,8 +145,8 @@ describe('Synchronize table storage', function () {
             ]
         };
         service.synchronize(chainId2, userId, clientState, function (error, result) {
+            if(error) done(error)
 
-            assert.isNull(error, 'Synchronize service failed');
             assert.equal(result.removedKeys.length, 2);
             done();
         });

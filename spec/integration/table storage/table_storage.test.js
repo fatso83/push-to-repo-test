@@ -3,7 +3,9 @@ var log4js = require('log4js'),
     chai = require('chai'),
     assert = chai.assert;
 
-describe('Table storage', function () {
+describe('slow.Table storage', function () {
+
+    this.timeout(10000);
 
     var service,
         storage,
@@ -22,6 +24,7 @@ describe('Table storage', function () {
     };
 
     before(function (done) {
+        logger.setLevel(log4js.levels.OFF)
         storage = require('../../../modules/synchronize/storage/tableStorage_v1.js');
         service = require('../../../modules/synchronize/service.js');
         service.setStorage(storage);

@@ -13,10 +13,10 @@ module.exports = {
             tableSvc.createTableIfNotExists(persistentUserStorageTableName, function (error, result, response) {
                 if (!error) {
                     // Table exists or created
-                    console.log('Table ' + persistentUserStorageTableName + ' exists or created');
+                    logger.info('Table ' + persistentUserStorageTableName + ' exists or created');
                     resolve(null);
                 } else {
-                    console.log('Error when creating table ' + persistentUserStorageTableName);
+                    logger.error('Error when creating table ' + persistentUserStorageTableName);
                     reject(error);
                 }
             });
