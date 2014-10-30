@@ -1,3 +1,15 @@
+/**
+ * Caches results based on the request's environment, servicepath, authorization header , and payload
+ * The two last fields are only used if they exist, so they are not compulsory.
+ *
+ * Results are refreshed once a day.
+ *
+ * Future improvements:
+ * - user configurable refresh interval
+ * - forced refresh / cache warm-up
+ */
+
+
 'use strict';
 
 var externalRequest = require('./externalRequest');
@@ -10,12 +22,6 @@ var crypto = require('crypto');
 var redisCache = require('./../redisCache');
 var basicToken = 'Basic J8ed0(tyAop206%JHP';
 var CACHE_TIME = (60 * 60 * 1000) * 24; // One day
-
-var hashObject = {
-	key       : "",
-	cacheTime : {},
-	data      : {}
-};
 
 function old (time) {
 	return (Date.now() - time) > CACHE_TIME;
