@@ -1,5 +1,5 @@
 /**
- * Caches results based on the request's environment, servicepath, authorization header , and payload
+ * Caches results based on the request environment, service path, authorization header , and payload
  * The two last fields are only used if they exist, so they are not compulsory.
  *
  * Results are refreshed once a day.
@@ -27,6 +27,11 @@ function old (time) {
 	return (Date.now() - time) > CACHE_TIME;
 }
 
+/**
+ *
+ * @param requestBody see the README for a definition of this format
+ * @param callback called with the (possibly cached) result
+ */
 exports.fetch = function (requestBody, callback) {
 	var requestToken, hashKey, cacheObj, error;
 	error = null;
