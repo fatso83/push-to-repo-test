@@ -16,6 +16,8 @@
  *	};
  */
 
+'use strict';
+
 var intRequest = require('./request_helpers/internalRequest');
 var extRequest = require('./request_helpers/externalRequest');
 var Utils = require('./Utils');

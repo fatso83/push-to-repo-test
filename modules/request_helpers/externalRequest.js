@@ -1,3 +1,5 @@
+'use strict';
+
 var request = require('request');
 
 var log4js = require('log4js');
@@ -5,8 +7,9 @@ var logger = log4js.getLogger('Module External Request');
 
 var asJson = JSON.stringify;
 
+var makeRequest = function (requestData, callback) {
+	logger.debug('Resolving request');
 
-exports.makeRequest = function (requestData, callback) {
 	var baseURL = "https://preprod.service-dk.norgesgruppen.no/";
 
 	var isOauth = false;
@@ -104,3 +107,5 @@ exports.makeRequest = function (requestData, callback) {
 		callback(responseObj);
 	});
 };
+
+exports.makeRequest  = makeRequest;
