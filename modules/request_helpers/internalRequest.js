@@ -29,10 +29,10 @@ var isLocalService = function (requestBody) {
 };
 
 
-function getMethod(serviceName) {
+var getMethod = function (serviceName) {
     var res = localServices[serviceName];
     return res && res.method || false;
-}
+};
 
 var makeRequest = function (requestBody, callback) {
     logger.debug('Resolving request');
@@ -68,7 +68,7 @@ var makeRequest = function (requestBody, callback) {
     }
 };
 
-exports = {
+module.exports = exports = {
     makeRequest: makeRequest,
     isLocalService: isLocalService
 };
