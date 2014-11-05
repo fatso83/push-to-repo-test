@@ -64,7 +64,7 @@ RequestCacher.prototype = {
         hashKey = hash(requestBody);
         logger.debug('The key is', hashKey);
 
-        redisCache.get(hashKey, function (reply) {
+        this.redisCache.get(hashKey, function (reply) {
             var cacheObj = reply || null;
             if (reply.status === "success" && cacheObj && !self.isOld(cacheObj.cacheTime)) {
                 logger.trace('----> Returning cached result');

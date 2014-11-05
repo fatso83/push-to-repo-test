@@ -25,25 +25,8 @@ describe('cachedService', function () {
 
 
     beforeEach(function () {
+        var redisCacheStub = require('./utils/redis-cache-stub').create();
         externalRequestStub = {};
-        var redisCacheStub = {
-            db: {},
-
-            cache: function (key, val, cb) {
-                var cached = this.db[key] =val;
-                cb(cached);
-            },
-
-            get: function (key, cb) {
-                var val = this.db[key];
-                cb( val && { data : val, status : 'success' } || { status : 'error'});
-            },
-
-            delete: function (key, cb) {
-                delete this.db[key];
-                cb();
-            }
-        };
 
         cachedService = proxyquire('../modules/request_helpers/cachedService', {
 

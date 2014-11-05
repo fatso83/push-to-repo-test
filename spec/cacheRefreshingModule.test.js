@@ -5,8 +5,7 @@
 var redis = require('./utils/redis-cache-stub');
 var RequestCacher = require('../modules/caching/request_cacher');
 
-
-describe.skip('RequestCacher', function () {
+describe('RequestCacher', function () {
 
     it('should warm the cache', function () {
         var redisCacheStub = redis.create(),
