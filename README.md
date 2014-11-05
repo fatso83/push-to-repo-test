@@ -8,13 +8,13 @@ and also doing caching of the NGT services.
 Definition dump from the class RESTPayload in the Frameowork
 
 ```typescript
-export class RESTPayload extends TWPayload {
-    serviceId:string;       // a unique UID
-    servicename:string;     // the service name (i.e. getTrumfProfile)
-    environment:string;     // preprod, prod, etc
-    servicepath:string;     // the path part of the url (after the hostname)
-    servicemethod:string;   // GET, PUT, POST, DELETE, ...
-    payload:any;            // only relevant for PUT and POST
+export class RESTPayload {
+        servicename:string;      // the service name (i.e. getTrumfProfile)
+        environment:string;      // preprod, prod, etc
+        servicepath:string;      // the path part of the url (after the hostname)
+        servicemethod:string;    // GET, PUT, POST, DELETE, ...
+        payload:any;             // only relevant for PUT and POST
+        headers:Array<any>;
 ```
 
 # Improvements to service caching
