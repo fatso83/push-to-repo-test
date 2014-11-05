@@ -2,8 +2,13 @@
  * Created by carl-erik.kopseng on 05.11.14.
  */
 
+var log4js = require('log4js');
+log4js.getLogger().info('DISABLING LOGGING OUTPUT');
+log4js.setGlobalLogLevel(log4js.levels.OFF);
+
 var handler = require('../../modules/requestHandler');
 var expect = require('chai').expect;
+
 
 describe('slow.requestHandler', function () {
 

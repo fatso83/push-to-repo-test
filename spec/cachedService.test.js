@@ -3,12 +3,6 @@ var sinon = require('sinon');
 var expect = require('chai').expect;
 var l4j = require('log4js');
 
-// turn off logging
-var loggerNames = ['Module Service Cacher', 'Version Number Utils', 'Request Handler'];
-loggerNames.forEach(function (name) {
-    var logger = l4j.getLogger(name);
-    logger.setLevel(l4j.levels.OFF);
-});
 
 describe('cachedService', function () {
     var requestBody = {
@@ -57,7 +51,7 @@ describe('cachedService', function () {
             './externalRequest': externalRequestStub,
 
             // no need for firing up redis
-            './../redisCache': redisCacheStub,
+            './../caching/redisCache': redisCacheStub,
 
             /* the request library takes 140 ms just to load! */
             'request' : {}

@@ -19,7 +19,7 @@ var logger = log4js.getLogger('Module Service Cacher');
 
 var request = require('request');
 var crypto = require('crypto');
-var redisCache = require('./../redisCache');
+var redisCache = require('./../caching/redisCache');
 var basicToken = 'Basic J8ed0(tyAop206%JHP';
 var CACHE_TIME = (60 * 60 * 1000) * 24; // One day
 
