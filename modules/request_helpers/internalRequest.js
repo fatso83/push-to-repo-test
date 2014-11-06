@@ -6,21 +6,26 @@ var logger = log4js.getLogger('Internal Request Resolver');
 var productSearchModule = require('./../productSearch/searchUtil');
 var trumfTermsAndConditionsModule = require('./../terms_caching/terms_cacher');
 var persistenceSyncModule = require('./../synchronize/request-adapter');
-var cachedServiceModule = require('./cachedService');
+
+var RequestCacher = require('../caching/request-cacher');
+var requestCacher = new RequestCacher({maxAgeInSeconds: 24 * 60 * 60});
+var cachingRequestHandler = requestCacher.handleRequest.bind(requestCacher);
 
 var localServices = {
-    'persistenceSynchronize': { method: persistenceSyncModule.synchronize},
-    'trumfProfile_termsAndConditions': { method: trumfTermsAndConditionsModule.fetch},
-    'productSearchProducts': { method: productSearchModule.search},
-    'productSearchGroups': { method: productSearchModule.search},
-    'productSearchBoth': { method: productSearchModule.search},
-    'productSearchGetProductsForGroup': { method: productSearchModule.search},
-    'productSearchGetAllCategories': { method: productSearchModule.search},
-    'productSearchGetProductById': { method: productSearchModule.search},
-    'productDetails2': { method: cachedServiceModule.fetch},
-    'recommendations': { method: cachedServiceModule.fetch},
-    'storesGetStore': { method: cachedServiceModule.fetch},
-    'brandMatch': { method: cachedServiceModule.fetch}
+    'persistenceSynchronize': {method: persistenceSyncModule.synchronize},
+    'trumfProfile_termsAndConditions': {method: trumfTermsAndConditionsModule.fetch},
+    'productSearchProducts': {method: productSearchModule.search},
+    'productSearchGroups': {method: productSearchModule.search},
+    'productSearchBoth': {method: productSearchModule.search},
+    'productSearchGetProductsForGroup': {method: productSearchModule.search},
+    'productSearchGetAllCategories': {method: productSearchModule.search},
+    'productSearchGetProductById': {method: productSearchModule.search},
+
+    // cached requests
+    'productDetails2': {method: cachingRequestHandler},
+    'recommendations': {method: cachingRequestHandler},
+    'storesGetStore': {method: cachingRequestHandler},
+    'brandMatch': {method: cachingRequestHandler}
 };
 
 var isLocalService = function (requestBody) {

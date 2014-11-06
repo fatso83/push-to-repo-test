@@ -17,15 +17,15 @@ export class RESTPayload {
         headers:Array<any>;
 ```
 
-# Improvements to service caching
-There needs to be improvements to the current caching
-
-##Current module 'cachedService':
-    1. Receives the whole requestBody object and does a call using the 'externalRequest' module
+## RequestCacher
+    1. Receives the requestBody object in handleRequest and does a call using the 'externalRequest' module
     2. Caches results based on the request's environment, service path, authorization header , and payload
     3. Stores a timestamp in the cached result
     4. The two last fields are only used if they exist, so they are not compulsory.
-    5. Results are refreshed once a day.
+    5. Results are refreshed as configured
+
+# Improvements to service caching
+There needs to be improvements to the current caching
 
 ## Non-standard error passing
 Our redisCache module does not use the standard convention in node of having an error as the first callback argument.
