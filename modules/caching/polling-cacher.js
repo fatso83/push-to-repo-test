@@ -15,7 +15,7 @@ PollingRequestCacher.prototype.start = function() {
         // refresh immediately
         doRequest();
 
-        // set up refreshe at sregular intervals
+        // set up refresh at regular intervals
         return setInterval(doRequest, opts.intervalInSeconds*1000);
     });
 };
@@ -38,7 +38,7 @@ PollingRequestCacher.prototype.addRequest= function(req, opts) {
         throw new Error('Tried adding request to running request cacher. Stop it, add the request, and start it again');
     }
 
-    var requestCacher = opts.requestCacherStub || new RequestCacher({ maxAge : FOREVER } );
+    var requestCacher = opts.requestCacherStub || new RequestCacher({ maxAgeInSeconds : FOREVER, maxStaleInSeconds : FOREVER } );
     this.requestOptionsList.push( {
             request : req,
             requestCacher : requestCacher,

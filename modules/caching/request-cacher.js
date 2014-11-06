@@ -12,7 +12,6 @@ var logger = require('log4js').getLogger('RequestCacher');
 
 var basicToken = 'Basic J8ed0(tyAop206%JHP';
 
-
 function hash(requestBody) {
     var requestToken, hashKey;
 
@@ -38,10 +37,19 @@ function hash(requestBody) {
 //    console.log(utils.format('Cached %s call: %s', this.request.servicename, this.request.servicepath));
 //}
 
+/**
+ *
+ * @param opts.maxAgeInSeconds how long a cached response should be valid before being refreshed
+ * @param opts.maxStaleInSeconds how long we are willing to use a stale cache in case of failing service requests
+ * @constructor
+ */
 function RequestCacher(opts) {
-    this.maxAge = opts.maxAgeInSeconds || 60 * 60 * 24;
+    this.maxAge = opts.maxAgeInSeconds || 60 * 60;
+    this.maxStale = opts.maxStaleInSeconds || 0;
 
-    if (!opts.stubs) { opts.stubs = {}; }
+    if (!opts.stubs) {
+        opts.stubs = {};
+    }
 
     this._redisCache = opts.stubs.redisCache || require('./redisCache');
     this._externalRequest = opts.stubs.externalRequest || require('../request_helpers/externalRequest');
@@ -50,9 +58,22 @@ function RequestCacher(opts) {
 RequestCacher.prototype = {
 
     isOld: function (time) {
-        return (Date.now() - time) > this.maxAge*1000;
+        return (Date.now() - time) > this.maxAge * 1000;
     },
 
+    isWithinStaleLimit: function (time) {
+        return (Date.now() - this._currentResult.data.cacheTime) < this.maxStale * 1000;
+    },
+
+    canUseStaleResult: function () {
+        var hasValidResult = this._currentResult && this._currentResult.status === 'success';
+
+        if (!hasValidResult) {
+            return false;
+        }
+
+        return this.isWithinStaleLimit();
+    },
 
     /**
      *
@@ -62,44 +83,58 @@ RequestCacher.prototype = {
     handleRequest: function (fwServiceRequest, callback) {
         var hashKey, self = this;
 
+        this._currentResult = null;
+
         hashKey = hash(fwServiceRequest);
         logger.debug('The key is', hashKey);
 
         this._redisCache.get(hashKey, function (reply) {
             var cacheObj = reply.data || null;
+
+            this._currentResult = reply;
+
             if (reply.status === "success" && cacheObj && !self.isOld(cacheObj.cacheTime)) {
+
                 logger.trace('----> Returning cached result');
                 callback(cacheObj.response, null);
+
             } else {
                 self.refresh(fwServiceRequest, callback);
             }
-        });
+        }.bind(this));
     },
 
     refresh: function (fwServiceRequest, cb) {
-        var cacheObj = {
+        var error, cacheObj = {
             key: hash(fwServiceRequest),
             cacheTime: null,
             response: null
-        }, error;
+        };
 
         logger.trace('Getting data from server (using external request)');
-        this._externalRequest.makeRequest(fwServiceRequest, function (responseObj) {
-            logger.trace('Got response', responseObj);
-            var code = responseObj.response.code;
+
+        this._externalRequest.makeRequest(fwServiceRequest, function (res) {
+            logger.trace('Got response', res);
+            var code = res.response.code;
 
             if (code === 200 || code === 201 || code === 204) {
-                if (responseObj.response.data) {
-                    cacheObj.response = responseObj.response.data;
-                    cacheObj.response.origin = "internal";
+                if (res.response.data) {
                     cacheObj.cacheTime = Date.now();
+                    cacheObj.response = res.response.data;
+
                     this._redisCache.cache(cacheObj.key, cacheObj, function (reply) {
                         logger.trace('Did cache result', reply);
                     });
                 }
+
+            } else if (this.canUseStaleResult()) {
+
+                cacheObj.response = this._currentResult.data.response;
+
             } else {
-                error = responseObj.response;
+                error = res.response;
             }
+
             cb(cacheObj.response, error);
         }.bind(this));
     }

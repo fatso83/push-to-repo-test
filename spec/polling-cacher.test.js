@@ -29,7 +29,7 @@ describe('PollingCacher', function () {
                 cb(responseObj);
             }),
 
-            refresh : sinon.spy(function(req, cb) {
+            refresh: sinon.spy(function (req, cb) {
                 cb(responseObj);
             })
         };
@@ -41,9 +41,9 @@ describe('PollingCacher', function () {
         var reqCacherStub = createRequestCacherStub();
 
         p.addRequest(requestBody, {
-            intervalInSeconds : 60,
-            requestCacherStub : reqCacherStub,
-            refreshHandler : this.stub()
+            intervalInSeconds: 60,
+            requestCacherStub: reqCacherStub,
+            refreshHandler: this.stub()
         });
         p.start();
 
@@ -58,14 +58,23 @@ describe('PollingCacher', function () {
         var reqCacherStub = createRequestCacherStub();
 
         p.addRequest(requestBody, {
-            intervalInSeconds : 60,
-            requestCacherStub : reqCacherStub,
-            refreshHandler : this.stub()
+            intervalInSeconds: 60,
+            requestCacherStub: reqCacherStub,
+            refreshHandler: this.stub()
         });
         p.start();
 
-        this.clock.tick(1000*61);
-        expect(reqCacherStub.refresh.callCount).to.equal(2);
+        this.clock.tick(1000 * 61 * 2);
+        expect(reqCacherStub.refresh.callCount).to.equal(3);
 
     }));
-})
+
+    // not sure how to test this
+    //it('should tells its internal cacher to keep using the cache in case of network errors', sinon.test(function () {
+    //    var p = new PollingCacher();
+    //    p.addRequest(requestBody, {
+    //            intervalInSeconds: 60 * 60
+    //        }
+    //    );
+    //}));
+});

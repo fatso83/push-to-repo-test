@@ -20,6 +20,7 @@
 
 var intRequest = require('./request_helpers/internalRequest');
 var extRequest = require('./request_helpers/externalRequest');
+var verify = require('./request_helpers/response-verifier').verify;
 var Utils = require('./Utils');
 var log4js = require('log4js');
 var logger = log4js.getLogger('Request Handler');
@@ -50,6 +51,10 @@ exports.handleRequest = function (body, callback) {
     var requester = intRequest.isLocalService(body) ? intRequest : extRequest;
 
     requester.makeRequest(body, function (response) {
+        if (!verify(response)) {
+            logger.error('The response we got is invalid: ' + response);
+        }
+
         callback(response);
     });
 };
