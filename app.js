@@ -1,6 +1,9 @@
 var server;
 
-function main(cb) {
+/**
+ * @param callback for integration testing
+ */
+function main(callback) {
 
     var express = require('express'),
         compress = require('compression'),
@@ -61,16 +64,14 @@ function main(cb) {
 
     server.listen(app.get('port'), function () {
         console.log('Express server listening');
-        cb && cb();
+        callback && callback();
     });
 }
 
-// start as normal if run directly from node
-if (require.main === module) {
-    main();
-}
+/**
+ * expose stop and start functions for testing
+ */
 
-// export stop and start functions for testing
 exports.stop = function (callback) {
     server.close();
     server.on('close', callback);
@@ -79,4 +80,9 @@ exports.stop = function (callback) {
 exports.start = function(cb) {
     main(cb);
 };
+
+/* start as normal if run directly from node */
+if (require.main === module) {
+    main();
+}
 
