@@ -3,7 +3,12 @@
  */
 
 var geolib = require('geolib');
-var repository = require('./data/kiwistores');
+
+var inMemRepository = {
+    getStores: function repository(cb) {
+        cb(require('./data/kiwistores'));
+    }
+};
 
 function filterByLimits(storeArray, minNumberOfStores, maxNumberOfStores, maxDistance) {
 
@@ -72,20 +77,26 @@ function filterByOpeninghours(storeArray, filter) {
 }
 
 
-function getClosestStores(latitude, longitude, minNumberOfStores, maxNumberOfStores, maxDistance, filter) {
+function getClosestStores(latitude, longitude, minNumberOfStores, maxNumberOfStores, maxDistance, filter, callback) {
     var myPos = {"latitude": latitude, "longitude": longitude};
 
-    var storeArray = repository.map(function (elem) {
-        return createStoreDistanceObject(elem, geolib.getDistance(myPos, elem.location) / 1000);
-    });
+    inMemRepository.getStores(function (stores) {
+        var storeArray = stores.map(function (elem) {
+            return createStoreDistanceObject(elem, geolib.getDistance(myPos, elem.location) / 1000);
+        });
 
-    storeArray.sort(function (a, b) {
-        return a.distance - b.distance;
+        storeArray.sort(function (a, b) {
+            return a.distance - b.distance;
+        });
+        storeArray = filterByOpeninghours(storeArray, filter);
+        storeArray = filterByLimits(storeArray, minNumberOfStores, maxNumberOfStores, maxDistance);
+
+        callback(storeArray);
     });
-    storeArray = filterByOpeninghours(storeArray, filter);
-    storeArray = filterByLimits(storeArray, minNumberOfStores, maxNumberOfStores, maxDistance);
-    return storeArray;
 
 }
 
 exports.getClosestStores = getClosestStores;
+exports.setRepository = function (repo) {
+    inMemRepository = repo;
+};

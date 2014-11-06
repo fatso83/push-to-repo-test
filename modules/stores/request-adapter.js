@@ -3,7 +3,7 @@
  * @param callback reverse parameter order of Node convention function(result, error)
  */
 
-var m = require('./store_service');
+var service = require('./store_service');
 var url = require('url');
 var _ = require('lodash');
 var querystring = require('querystring');
@@ -21,22 +21,21 @@ module.exports = function (requestBody, callback) {
     params = querystring.parse(parsedUrl.query);
 
     if (missingMandatoryParameters(params)) {
-        callback(null, { data : "Mandatory query parameters are: latitude, longitude", code : 400 } );
+        callback(null, {data: "Mandatory query parameters are: latitude, longitude", code: 400});
         return;
     }
 
     try {
-        var result = m.getClosestStores(
+        service.getClosestStores(
             params.latitude,
             params.longitude,
             params.minnumberofstores,
             params.maxnumberofstores,
             params.maxdistance,
-            params.filter);
-
-        callback(result);
-
-    } catch(err) {
+            params.filter,
+            callback
+        );
+    } catch (err) {
         callback(null, err);
     }
 };
