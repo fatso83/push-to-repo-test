@@ -7,11 +7,8 @@
  * Requests will have their cache updated once maxAgeInSeconds is surpassed, but only if the request is succesful
  */
 
-//var utils = require('utils');
 var crypto = require('crypto');
 var logger = require('log4js').getLogger('RequestCacher');
-var externalRequest = require('../request_helpers/externalRequest');
-var request = require('request');
 
 var basicToken = 'Basic J8ed0(tyAop206%JHP';
 
@@ -43,54 +40,60 @@ function hash(requestBody) {
 
 function RequestCacher(opts) {
     this.maxAge = opts.maxAgeInSeconds || 60 * 60 * 24;
-    this.redisCache = opts.redisCache || require('./redisCache');
+
+    if (!opts.stubs) { opts.stubs = {}; }
+
+    this._redisCache = opts.stubs.redisCache || require('./redisCache');
+    this._externalRequest = opts.stubs.externalRequest || require('../request_helpers/externalRequest');
 }
 
 RequestCacher.prototype = {
 
     isOld: function (time) {
-        return (Date.now() - time) > this.maxAge;
+        return (Date.now() - time) > this.maxAge*1000;
     },
 
 
     /**
      *
-     * @param requestBody {RESTPayload} see the README for a definition of this format
+     * @param fwServiceRequest  see the README for a definition of this format
      * @param callback called with the (possibly cached) result
      */
-    handleRequest: function (requestBody, callback) {
+    handleRequest: function (fwServiceRequest, callback) {
         var hashKey, self = this;
 
-        hashKey = hash(requestBody);
+        hashKey = hash(fwServiceRequest);
         logger.debug('The key is', hashKey);
 
-        this.redisCache.get(hashKey, function (reply) {
-            var cacheObj = reply || null;
+        this._redisCache.get(hashKey, function (reply) {
+            var cacheObj = reply.data || null;
             if (reply.status === "success" && cacheObj && !self.isOld(cacheObj.cacheTime)) {
                 logger.trace('----> Returning cached result');
-                callback(cacheObj.data.response, null);
+                callback(cacheObj.response, null);
             } else {
-                this.refresh(requestBody, callback);
+                self.refresh(fwServiceRequest, callback);
             }
         });
     },
 
-    refresh: function (request, cb) {
+    refresh: function (fwServiceRequest, cb) {
         var cacheObj = {
-            key: hash(request),
+            key: hash(fwServiceRequest),
             cacheTime: null,
             response: null
         }, error;
 
         logger.trace('Getting data from server (using external request)');
-        externalRequest.makeRequest(request, function (responseObj) {
+        this._externalRequest.makeRequest(fwServiceRequest, function (responseObj) {
+            logger.trace('Got response', responseObj);
             var code = responseObj.response.code;
+
             if (code === 200 || code === 201 || code === 204) {
                 if (responseObj.response.data) {
                     cacheObj.response = responseObj.response.data;
                     cacheObj.response.origin = "internal";
                     cacheObj.cacheTime = Date.now();
-                    redisCache.cache(cacheObj.key, cacheObj, function (reply) {
+                    this._redisCache.cache(cacheObj.key, cacheObj, function (reply) {
                         logger.trace('Did cache result', reply);
                     });
                 }
@@ -98,8 +101,8 @@ RequestCacher.prototype = {
                 error = responseObj.response;
             }
             cb(cacheObj.response, error);
-        });
+        }.bind(this));
     }
 };
 
-exports = RequestCacher;
+module.exports = RequestCacher;
