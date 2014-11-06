@@ -20,20 +20,24 @@
 
 var intRequest = require('./request_helpers/internalRequest');
 var extRequest = require('./request_helpers/externalRequest');
-var verify = require('./request_helpers/response-verifier').verify;
+var validator = require('./response-request-verifier');
 var Utils = require('./Utils');
 var log4js = require('log4js');
 var logger = log4js.getLogger('Request Handler');
 
-// Requires beta 11, which is the current released version
 var requiredMinimumFrameworkVersion = "5.0.0";
 
 exports.handleRequest = function (body, callback) {
     var fwVersion = (body.frameworkVersion);
+    var errorMsg = null;
 
-    // If the caller Framework is too old
-    // Then flat out deny the request
-    if (!Utils.isMinimumRequiredVersion(fwVersion, requiredMinimumFrameworkVersion)) {
+    if (!validator.validateRequest(body)) {
+        errorMsg = 'Invalid request body. Missing essential content';
+    } else if (!Utils.isMinimumRequiredVersion(fwVersion, requiredMinimumFrameworkVersion)) {
+        errorMsg = "The version of the Framework you are using is too old, please upgrade";
+    }
+
+    if (errorMsg) {
         return callback({
             serviceid: body.serviceid || "",
             socketid: body.socketid || null,
@@ -41,7 +45,7 @@ exports.handleRequest = function (body, callback) {
                 code: 403,
                 origin: 'internal',
                 data: {
-                    error: "The version of the Framework you are using is too old, please upgrade"
+                    error: errorMsg
                 }
             }
         });
@@ -51,8 +55,8 @@ exports.handleRequest = function (body, callback) {
     var requester = intRequest.isLocalService(body) ? intRequest : extRequest;
 
     requester.makeRequest(body, function (response) {
-        if (!verify(response)) {
-            logger.error('The response we got is invalid: ' + response);
+        if (!validator.validateResponse(response)) {
+            logger.error('The response we got is invalid: ' + JSON.stringify(response));
         }
 
         callback(response);

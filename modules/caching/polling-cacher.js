@@ -1,6 +1,6 @@
 var FOREVER = 60 * 60 * 24 * 365 * 100;
 var RequestCacher = require('./request-cacher');
-var logger  = require('log4js').getLogger('PollingRequestCacher');
+var logger = require('log4js').getLogger('PollingRequestCacher');
 
 var PollingRequestCacher = function () {
     this.requestOptionsList = [];
@@ -11,12 +11,20 @@ var PollingRequestCacher = function () {
 PollingRequestCacher.prototype.start = function () {
     this.intervals = this.requestOptionsList.map(function (opts) {
 
-        var defaultLogger = function (result) {
+        var defaultLogger = function () {
             logger.info('Refreshing cache for ' + opts.request.servicepath);
         };
 
         var doRequest = function () {
-            opts.requestCacher.refresh(opts.request, opts.refreshHandler || defaultLogger);
+            opts.requestCacher.refresh(opts.request, function () {
+                var fn = opts.refreshHandler || defaultLogger;
+
+                try {
+                    fn.apply(null, arguments);
+                } catch (err) {
+                    /* cannot allow the refreshHandler to take down the server */
+                }
+            });
         };
 
         // refresh immediately
@@ -35,6 +43,7 @@ PollingRequestCacher.prototype.stop = function () {
 /**
  * Adds a request that should be refreshed regularly
  * @param req
+ * @param opts options (some mandatory)
  * @param opts.intervalInSeconds the intervalInSeconds between each refresh (in seconds)
  * @param [opts.refreshHandler] function to call on success. Do nothing as default
  *
