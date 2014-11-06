@@ -3,33 +3,35 @@
 var log4js = require('log4js');
 var logger = log4js.getLogger('Internal Request Resolver');
 
+// caching
+var RequestCacher = require('../caching/request-cacher');
+var ONE_DAY = 24 * 60 * 60;
+var requestCacher = new RequestCacher({maxAgeInSeconds: ONE_DAY});
+var cachingRequestHandler = requestCacher.handleRequest.bind(requestCacher);
+
 var productSearchModule = require('./../productSearch/searchUtil');
 var trumfTermsAndConditionsModule = require('./../terms_caching/terms_cacher');
 var persistenceSyncModule = require('./../synchronize/request-adapter');
 
-var RequestCacher = require('../caching/request-cacher');
-var requestCacher = new RequestCacher({maxAgeInSeconds: 24 * 60 * 60});
-var cachingRequestHandler = requestCacher.handleRequest.bind(requestCacher);
-
 var localServices = {
-    'persistenceSynchronize': {method: persistenceSyncModule.synchronize},
-    'trumfProfile_termsAndConditions': {method: trumfTermsAndConditionsModule.fetch},
-    'productSearchProducts': {method: productSearchModule.search},
-    'productSearchGroups': {method: productSearchModule.search},
-    'productSearchBoth': {method: productSearchModule.search},
-    'productSearchGetProductsForGroup': {method: productSearchModule.search},
-    'productSearchGetAllCategories': {method: productSearchModule.search},
-    'productSearchGetProductById': {method: productSearchModule.search},
+    'persistenceSynchronize': persistenceSyncModule.synchronize,
+    'trumfProfile_termsAndConditions': trumfTermsAndConditionsModule.fetch,
+    'productSearchProducts': productSearchModule.search,
+    'productSearchGroups': productSearchModule.search,
+    'productSearchBoth': productSearchModule.search,
+    'productSearchGetProductsForGroup': productSearchModule.search,
+    'productSearchGetAllCategories': productSearchModule.search,
+    'productSearchGetProductById': productSearchModule.search,
 
     // can't be cached
-    // 'storesClosestToMe': {method: require('../stores/request-handler')},
+    'storesClosestToMe': require('../stores/request-adapter'),
 
     // cached requests
-    'productDetails2': {method: cachingRequestHandler},
-    'recommendations': {method: cachingRequestHandler},
-    'brandMatch': {method: cachingRequestHandler},
-    'storesGetStore': {method: cachingRequestHandler},
-    'storesInCounties': {method: cachingRequestHandler} // preliminary name
+    'productDetails2': cachingRequestHandler,
+    'recommendations': cachingRequestHandler,
+    'brandMatch': cachingRequestHandler,
+    'storesGetStore': cachingRequestHandler,
+    'storesInCounties': cachingRequestHandler // preliminary name
 };
 
 var isLocalService = function (requestBody) {
@@ -40,7 +42,7 @@ var isLocalService = function (requestBody) {
 
 var getMethod = function (serviceName) {
     var res = localServices[serviceName];
-    return res && res.method || false;
+    return res || false;
 };
 
 var makeRequest = function (requestBody, callback) {
