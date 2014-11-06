@@ -12,6 +12,7 @@ function filterByLimits(storeArray, minNumberOfStores, maxNumberOfStores, maxDis
     }
 
     for (var i = minNumberOfStores; i < storeArray.length; i++) {
+
         // frontend expects distance in kilometers, in spite of passing metres in
         if (maxDistance !== 0 && storeArray[i].distance * 1000 > maxDistance) {
             return storeArray.slice(0, i);
@@ -19,12 +20,11 @@ function filterByLimits(storeArray, minNumberOfStores, maxNumberOfStores, maxDis
 
         // using '+' ahead of 'i' in order to avoid string concat instead of sum
         if (maxNumberOfStores !== 0 && ( +i + 1 - minNumberOfStores) >= maxNumberOfStores) {
-            //console.log(+i + " + 1 - " + minNumberOfStores + " = ");
-            //console.log(+i + 1 - minNumberOfStores);
             return storeArray.slice(0, i);
         }
 
     }
+
     return storeArray;
 }
 
