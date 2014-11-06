@@ -12,7 +12,7 @@ loggerNames.forEach(function(name){
 });
 
 describe('requestHandler - fast unit tests', function () {
-    var requestData = {serviceName: 'someExternalService', frameworkVersion: '5.0.0'};
+    var requestData = {servicename: 'someExternalService', frameworkVersion: '5.0.0', servicepath : '/asdfasdf'};
     var handler;
     var internalRequestStub;
     var externalRequestStub;
