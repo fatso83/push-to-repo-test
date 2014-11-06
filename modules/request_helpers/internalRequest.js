@@ -21,11 +21,15 @@ var localServices = {
     'productSearchGetAllCategories': {method: productSearchModule.search},
     'productSearchGetProductById': {method: productSearchModule.search},
 
+    // can't be cached
+    // 'storesClosestToMe': {method: require('../stores/request-handler')},
+
     // cached requests
     'productDetails2': {method: cachingRequestHandler},
     'recommendations': {method: cachingRequestHandler},
+    'brandMatch': {method: cachingRequestHandler},
     'storesGetStore': {method: cachingRequestHandler},
-    'brandMatch': {method: cachingRequestHandler}
+    'storesInCounties': {method: cachingRequestHandler} // preliminary name
 };
 
 var isLocalService = function (requestBody) {

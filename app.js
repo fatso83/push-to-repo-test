@@ -2,15 +2,23 @@ var express = require('express'),
     compress = require('compression'),
     cors = require('cors'),
     logger = require('morgan'),
+    log4js = require('log4js'),
     bodyParser = require('body-parser'),
     cookieParser = require('cookie-parser'),
     path = require('path'),
     debug = require('debug')('ng-azure-rest-api');
 
+// Set global caching level
+log4js.setGlobalLogLevel(log4js.levels.INFO);
 
 // Routes
 var request = require('./routes/request');
 var index = require('./routes/index');
+
+// Warm up caches
+var cacheWarmer = require('./modules/caching/boot-script');
+cacheWarmer.start();
+
 
 // Setup the search module
 var searchUtil = require('./modules/productSearch/searchUtil');
@@ -29,7 +37,7 @@ app.use(compress());
 app.use(cors());
 app.use(logger('dev'));
 
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
