@@ -3,12 +3,15 @@
  */
 
 var geolib = require('geolib');
+var repository;
 
-var inMemRepository = {
+var inMemRepo = {
     getStores: function repository(cb) {
         cb(require('./data/kiwistores'));
     }
 };
+
+repository = inMemRepo;
 
 function filterByLimits(storeArray, minNumberOfStores, maxNumberOfStores, maxDistance) {
 
@@ -80,7 +83,7 @@ function filterByOpeninghours(storeArray, filter) {
 function getClosestStores(latitude, longitude, minNumberOfStores, maxNumberOfStores, maxDistance, filter, callback) {
     var myPos = {"latitude": latitude, "longitude": longitude};
 
-    inMemRepository.getStores(function (stores) {
+    repository.getStores(function (stores) {
         var storeArray = stores.map(function (elem) {
             return createStoreDistanceObject(elem, geolib.getDistance(myPos, elem.location) / 1000);
         });
@@ -98,5 +101,5 @@ function getClosestStores(latitude, longitude, minNumberOfStores, maxNumberOfSto
 
 exports.getClosestStores = getClosestStores;
 exports.setRepository = function (repo) {
-    inMemRepository = repo;
+    repository = repo;
 };
