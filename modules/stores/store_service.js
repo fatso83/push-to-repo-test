@@ -13,6 +13,10 @@ var inMemRepo = {
 
 repository = inMemRepo;
 
+function isNumber(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
 function filterByLimits(storeArray, minNumberOfStores, maxNumberOfStores, maxDistance) {
 
     if (maxDistance === 0 && maxNumberOfStores === 0 || minNumberOfStores === storeArray.length) {
@@ -37,11 +41,10 @@ function filterByLimits(storeArray, minNumberOfStores, maxNumberOfStores, maxDis
 }
 
 function createStoreDistanceObject(storeObject, distance) {
-    var distanceStore = {
+    return {
         "distance": distance,
         "store": storeObject
     };
-    return distanceStore;
 }
 
 function filterOnOpenLate(storeArray) {
@@ -82,10 +85,21 @@ function filterByOpeninghours(storeArray, filter) {
 
 function getClosestStores(latitude, longitude, minNumberOfStores, maxNumberOfStores, maxDistance, filter, callback) {
     var myPos = {"latitude": latitude, "longitude": longitude};
+    var FAR_FAR_AWAY = Math.pow(10, 100);
 
     repository.getStores(function (stores) {
         var storeArray = stores.map(function (elem) {
-            return createStoreDistanceObject(elem, geolib.getDistance(myPos, elem.location) / 1000);
+            var distance,
+                location = elem.location;
+
+            if (!location || !isNumber(location.latitude) || !isNumber(location.longitude)) {
+                distance = FAR_FAR_AWAY;
+            }
+            else {
+                distance = geolib.getDistance(myPos, location) / 1000;
+            }
+
+            return createStoreDistanceObject(elem, distance);
         });
 
         storeArray.sort(function (a, b) {
