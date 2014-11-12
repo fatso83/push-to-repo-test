@@ -1,6 +1,7 @@
 var redis = require('./utils/redis-cache-stub');
 var expect = require('chai').expect;
 var sinon = require('sinon');
+var _ = require('lodash');
 var RequestCacher = require('../modules/caching/request-cacher');
 
 describe('RequestCacher', function () {
@@ -114,6 +115,17 @@ describe('RequestCacher', function () {
            expect(result).to.equal(null);
         });
     }));
+
+    it('the hash function should treat the service path consistently as lowercase', function() {
+        var req1 = _.extend({}, requestBody),
+        req2 = _.extend({}, requestBody),
+        hash = RequestCacher.hash;
+
+        req1.servicepath = req1.servicepath.toUpperCase();
+        req2.servicepath = req2.servicepath.toLowerCase();
+
+       expect(hash(req1)).to.equal(hash(req2));
+    });
 
 
     function setupExternalRequestToOnlyRespondSuccessfullyOnce() {

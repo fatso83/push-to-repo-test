@@ -6,7 +6,8 @@ var environment = 'preprod';
 var storeCacher = new PollingCacher();
 
 // cache stores
-[1100, 1210, 1300].forEach(function (chainId) {
+var chainIds = [1100, 1210, 1300];
+chainIds.forEach(function (chainId) {
 
     storeCacher.addRequest({
         environment : environment,

@@ -13,8 +13,9 @@ var logger = require('log4js').getLogger('RequestCacher');
 var basicToken = 'Basic J8ed0(tyAop206%JHP';
 
 function hash(requestBody) {
-    var requestToken, hashKey;
+    var requestToken, hashKey, servicePath;
 
+    servicePath = requestBody.servicepath.toLowerCase();
     requestToken = basicToken;
     requestBody.headers.forEach(function (header) {
         if (header.Authorization) {
@@ -27,15 +28,11 @@ function hash(requestBody) {
         payload = JSON.stringify(requestBody.payload);
     }
 
-    hashKey = 'ng_service_cache_' + (requestBody.environment || "") + "_" + crypto.createHash('sha256').update(requestBody.servicepath + requestToken + payload).digest('base64');
+    hashKey = 'ng_service_cache_' + (requestBody.environment || "") + "_" + crypto.createHash('sha256').update(servicePath + requestToken + payload).digest('base64');
 
     return hashKey;
 }
 
-
-//function refresh(req) {
-//    console.log(utils.format('Cached %s call: %s', this.request.servicename, this.request.servicepath));
-//}
 
 /**
  *
@@ -140,4 +137,8 @@ RequestCacher.prototype = {
     }
 };
 
+// expose the hash function to make it testable
+RequestCacher.hash = hash;
+
 module.exports = RequestCacher;
+
