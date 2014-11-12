@@ -24,6 +24,7 @@ function main(callback) {
     var request = require('./routes/request');
     var index = require('./routes/index');
 
+
     // Warm up caches
     var cacheWarmer = require('./modules/caching/boot-script');
     cacheWarmer.start();
@@ -53,6 +54,7 @@ function main(callback) {
 
     app.use('/', index);
     app.use('/request', request);
+    app.use('/FindStore', require('./routes/find-store'));
 
     // Catch 404 and forwarding to error handler
     app.use(function (req, res, next) {

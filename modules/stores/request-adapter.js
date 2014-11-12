@@ -7,10 +7,20 @@ var service = require('./store_service');
 var url = require('url');
 var _ = require('lodash');
 var querystring = require('querystring');
+var isNumber = require("isnumber")
 
 function missingMandatoryParameters(params) {
     return !('longitude' in params && 'latitude' in params);
 }
+
+var parseWithFallback = function (parser) {
+    return function (s, defaultVal) {
+        return isNumber(s) ? parser(s) : defaultVal;
+    };
+};
+
+var int = parseWithFallback(parseInt);
+var float = parseWithFallback(parseFloat);
 
 module.exports = function (requestBody, callback) {
 
@@ -27,12 +37,12 @@ module.exports = function (requestBody, callback) {
 
     try {
         service.getClosestStores(
-            params.latitude,
-            params.longitude,
-            params.minnumberofstores,
-            params.maxnumberofstores,
-            params.maxdistance,
-            params.filter,
+            float(params.latitude),
+            float(params.longitude),
+            int(params.minnumberofstores, 1),
+            int(params.maxnumberofstores, null),
+            float(params.maxdistance, null),
+            params.filter || "",
             callback
         );
     } catch (err) {
