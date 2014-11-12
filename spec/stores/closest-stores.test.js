@@ -1,8 +1,9 @@
 var expect = require('chai').expect;
-var  _ = require('lodash');
+var _ = require('lodash');
 var storeService = require('../../modules/stores/store_service');
 
 describe('Store service', function () {
+    var DELTA_IN_PERCENT = 0.5;
 
     this.timeout(200);
 
@@ -18,61 +19,29 @@ describe('Store service', function () {
             storeService.setRepository(inMemRepository);
         });
 
-        // test case 1 in #43751-1147
-        function testCase1(testCallback) {
-            var latitude = 59.9170013, longitude = 10.72788689999993, minNumberOfStores = 1, maxNumberOfStores = 0, maxDistance = 500;
+        function testCase(lat, long, maxdistance, filter, testCaseFileName, callback) {
 
-            storeService.getClosestStores(
-                latitude, longitude, minNumberOfStores, maxNumberOfStores, maxDistance, null, testCallback
-            );
-        }
+            storeService.getClosestStores(lat, long, 1, 0, maxdistance, filter, function (actualResults) {
+                var expectedResults = require(testCaseFileName);
 
-        // test case 2 in #43751-1147
-        function testCase2(testCallback) {
-            var latitude = 63.4305149, longitude = 10.39505280000003, minnumberofstores = 1, maxNumberOfStores = 0, maxDistance = 1230297, filter = 'isopensunday';
+                for (var i = 0, actual, expected; i < actualResults.length; i++) {
+                    actual = actualResults[i];
+                    expected = expectedResults[i];
 
-            storeService.getClosestStores(
-                latitude, longitude, minnumberofstores, maxNumberOfStores, maxDistance, filter, testCallback
-            );
-        }
+                    expect(actual.store).to.eql(expected.store);
+                    expect(actual.distance / expected.distance * 100).to.be.closeTo(100, DELTA_IN_PERCENT);
+                }
 
-        it('should return an array of stores', function (done) {
-            testCase1(function (res) {
-                expect(res).to.be.an('array');
-                done();
+                callback();
             });
-        });
+        }
 
         it('should pass test case 1 of jira case #43751-1147', function (done) {
-            testCase1(function (res) {
-                var expected = require('./results/43751-1147_testcase1.json'),
-                    resultElement = res[0],
-                    expectedElement = expected[0];
-
-                expect(res.length).to.equal(expected.length);
-
-                expect(resultElement.store).to.eql(expectedElement.store);
-                expect(resultElement.distance).to.be.closeTo(expectedElement.distance, 0.01);
-
-                done();
-            });
+            testCase(59.9170013, 10.72788689999993, 500, null, './results/43751-1147_testcase1.json', done);
         });
 
         it('should pass test case 2 of jira case #43751-1147', function (done) {
-            var floorDistanceOfStore = function (store) {
-                    var storeWithFlooredDistance = _.extend({}, store);
-                    storeWithFlooredDistance.distance = Math.round(storeWithFlooredDistance);
-                    return storeWithFlooredDistance;
-                },
-                productionResults = require('./results/43751-1147_testcase2.json'),
-                expected = productionResults.map(floorDistanceOfStore);
-
-            testCase2(function (res) {
-                var actual = res.map(floorDistanceOfStore);
-                expect(res.length).to.equal(98);
-                expect(actual).to.eql(expected);
-                done();
-            });
+            testCase(63.4305149, 10.39505280000003, 1230297, 'isopensunday', './results/43751-1147_testcase2.json', done);
         });
 
         it('should consider incomplete location data as being equal to being really far away', function () {
