@@ -1,7 +1,5 @@
 "use strict";
 
-// File system
-var fs = require('fs');
 // Request module
 var request = require('request');
 
@@ -16,14 +14,7 @@ process.env.AZURE_STORAGE_ACCESS_KEY = "3aUm5uHBpx54TNoK41DyZ6+dyGLiW+KprpPQecF7
 var log4js = require('log4js');
 var logger = log4js.getLogger('/productSearch/model');
 
-if(process.env.NODE_ENV === 'production') {
-	logger.setLevel(log4js.levels.OFF);
-} else {
-	logger.setLevel(log4js.levels.DEBUG);
-}
-
 // Import external modules
-var fileUtil = require('./utils/fileUtil');
 var dataUtils = require('./utils/dataUtil');
 
 // Setup Azure storage

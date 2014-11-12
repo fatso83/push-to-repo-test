@@ -1,5 +1,6 @@
 var utils = require('util');
 var PollingCacher = require('./polling-cacher');
+var logger = require('log4js').getLogger('boot-script');
 
 var environment = 'preprod';
 var storeCacher = new PollingCacher();
@@ -16,8 +17,8 @@ var storeCacher = new PollingCacher();
     }, {
         intervalInSeconds: 60*60,
         refreshHandler : function(stores) {
-            if(stores) console.log(utils.format('Refreshed store cache for %s. Got %d stores' , chainId, stores.length));
-            else console.log('An error has occurred when trying to refresh the store cache');
+            if(stores) { logger.info(utils.format('Refreshed store cache for %s. Got %d stores' , chainId, stores.length)); }
+            else { logger.error('An error has occurred when trying to refresh the store cache'); }
         }
     });
 

@@ -15,21 +15,22 @@ function main(callback) {
         path = require('path'),
         debug = require('debug')('ng-azure-rest-api');
 
-// Set global caching level
-    log4js.setGlobalLogLevel(log4js.levels.INFO);
-    //log4js.setGlobalLogLevel(log4js.levels.TRACE);
+    // Set global logging level
+    if (process.env.NODE_ENV === 'production') {
+        logger.setLevel(log4js.levels.OFF);
+    }
 
-// Routes
+    // Routes
     var request = require('./routes/request');
     var index = require('./routes/index');
 
-// Warm up caches
+    // Warm up caches
     var cacheWarmer = require('./modules/caching/boot-script');
     cacheWarmer.start();
 
-// Setup the search module
+    // Setup the search module
     var searchUtil = require('./modules/productSearch/searchUtil');
-// Start loading data when the server starts
+    // Start loading data when the server starts
     searchUtil.loadData();
 
     var app = express();
@@ -50,11 +51,10 @@ function main(callback) {
 
     app.use(express.static(path.join(__dirname, 'public')));
 
-// TODO: App Routes
     app.use('/', index);
     app.use('/request', request);
 
-// Catch 404 and forwarding to error handler
+    // Catch 404 and forwarding to error handler
     app.use(function (req, res, next) {
         var err = new Error('Not Found');
         err.status = 404;
@@ -63,7 +63,7 @@ function main(callback) {
     });
 
     server.listen(app.get('port'), function () {
-        console.log('Express server listening');
+        log4js.getDefaultLogger('Express server listening');
         callback && callback();
     });
 }
@@ -77,7 +77,7 @@ exports.stop = function (callback) {
     server.on('close', callback);
 };
 
-exports.start = function(cb) {
+exports.start = function (cb) {
     main(cb);
 };
 
