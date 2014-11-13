@@ -1,4 +1,5 @@
-var server;
+var server,
+    log4js = require('log4js');
 
 /**
  * @param callback for integration testing
@@ -9,7 +10,6 @@ function main(callback) {
         compress = require('compression'),
         cors = require('cors'),
         logger = require('morgan'),
-        log4js = require('log4js'),
         bodyParser = require('body-parser'),
         cookieParser = require('cookie-parser'),
         path = require('path'),
@@ -65,7 +65,6 @@ function main(callback) {
     });
 
     server.listen(app.get('port'), function () {
-        log4js.getDefaultLogger('Express server listening');
         callback && callback();
     });
 }
@@ -85,6 +84,6 @@ exports.start = function (cb) {
 
 /* start as normal if run directly from node */
 if (require.main === module) {
-    main();
+    main(console.log.bind(console, 'Express server listening'));
 }
 

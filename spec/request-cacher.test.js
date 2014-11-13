@@ -10,7 +10,7 @@ describe('RequestCacher', function () {
     var redisCacheStub, spy, cacher,
         externalRequestStub = {},
         requestBody = {
-            serviceId: 'someExternalService',
+            servicename: 'someExternalService',
             servicepath: '/some/external/service?myparam=1',
             frameworkVersion: '5.0.0',
             headers: []
