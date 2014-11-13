@@ -51,8 +51,28 @@ describe('slow.server tests', function () {
         }
     };
 
+    var testCase4_43751_1147 = {
+        path: '/FindStore/Stores/1300',
+        test: function (stores, done) {
+            expect(stores.length).to.be.greaterThan(170).and.lessThan(210);
+            done();
+        }
+    };
+
 
     describe('/FindStore/Stores/[chainid]', function () {
+
+        it('should return somewhere near 186 stores for Meny', function(done) {
+            request.get('http://localhost:1337' + testCase4_43751_1147.path, function (err, res, body) {
+                if (err) {
+                    done(err);
+                }
+
+                testCase4_43751_1147.test(JSON.parse(body), done);
+            });
+
+        });
+
     });
     describe('/FindStore/AllStoresInCounties/[chainid]', function () {
 
