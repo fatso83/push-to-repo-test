@@ -1,5 +1,5 @@
 var azure = require('azure-storage'),
-    config = require('../../config.js'),
+    config = require('./table-storage-config.js'),
     service = azure.createTableService(config.tableStorage.account, config.tableStorage.key),
     log4js = require('log4js'),
     logger = log4js.getLogger('Synchronize Service'),

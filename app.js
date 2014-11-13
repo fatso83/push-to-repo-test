@@ -1,10 +1,11 @@
 var server,
+    config = require('./modules/configuration-loader'),
     log4js = require('log4js');
 
 /**
  * @param callback for integration testing
  */
-function main(callback) {
+function main(config, callback) {
 
     var express = require('express'),
         compress = require('compression'),
@@ -16,28 +17,16 @@ function main(callback) {
         debug = require('debug')('ng-azure-rest-api');
 
     // Set global logging level
-    if (process.env.NODE_ENV === 'production') {
-        logger.setLevel(log4js.levels.OFF);
-    }
+    log4js.setGlobalLogLevel(log4js.levels[config.logging.level]);
 
     // Routes
     var request = require('./routes/request');
     var index = require('./routes/index');
 
-
-    // Warm up caches
-    var cacheWarmer = require('./modules/caching/boot-script');
-    cacheWarmer.start();
-
-    // Setup the search module
-    var searchUtil = require('./modules/productSearch/searchUtil');
-    // Start loading data when the server starts
-    searchUtil.loadData();
-
     var app = express();
     server = require('http').createServer(app);
 
-    app.set('port', process.env.PORT || 3000);
+    app.set('port', config.port);
 
     app.set('views', path.join(__dirname, 'views'));
     app.set('view engine', 'jade');
@@ -59,13 +48,33 @@ function main(callback) {
     // Catch 404 and forwarding to error handler
     app.use(function (req, res, next) {
         var err = new Error('Not Found');
+
         err.status = 404;
         err.message = "That route does not exist";
+
         next(err);
     });
 
     server.listen(app.get('port'), function () {
-        callback && callback();
+
+        // Warm up caches
+        if (!config.disable['cache-warmup']) {
+            var cacheWarmer = require('./modules/caching/boot-script');
+            cacheWarmer.start();
+        }
+
+        if (!config.disable['product-module']) {
+            // Load data needed for the search module
+            var searchUtil = require('./modules/productSearch/searchUtil');
+            searchUtil.loadData(function () {
+
+                // finally everything has been setup
+                if (callback) {
+                    callback();
+                }
+            });
+        } else { callback(); }
+
     });
 }
 
@@ -78,12 +87,17 @@ exports.stop = function (callback) {
     server.on('close', callback);
 };
 
-exports.start = function (cb) {
-    main(cb);
+exports.start = function (overrides, cb) {
+    config.load(overrides, function (config) {
+        main(config, cb);
+    });
 };
 
 /* start as normal if run directly from node */
 if (require.main === module) {
-    main(console.log.bind(console, 'Express server listening'));
+
+    config.load(function (config) {
+        main(config, console.log.bind(console, 'Express server listening'));
+    });
 }
 

@@ -49,7 +49,7 @@ function RequestCacher(opts) {
         opts.stubs = {};
     }
 
-    this._redisCache = opts.stubs.redisCache || require('./redisCache');
+    this._redisCache = opts.stubs.redisCache || require('./redis-cache');
     this._externalRequest = opts.stubs.externalRequest || require('../request_helpers/externalRequest');
 }
 
@@ -80,7 +80,7 @@ RequestCacher.prototype = {
      */
     handleRequest: function (fwServiceRequest, callback) {
         logger.debug('Handling request for ' + fwServiceRequest.servicename);
-        var hashKey, self = this;
+        var hashKey, self = this, start = Date.now();
 
         this._currentResult = null;
 
@@ -94,7 +94,7 @@ RequestCacher.prototype = {
 
             if (reply.status === "success" && cacheObj && !self.isOld(cacheObj.cacheTime)) {
 
-                logger.trace('----> Returning cached result');
+                logger.trace('----> Got cached result in ' + (Date.now()-start) + ' ms');
                 callback(cacheObj.response, null);
 
             } else {

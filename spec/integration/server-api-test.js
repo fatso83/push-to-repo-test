@@ -11,8 +11,10 @@ describe('slow.server tests', function () {
     this.timeout(6000);
 
     before(function (done) {
-        process.env.PORT = 1337;
-        app.start(done);
+        app.start({
+            port : 1337,
+            disable : {'cache-warmup' : 1, 'product-module' : 1 }
+        },done);
     });
 
     after(function (done) {

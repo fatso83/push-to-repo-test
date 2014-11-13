@@ -24,7 +24,7 @@ describe('slow.Table storage', function () {
     };
 
     before(function (done) {
-        logger.setLevel(log4js.levels.OFF)
+        logger.setLevel(log4js.levels.OFF);
         storage = require('../../../modules/synchronize/storage/tableStorage_v1.js');
         service = require('../../../modules/synchronize/service.js');
         service.setStorage(storage);

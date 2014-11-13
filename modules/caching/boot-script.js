@@ -26,6 +26,7 @@ chainIds.forEach(function (chainId) {
 });
 
 exports.start = function() {
+    logger.info('Starting warming of caches');
     storeCacher.start();
 };
 exports.stop = function() {
