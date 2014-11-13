@@ -1,78 +1,85 @@
+'use strict';
+
 var log4js = require('log4js');
 var logger = log4js.getLogger('Internal Request Resolver');
+
+// caching
+var RequestCacher = require('../caching/request-cacher');
+var ONE_DAY = 24 * 60 * 60;
+var requestCacher = new RequestCacher({maxAgeInSeconds: ONE_DAY});
+var cachingRequestHandler = requestCacher.handleRequest.bind(requestCacher);
 
 var productSearchModule = require('./../productSearch/searchUtil');
 var trumfTermsAndConditionsModule = require('./../terms_caching/terms_cacher');
 var persistenceSyncModule = require('./../synchronize/request-adapter');
-var cachedServiceModule = require('./cachedService');
 
-var localServices = [
-	{name : 'persistenceSynchronize', method : persistenceSyncModule.synchronize},
-	{name : 'trumfProfile_termsAndConditions', method : trumfTermsAndConditionsModule.fetch},
-	{name : 'productSearchProducts', method : productSearchModule.search},
-	{name : 'productSearchGroups', method : productSearchModule.search},
-	{name : 'productSearchBoth', method : productSearchModule.search},
-	{name : 'productSearchGetProductsForGroup', method : productSearchModule.search},
-	{name : 'productSearchGetAllCategories', method : productSearchModule.search},
-	{name : 'productSearchGetProductById', method : productSearchModule.search},
-	{name : 'productDetails2', method : cachedServiceModule.fetch},
-	{name : 'recommendations', method : cachedServiceModule.fetch},
-	{name : 'storesGetStore', method : cachedServiceModule.fetch},
-	{name : 'brandMatch', method : cachedServiceModule.fetch}
-];
+var localServices = {
+    'persistenceSynchronize': persistenceSyncModule.synchronize,
+    'trumfProfile_termsAndConditions': trumfTermsAndConditionsModule.fetch,
+    'productSearchProducts': productSearchModule.search,
+    'productSearchGroups': productSearchModule.search,
+    'productSearchBoth': productSearchModule.search,
+    'productSearchGetProductsForGroup': productSearchModule.search,
+    'productSearchGetAllCategories': productSearchModule.search,
+    'productSearchGetProductById': productSearchModule.search,
 
-exports.isLocalService = function (requestBody) {
-	var serviceName = requestBody.servicename;
+    // can't be cached
+    'storesClosestToMe': require('../stores/request-adapter'),
 
-	var i = localServices.length;
-	while (i--) {
-		if (localServices[i].name === serviceName) {
-			return true;
-		}
-	}
-	return false;
+    // cached requests
+    'productDetails2': cachingRequestHandler,
+    'recommendations': cachingRequestHandler,
+    'brandMatch': cachingRequestHandler,
+    'storesGetStore': cachingRequestHandler,
+    'allStoresInCounties': cachingRequestHandler // preliminary name
 };
 
-exports.makeRequest = function (requestBody, callback) {
-	logger.debug('Resolving internally');
+var isLocalService = function (requestBody) {
+    var serviceName = requestBody.servicename;
+    return serviceName in localServices;
+};
 
-		function getMethod (serviceName) {
-			var i = localServices.length;
-			while (i--) {
-				if (localServices[i].name === serviceName) {
-					return localServices[i].method;
-				}
-			}
-			return false;
-		}
 
-		var responseObj = {
-			serviceId    : requestBody.serviceId,
-			response     : {
-				code   : 200,
-				origin : 'internal',
-				data   : {}
-			}
-		};
+var getMethod = function (serviceName) {
+    var res = localServices[serviceName];
+    return res || false;
+};
 
-		var method = getMethod(requestBody.servicename);
+var makeRequest = function (requestBody, callback) {
+    logger.debug('Resolving request');
 
-		if (method) {
-			method(requestBody, function (response, error) {
-				if (error) {
-					responseObj.response.data = error.data || {};
-					responseObj.response.code = error.code || 500;
-					responseObj.response.origin = error.origin || 'internal';
-					callback(responseObj);
-				} else {
-					responseObj.response.data = response;
-					responseObj.response.origin = response.origin || 'internal';
-					callback(responseObj);
-				}
-			});
-		} else {
-			responseObj.response.code = 500;
-			responseObj.response.data = 'No service name supplied in request body';
-			callback(responseObj);
-		}
+    var responseObj = {
+        serviceId: requestBody.serviceId,
+        response: {
+            code: 200,
+            origin: 'internal',
+            data: {}
+        }
+    };
+
+    var method = getMethod(requestBody.servicename);
+
+    if (method) {
+        method(requestBody, function (response, error) {
+            if (error) {
+                responseObj.response.data = error.data || {};
+                responseObj.response.code = error.code || 500;
+                responseObj.response.origin = error.origin || 'internal';
+                callback(responseObj);
+            } else {
+                responseObj.response.data = response;
+                responseObj.response.origin = response.origin || 'internal';
+                callback(responseObj);
+            }
+        });
+    } else {
+        responseObj.response.code = 500;
+        responseObj.response.data = 'No service name supplied in request body';
+        callback(responseObj);
+    }
+};
+
+module.exports = exports = {
+    makeRequest: makeRequest,
+    isLocalService: isLocalService
 };

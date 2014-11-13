@@ -1,4 +1,5 @@
-var proxyquire= require('proxyquire').noCallThru();;
+'use strict';
+
 var sinon = require('sinon');
 var expect = require('chai').expect;
 var l4j = require('log4js');
@@ -10,8 +11,8 @@ loggerNames.forEach(function(name){
     logger.setLevel(l4j.levels.OFF);
 });
 
-describe('requestHandler', function () {
-    var requestData = {serviceName: 'someExternalService', frameworkVersion: '5.0.0'};
+describe('requestHandler - fast unit tests', function () {
+    var requestData = {servicename: 'someExternalService', frameworkVersion: '5.0.0', servicepath : '/asdfasdf'};
     var handler;
     var internalRequestStub;
     var externalRequestStub;
@@ -19,6 +20,8 @@ describe('requestHandler', function () {
     this.timeout(100);
 
     beforeEach(function () {
+        var proxyquire= require('proxyquire').noCallThru();
+
         internalRequestStub = {};
         externalRequestStub = {};
 

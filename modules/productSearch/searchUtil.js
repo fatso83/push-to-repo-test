@@ -7,12 +7,6 @@ var dataUtils = require('./utils/dataUtil');
 var log4js = require('log4js');
 var logger = log4js.getLogger('/productSearch/searchUtil');
 
-if (process.env.NODE_ENV === 'production') {
-	logger.setLevel(log4js.levels.OFF);
-} else {
-	logger.setLevel(log4js.levels.ALL);
-}
-
 var createEmptyOutput = function () {
 	return [
 		{
@@ -72,8 +66,8 @@ exports.search = function (request, callback) {
 };
 
 // Loads the data
-exports.loadData = function () {
-	chainDataModel.loadData();
+exports.loadData = function (cb) {
+	chainDataModel.loadData(cb);
 };
 
 exports.updateData = function () {

@@ -1,5 +1,5 @@
 var azure = require('azure-storage'),
-    config = require('../../config.js'),
+    config = require('./table-storage-config.js'),
     tableSvc = azure.createTableService(config.tableStorage.account, config.tableStorage.key),
     Promise = require("es6-promise").Promise,
     log4js = require('log4js'),

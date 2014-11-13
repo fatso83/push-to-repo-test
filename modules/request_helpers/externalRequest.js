@@ -1,12 +1,16 @@
+'use strict';
+
 var request = require('request');
+var util = require('util');
 
 var log4js = require('log4js');
 var logger = log4js.getLogger('Module External Request');
 
 var asJson = JSON.stringify;
 
+var makeRequest = function (requestData, callback) {
+	logger.debug('Resolving request');
 
-exports.makeRequest = function (requestData, callback) {
 	var baseURL = "https://preprod.service-dk.norgesgruppen.no/";
 
 	var isOauth = false;
@@ -52,20 +56,17 @@ exports.makeRequest = function (requestData, callback) {
 		method  : requestData.servicemethod || 'GET'
 	};
 
-	logger.debug('sender til ' + options.uri);
+	logger.debug('POSTing to: ' + options.uri);
 
 	if (requestData.servicemethod === 'POST') {
 		options.json = requestData.payload || "";
 	}
 
-	options.startTime = new Date().getTime();
+	options.startTime = Date.now();
 
-	logger.debug('<--- External Request -->');
 	logger.debug(options);
-	logger.debug('<-------------->');
 
 	request(options, function (error, response, body) {
-		logger.debug('Request callback');
 
 		if (error) {
 			logger.error('Got error', asJson(error));
@@ -82,7 +83,7 @@ exports.makeRequest = function (requestData, callback) {
 		}
 
 		try {
-			logger.debug('Got response from service, status', response.statusCode);
+			logger.trace(util.format('Got response for %s with code %d (%d KB)', requestData.servicename, response.statusCode, Math.round(body.length/1024)));
 
 			responseObj.response.code = response.statusCode;
 
@@ -104,3 +105,5 @@ exports.makeRequest = function (requestData, callback) {
 		callback(responseObj);
 	});
 };
+
+exports.makeRequest  = makeRequest;

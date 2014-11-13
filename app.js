@@ -1,56 +1,103 @@
-var express = require('express'),
-    compress = require('compression'),
-    cors = require('cors'),
-    logger = require('morgan'),
-    bodyParser = require('body-parser'),
-    cookieParser = require('cookie-parser'),
-    path = require('path'),
-    debug = require('debug')('ng-azure-rest-api');
+var server,
+    config = require('./modules/configuration-loader'),
+    log4js = require('log4js');
 
+/**
+ * @param callback for integration testing
+ */
+function main(config, callback) {
 
-// Routes
-var request = require('./routes/request');
-var index = require('./routes/index');
+    var express = require('express'),
+        compress = require('compression'),
+        cors = require('cors'),
+        logger = require('morgan'),
+        bodyParser = require('body-parser'),
+        cookieParser = require('cookie-parser'),
+        path = require('path'),
+        debug = require('debug')('ng-azure-rest-api');
 
-// Setup the Redis module
-var redis_mod = require('./modules/redisCache.js');
+    // Set global logging level
+    log4js.setGlobalLogLevel(log4js.levels[config.logging.level]);
 
-// Setup the search module
-var searchUtil = require('./modules/productSearch/searchUtil');
-// Start loading data when the server starts
-searchUtil.loadData();
+    // Routes
+    var request = require('./routes/request');
+    var index = require('./routes/index');
 
-var app = express();
-var server = require('http').createServer(app);
+    var app = express();
+    server = require('http').createServer(app);
 
-app.set('port', process.env.PORT || 3000);
+    app.set('port', config.port);
 
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+    app.set('views', path.join(__dirname, 'views'));
+    app.set('view engine', 'jade');
 
-app.use(compress());
-app.use(cors());
-app.use(logger('dev'));
+    app.use(compress());
+    app.use(cors());
+    app.use(logger('dev'));
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-app.use(cookieParser());
+    app.use(bodyParser.urlencoded({extended: false}));
+    app.use(bodyParser.json());
+    app.use(cookieParser());
 
-app.use(express.static(path.join(__dirname, 'public')));
+    app.use(express.static(path.join(__dirname, 'public')));
 
-// TODO: App Routes
-app.use('/', index);
-app.use('/request', request);
+    app.use('/', index);
+    app.use('/request', request);
+    app.use('/FindStore', require('./routes/find-store'));
 
-// Catch 404 and forwarding to error handler
-app.use(function (req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    err.message = "That route does not exist";
-    next(err);
-});
+    // Catch 404 and forwarding to error handler
+    app.use(function (req, res, next) {
+        var err = new Error('Not Found');
 
-server.listen(app.get('port'), function () {
-    console.log('Express server listening');
-});
+        err.status = 404;
+        err.message = "That route does not exist";
+
+        next(err);
+    });
+
+    server.listen(app.get('port'), function () {
+
+        // Warm up caches
+        if (!config.disable['cache-warmup']) {
+            var cacheWarmer = require('./modules/caching/boot-script');
+            cacheWarmer.start();
+        }
+
+        if (!config.disable['product-module']) {
+            // Load data needed for the search module
+            var searchUtil = require('./modules/productSearch/searchUtil');
+            searchUtil.loadData(function () {
+
+                // finally everything has been setup
+                if (callback) {
+                    callback();
+                }
+            });
+        } else { callback(); }
+
+    });
+}
+
+/**
+ * expose stop and start functions for testing
+ */
+
+exports.stop = function (callback) {
+    server.close();
+    server.on('close', callback);
+};
+
+exports.start = function (overrides, cb) {
+    config.load(overrides, function (config) {
+        main(config, cb);
+    });
+};
+
+/* start as normal if run directly from node */
+if (require.main === module) {
+
+    config.load(function (config) {
+        main(config, console.log.bind(console, 'Express server listening'));
+    });
+}
 
