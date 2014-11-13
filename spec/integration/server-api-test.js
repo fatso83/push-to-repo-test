@@ -12,9 +12,10 @@ describe('slow.server tests', function () {
 
     before(function (done) {
         app.start({
-            port : 1337,
-            disable : {'cache-warmup' : 1, 'product-module' : 1 }
-        },done);
+            port: 1337,
+            disable: {'cache-warmup': 1, 'product-module': 1},
+            logging: {level: 'WARN'}
+        }, done);
     });
 
     after(function (done) {
@@ -44,7 +45,7 @@ describe('slow.server tests', function () {
                 expect(ostFold.municipalities.length).to.equal(7);
 
                 done();
-            }catch(ex) {
+            } catch (ex) {
                 done(ex);
             }
         }
@@ -58,9 +59,11 @@ describe('slow.server tests', function () {
         it('should return 20 counties and the right number of municipalities', function (done) {
 
             request.get('http://localhost:1337' + testCase3_43751_1147.path, function (err, res, body) {
-                if(err) { done(err); }
+                if (err) {
+                    done(err);
+                }
 
-                testCase3_43751_1147.test(JSON.parse(body),done);
+                testCase3_43751_1147.test(JSON.parse(body), done);
             });
 
         });
@@ -71,9 +74,11 @@ describe('slow.server tests', function () {
         it('should return lots of stores', function (done) {
 
             request.get('http://localhost:1337' + testCase2_43751_1147.path, function (err, res, body) {
-                if(err) { done(err); }
+                if (err) {
+                    done(err);
+                }
 
-                testCase2_43751_1147.test(JSON.parse(body),done);
+                testCase2_43751_1147.test(JSON.parse(body), done);
             });
 
         });
