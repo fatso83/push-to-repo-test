@@ -7,6 +7,9 @@ var expect = require('chai').expect;
 
 describe('slow.server tests', function () {
 
+    // ngt servers are slow
+    this.timeout(6000);
+
     before(function (done) {
         process.env.PORT = 1337;
         app.start(done);
@@ -19,19 +22,49 @@ describe('slow.server tests', function () {
     // StoresClosestToMe
     var testCase2_43751_1147 = {
         path: "/FindStore/StoresClosestToMe/1100/?latitude=63.4305149&longitude=10.39505280000003&minnumberofstores=1&maxNumberOfStores=0&maxDistance=1230297&filter=isopensunday",
-        test: function testCase2_43751_1147(stores, done) {
+        test: function (stores, done) {
             expect(stores).to.be.an('array');
             expect(stores.length).to.be.greaterThan(90).and.lessThan(200);
             done();
         }
     };
 
+    var testCase3_43751_1147 = {
+        path: '/FindStore/AllStoresInCounties/1210',
+        test: function (counties, done) {
+
+            try {
+                expect(counties.length).to.be.equal(21);
+
+                var ostFold = counties.filter(function (c) {
+                    return c.county.name.toLocaleUpperCase() === 'ØSTFOLD';
+                })[0];
+                expect(ostFold.municipalities.length).to.equal(7);
+
+                done();
+            }catch(ex) {
+                done(ex);
+            }
+        }
+    };
+
+
     describe('/FindStore/Stores/[chainid]', function () {
     });
     describe('/FindStore/AllStoresInCounties/[chainid]', function () {
+
+        it('should return 20 counties and the right number of municipalities', function (done) {
+
+            request.get('http://localhost:1337' + testCase3_43751_1147.path, function (err, res, body) {
+                if(err) { done(err); }
+
+                testCase3_43751_1147.test(JSON.parse(body),done);
+            });
+
+        });
     });
 
-    describe.only('/FindStore/StoresClosestToMe/[chainid]', function () {
+    describe('/FindStore/StoresClosestToMe/[chainid]', function () {
 
         it('should return lots of stores', function (done) {
 

@@ -14,20 +14,29 @@ function createRequestBody(servicename, path) {
 		"environment": "preprod",
 		"servicename": servicename,
 		"servicepath": "api" + path,
-		"frameworkVersion": "5.0.0"
+		"frameworkVersion": "5.0.0",
+		"headers" : []
 	};
 }
-//router.get('/StoresClosestToMe/:id', cors(), function (req, res) {
-//
-//});
 
-router.get('/StoresClosestToMe/:id', cors(), function (req, res) {
-	//console.log('asdf;alskdjfas',req);
-	//res.send('jhello');
-	requestHandler.handleRequest(createRequestBody('storesClosestToMe',req.originalUrl), function(result) {
-		//console.log(result.body)
+function routeToRequestHandler(res, serviceName, url) {
+	requestHandler.handleRequest(createRequestBody(serviceName, url), function(result) {
 		res.status(result.response.code || 500).json(result.response.data);
 	});
+}
+
+// location based service
+router.get('/StoresClosestToMe/:chainid', cors(), function (req, res) {
+	routeToRequestHandler(res, 'storesClosestToMe',req.originalUrl);
 });
 
+// fetches stores grouped on counties
+router.get('/AllStoresInCounties/:chainid', cors(), function(req,res) {
+	routeToRequestHandler(res, 'allStoresInCounties',req.originalUrl);
+});
+
+// fetches all stores
+router.get('/Stores/:chainid', cors(), function(req,res) {
+	routeToRequestHandler(res, 'storesGetStore',req.originalUrl);
+});
 module.exports = router;
