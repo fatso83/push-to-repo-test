@@ -64,12 +64,9 @@ var makeRequest = function (requestData, callback) {
 
 	options.startTime = Date.now();
 
-	logger.debug('<--- External Request -->');
 	logger.debug(options);
-	logger.debug('<-------------->');
 
 	request(options, function (error, response, body) {
-		logger.debug('Request callback');
 
 		if (error) {
 			logger.error('Got error', asJson(error));
