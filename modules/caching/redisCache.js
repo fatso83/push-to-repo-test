@@ -16,8 +16,8 @@ var redis_lib = require("redis");
 
 logger.trace('Initializing redis');
 
-var cli = redis_lib.createClient(6379, 'ngredis.redis.cache.windows.net',
-	{auth_pass : 'wLas7WOEZDEzNbMMYmUv2scGPrtGfuPyVIWA/LJqpyU=', return_buffers : true});
+var cli = redis_lib.createClient(6379, 'ngredisdev.redis.cache.windows.net',
+	{auth_pass : '5SziauARAm7mWus0zl3sfv4OwccMVEtwIh5vMgp/D7c=', return_buffers : true});
 
 
 function on_error (error) {
