@@ -9,6 +9,7 @@
 
 var crypto = require('crypto');
 var logger = require('log4js').getLogger('RequestCacher');
+var utils = require('util');
 
 var basicToken = 'Basic J8ed0(tyAop206%JHP';
 
@@ -78,12 +79,13 @@ RequestCacher.prototype = {
      * @param callback called with the (possibly cached) result
      */
     handleRequest: function (fwServiceRequest, callback) {
+        logger.debug('Handling request for ' + fwServiceRequest.servicename);
         var hashKey, self = this;
 
         this._currentResult = null;
 
         hashKey = hash(fwServiceRequest);
-        logger.debug('The key is', hashKey);
+        logger.debug('Key: ', hashKey);
 
         this._redisCache.get(hashKey, function (reply) {
             var cacheObj = reply.data || null;
@@ -111,8 +113,8 @@ RequestCacher.prototype = {
         logger.trace('Getting data from server (using external request)');
 
         this._externalRequest.makeRequest(fwServiceRequest, function (res) {
-            logger.trace('Got response', res);
             var code = res.response.code;
+            logger.trace(utils.format('Got response for %s with code %d', fwServiceRequest.servicename, code));
 
             if (code === 200 || code === 201 || code === 204) {
                 if (res.response.data) {
