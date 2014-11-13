@@ -40,6 +40,7 @@ cli.on('error', on_error);
 cli.on('drain', on_drain);
 cli.on('idle', on_idle);
 cli.on('end', on_end);
+cli.on('ready', logger.info.bind(logger,'Redis ready'));
 
 /**
  * Save data to redis cache
@@ -96,41 +97,6 @@ exports.get = function (key, callback) {
 				cbo.data = JSON.parse((reply || "").toString());
 			}
 			callback(cbo);
-		});
-	} else {
-		callback({
-			status : "error",
-			error  : "Missing parameters (key, callback)"
-		});
-	}
-};
-
-/**
- * Deletes a key and its data from the Redis cache
- * @param key - The key of the data to fetch
- * @param callback(callbackObj)
- */
-exports.delete = function (key, callback) {
-	if (key && (typeof key === 'string') && callback && (typeof callback === 'function')) {
-		cli.del(key, function (err, reply) {
-			var cbo = {
-				status : "success",
-				data   : null,
-				error  : null
-			};
-
-			if (err || reply === null) {
-				cbo.status = "error";
-				if (err) {
-					cbo.error = err;
-				} else {
-					cbo.error = "Key not found";
-				}
-			}
-			callback({
-				status : status,
-				error  : error
-			});
 		});
 	} else {
 		callback({
