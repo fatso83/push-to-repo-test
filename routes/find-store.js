@@ -2,7 +2,8 @@ var express = require('express');
 var router = express.Router();
 var cors = require('cors');
 
-var requestHandler = require('./../modules/requestHandler');
+var requestHandler = require('../modules/requestHandler');
+var storesRepository = require('../modules/stores/store-repository');
 
 var log4js = require('log4js');
 var logger = log4js.getLogger('FindStore');
@@ -29,16 +30,16 @@ function routeToRequestHandler(res, serviceName, url) {
 
 // location based service
 router.get('/StoresClosestToMe/:chainid', cors(), function (req, res) {
-    routeToRequestHandler(res, 'storesClosestToMe', req.originalUrl);
+    routeToRequestHandler(res, 'storesClosestToMe', 'api' + req.originalUrl);
 });
 
 // fetches stores grouped on counties
 router.get('/AllStoresInCounties/:chainid', cors(), function (req, res) {
-    routeToRequestHandler(res, 'allStoresInCounties', req.originalUrl);
+    routeToRequestHandler(res, 'allStoresInCounties', 'api' + req.originalUrl);
 });
 
 // fetches all stores
 router.get('/Stores/:chainid', cors(), function (req, res) {
-    routeToRequestHandler(res, 'storesGetStore', req.originalUrl);
+    routeToRequestHandler(res, 'storesGetStore', storesRepository.getStoreUrl(req.params.chainid));
 });
 module.exports = router;

@@ -6,11 +6,13 @@ var app = require('../../app');
 var expect = require('chai').expect;
 
 describe('slow.server tests', function () {
+    var testStart;
 
     // ngt servers are slow
     this.timeout(6000);
 
     before(function (done) {
+        testStart = Date.now();
         app.start({
             port: 1337,
             disable: {'cache-warmup': 1, 'product-module': 1},
@@ -20,6 +22,7 @@ describe('slow.server tests', function () {
 
     after(function (done) {
         app.stop(done);
+        console.log('Server API Test duration',(Date.now()-testStart));
     });
 
     // StoresClosestToMe

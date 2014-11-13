@@ -11,10 +11,7 @@ function createRequestBody(opts) {
         "headers": []
     };
 
-    var obj = _.extend(defaults, opts);
-    obj.servicepath= "api" + opts.servicepath;
-
-    return obj;
+    return _.extend(defaults, opts);
 }
 
 module.exports = exports = {
