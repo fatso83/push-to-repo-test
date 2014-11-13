@@ -4,6 +4,7 @@ var log4js = require('log4js');
 var logger = log4js.getLogger('Redis Cache');
 var configuration = require('../configuration-loader');
 var redis_lib = require("redis");
+var queuedOperations = [];
 var cli;
 
 
@@ -50,6 +51,11 @@ configuration.load(function (config) {
     cli.on('idle', on_idle);
     cli.on('end', on_end);
     cli.on('ready', logger.info.bind(logger, 'Redis ready'));
+
+    var i = queuedOperations.length
+    while (i--) {
+        queuedOperations[i]();
+    }
 });
 
 /**
@@ -58,7 +64,7 @@ configuration.load(function (config) {
  * @param data - Data to save (object, string whatever)
  * @param callback(callbackObj)
  */
-exports.cache = function (key, data, callback) {
+var cache = function (key, data, callback) {
 
     if (key && (typeof key === 'string') && data && callback && (typeof callback === 'function')) {
         var toSave = JSON.stringify(data);
@@ -88,7 +94,7 @@ exports.cache = function (key, data, callback) {
  * @param key - The key of the data to fetch
  * @param callback(callbackObj)
  */
-exports.get = function (key, callback) {
+var get = function (key, callback) {
     var start = Date.now();
 
     if (key && (typeof key === 'string') && callback && (typeof callback === 'function')) {
@@ -116,5 +122,30 @@ exports.get = function (key, callback) {
             status: "error",
             error: "Missing parameters (key, callback)"
         });
+    }
+};
+
+var queueOperation = function (cmd, args) {
+    queuedOperations.push(function() {
+        cmd.apply(null, args);
+    });
+};
+
+module.exports = exports = {
+    get: function () {
+        if (!cli) {
+            queueOperation(get, arguments);
+        }
+        else {
+            get.apply(null, arguments);
+        }
+    },
+    cache: function () {
+        if (!cli) {
+            queueOperation(cache, arguments);
+        }
+        else {
+            cache.apply(null, arguments);
+        }
     }
 };
