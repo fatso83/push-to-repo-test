@@ -3,7 +3,7 @@ var PollingCacher = require('./polling-cacher');
 var logger = require('log4js').getLogger('boot-script');
 
 var storeCacher = new PollingCacher();
-var storesRepository = require('../modules/stores/store-repository');
+var storesRepository = require('../../modules/stores/store-repository');
 
 // cache stores
 var chainIds = [1100, 1210, 1300];
