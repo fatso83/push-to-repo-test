@@ -30,12 +30,12 @@ function routeToRequestHandler(res, serviceName, url) {
 
 // location based service
 router.get('/StoresClosestToMe/:chainid', cors(), function (req, res) {
-    routeToRequestHandler(res, 'storesClosestToMe', 'api' + req.originalUrl);
+    routeToRequestHandler(res, 'storesClosestToMe', req.originalUrl);
 });
 
 // fetches stores grouped on counties
 router.get('/AllStoresInCounties/:chainid', cors(), function (req, res) {
-    routeToRequestHandler(res, 'allStoresInCounties', 'api' + req.originalUrl);
+    routeToRequestHandler(res, 'allStoresInCounties', req.originalUrl);
 });
 
 // fetches all stores

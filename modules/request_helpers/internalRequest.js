@@ -45,6 +45,7 @@ var getMethod = function (serviceName) {
     return res || false;
 };
 
+
 var makeRequest = function (requestBody, callback) {
     logger.debug('Resolving request');
 
@@ -79,7 +80,14 @@ var makeRequest = function (requestBody, callback) {
     }
 };
 
-module.exports = exports = {
+
+exports.makeRequest = makeRequest;
+exports.isLocalService = isLocalService;
+
+// Somehow this seems to fail when running internalRequest recursively
+/*
+module.exports = {
     makeRequest: makeRequest,
     isLocalService: isLocalService
 };
+*/

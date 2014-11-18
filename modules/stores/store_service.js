@@ -11,7 +11,7 @@ var inMemRepo = {
     }
 };
 
-repository = inMemRepo;
+repository = require('./store-repository.js');
 
 function isNumber(n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
@@ -87,8 +87,9 @@ function getClosestStores(latitude, longitude, minNumberOfStores, maxNumberOfSto
     var myPos = {"latitude": latitude, "longitude": longitude};
     var FAR_FAR_AWAY = Math.pow(10, 100);
 
-    repository.getStores(function (stores) {
-        var storeArray = stores.map(function (elem) {
+    repository.getStores(1100, function (stores) {
+
+        var storeArray = stores.response.data.map(function (elem) {
             var distance,
                 location = elem.location;
 
@@ -110,10 +111,10 @@ function getClosestStores(latitude, longitude, minNumberOfStores, maxNumberOfSto
 
         callback(storeArray);
     });
-
 }
 
+
 exports.getClosestStores = getClosestStores;
-exports.setRepository = function (repo) {
+exports.setRepository = function(repo) {
     repository = repo;
 };

@@ -13,17 +13,10 @@ var getStoreRequest = function(chainId) {
     });
 };
 
-/**
- *
- * @param chainId
- * @param cb
- */
 var getStores = function repository(chainId, cb) {
-
     internalRequestHandler.makeRequest(
-        getStoreRequest(chainId, cb)
+        getStoreRequest(chainId) , cb
     );
-
 };
 
 

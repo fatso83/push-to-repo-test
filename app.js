@@ -43,7 +43,7 @@ function main(config, callback) {
 
     app.use('/', index);
     app.use('/request', request);
-    app.use('/FindStore', require('./routes/find-store'));
+    app.use('/api/FindStore', require('./routes/find-store'));
 
     // Catch 404 and forwarding to error handler
     app.use(function (req, res, next) {

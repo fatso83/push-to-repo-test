@@ -7,7 +7,7 @@ var service = require('./store_service');
 var url = require('url');
 var _ = require('lodash');
 var querystring = require('querystring');
-var isNumber = require("isnumber")
+var isNumber = require("isnumber");
 
 function missingMandatoryParameters(params) {
     return !('longitude' in params && 'latitude' in params);
