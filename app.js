@@ -97,7 +97,7 @@ exports.start = function (overrides, cb) {
 if (require.main === module) {
 
     config.load(function (config) {
-        main(config, console.log.bind(console, 'Express server listening'));
+        main(config, console.log.bind(console, 'Express server listening at :' + config.port ));
     });
 }
 
