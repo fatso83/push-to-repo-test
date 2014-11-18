@@ -34,3 +34,6 @@ node_modules
 # Azure
 azure.err
 *.publishsettings
+
+# Visual Studio
+.ntvs_analysis.dat
