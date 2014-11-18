@@ -42,7 +42,7 @@ function on_end() {
 configuration.load(function (config) {
     var redis = config.caching.redis;
 
-    cli = redis_lib.createClient(redis.port, redis.url,
+    cli = redis_lib.createClient(redis.port, redis.host,
         {auth_pass: redis.key, return_buffers: true});
 
     cli.on('connect', on_connect);

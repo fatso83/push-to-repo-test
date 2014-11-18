@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <Name>NG-Azure-REST-API</Name>
+    <RootNamespace>NG-Azure-REST-API</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>c78eb353-dcc6-4c56-a34f-1e00641dc689</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <StartupFile>app.js</StartupFile>
+    <StartWebBrowser>False</StartWebBrowser>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
+    <ProjectView>ShowAllFiles</ProjectView>
+    <StartWebBrowser>false</StartWebBrowser>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="app.js" />
+    <Compile Include="modules\caching\boot-script.js" />
+    <Compile Include="modules\caching\polling-cacher.js" />
+    <Compile Include="modules\caching\redis-cache.js" />
+    <Compile Include="modules\caching\request-cacher.js" />
+    <Compile Include="modules\configuration-loader.js" />
+    <Compile Include="modules\productSearch\model.js" />
+    <Compile Include="modules\productSearch\searchUtil.js" />
+    <Compile Include="modules\productSearch\titleSearch.js" />
+    <Compile Include="modules\productSearch\utils\dataUtil.js" />
+    <Compile Include="modules\productSearch\utils\fileUtil.js" />
+    <Compile Include="modules\requestHandler.js" />
+    <Compile Include="modules\request_helpers\externalRequest.js" />
+    <Compile Include="modules\request_helpers\internalRequest.js" />
+    <Compile Include="modules\request_helpers\request-builder.js" />
+    <Compile Include="modules\response-request-verifier.js" />
+    <Compile Include="modules\stores\request-adapter.js" />
+    <Compile Include="modules\stores\store-repository.js" />
+    <Compile Include="modules\stores\store_service.js" />
+    <Compile Include="modules\synchronize\loggable.js" />
+    <Compile Include="modules\synchronize\request-adapter.js" />
+    <Compile Include="modules\synchronize\service.js" />
+    <Compile Include="modules\synchronize\storage\InMemStorage.js" />
+    <Compile Include="modules\synchronize\storage\table-storage-config.js" />
+    <Compile Include="modules\synchronize\storage\tableStorage_v1.js" />
+    <Compile Include="modules\synchronize\storage\tableStorage_v2.js" />
+    <Compile Include="modules\synchronize\storage\transaction.js" />
+    <Compile Include="modules\terms_caching\terms_cacher.js" />
+    <Compile Include="modules\Utils.js" />
+    <Compile Include="routes\find-store.js" />
+    <Compile Include="routes\index.js" />
+    <Compile Include="routes\request.js" />
+    <Compile Include="spec\integration\requestHandler.slow.test.js" />
+    <Compile Include="spec\integration\server-api-test.js" />
+    <Compile Include="spec\integration\synchronize\synchronize_table_storage.test.js" />
+    <Compile Include="spec\integration\table storage\table_storage.test.js" />
+    <Compile Include="spec\polling-cacher.test.js" />
+    <Compile Include="spec\request-cacher.test.js" />
+    <Compile Include="spec\requestHandler.test.js" />
+    <Compile Include="spec\stores\closest-stores.test.js" />
+    <Compile Include="spec\synchronize\synchronize_service.test.js" />
+    <Compile Include="spec\utils\redis-cache-stub.js" />
+    <Compile Include="spec\__pre.test.js" />
+    <Content Include=".gitignore" />
+    <Content Include="defaults.json" />
+    <Content Include="development.json" />
+    <Content Include="modules\stores\data\kiwistores.json" />
+    <Content Include="package.json" />
+    <Content Include="production.json" />
+    <Content Include="README.md" />
+    <Content Include="spec\stores\fixtures\kiwistores.json" />
+    <Content Include="views\error.jade" />
+    <Content Include="views\index.jade" />
+    <Content Include="views\layout.jade" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="modules\" />
+    <Folder Include="modules\caching\" />
+    <Folder Include="modules\productSearch\" />
+    <Folder Include="modules\productSearch\utils\" />
+    <Folder Include="modules\request_helpers\" />
+    <Folder Include="modules\stores\" />
+    <Folder Include="modules\stores\data\" />
+    <Folder Include="modules\synchronize\" />
+    <Folder Include="modules\synchronize\storage\" />
+    <Folder Include="modules\terms_caching\" />
+    <Folder Include="routes\" />
+    <Folder Include="spec\" />
+    <Folder Include="spec\integration\" />
+    <Folder Include="spec\integration\synchronize\" />
+    <Folder Include="spec\integration\table storage\" />
+    <Folder Include="spec\stores\" />
+    <Folder Include="spec\stores\fixtures\" />
+    <Folder Include="spec\synchronize\" />
+    <Folder Include="spec\utils\" />
+    <Folder Include="views\" />
+  </ItemGroup>
+  <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
+</Project>
