@@ -24,11 +24,13 @@ var float = parseWithFallback(parseFloat);
 
 module.exports = function (requestBody, callback) {
 
-    var parsedUrl, params;
-
+    var parsedUrl, params, chainId;
+    
     // ensure easier parsing of parameters
     parsedUrl = url.parse(requestBody.servicepath.toLowerCase());
+    chainId = parsedUrl.pathname.substr(parsedUrl.pathname.lastIndexOf('/')+1);
     params = querystring.parse(parsedUrl.query);
+    
 
     if (missingMandatoryParameters(params)) {
         callback(null, {data: "Mandatory query parameters are: latitude, longitude", code: 400});
@@ -37,6 +39,7 @@ module.exports = function (requestBody, callback) {
 
     try {
         service.getClosestStores(
+            int(chainId),
             float(params.latitude),
             float(params.longitude),
             int(params.minnumberofstores, 1),

@@ -83,25 +83,31 @@ function filterByOpeninghours(storeArray, filter) {
 }
 
 
-function getClosestStores(latitude, longitude, minNumberOfStores, maxNumberOfStores, maxDistance, filter, callback) {
+function getClosestStores(chainId, latitude, longitude, minNumberOfStores, maxNumberOfStores, maxDistance, filter, callback) {
     var myPos = {"latitude": latitude, "longitude": longitude};
     var FAR_FAR_AWAY = Math.pow(10, 100);
 
-    repository.getStores(1100, function (stores) {
+    repository.getStores(chainId, function (stores) {
 
-        var storeArray = stores.response.data.map(function (elem) {
-            var distance,
-                location = elem.location;
+        var storeArray = [];
+        if (stores.response.code != "200")
+            throw "FAIL";
 
-            if (!location || !isNumber(location.latitude) || !isNumber(location.longitude)) {
-                distance = FAR_FAR_AWAY;
-            }
-            else {
-                distance = geolib.getDistance(myPos, location) / 1000;
-            }
+        if (stores.response.data) {
+            // TODO: more error checking here
+            storeArray = stores.response.data.map(function(elem) {
+                var distance,
+                    location = elem.location;
 
-            return createStoreDistanceObject(elem, distance);
-        });
+                if (!location || !isNumber(location.latitude) || !isNumber(location.longitude)) {
+                    distance = FAR_FAR_AWAY;
+                } else {
+                    distance = geolib.getDistance(myPos, location) / 1000;
+                }
+
+                return createStoreDistanceObject(elem, distance);
+            });
+        }
 
         storeArray.sort(function (a, b) {
             return a.distance - b.distance;
