@@ -81,6 +81,8 @@
     <Content Include="production.json" />
     <Content Include="README.md" />
     <Content Include="spec\stores\fixtures\kiwistores.json" />
+    <Content Include="spec\stores\expected\43751-1147_testcase1.json" />
+    <Content Include="spec\stores\expected\43751-1147_testcase2.json" />
     <Content Include="views\error.jade" />
     <Content Include="views\index.jade" />
     <Content Include="views\layout.jade" />
@@ -102,6 +104,7 @@
     <Folder Include="spec\integration\table storage\" />
     <Folder Include="spec\stores\" />
     <Folder Include="spec\stores\fixtures\" />
+    <Folder Include="spec\stores\expected\" />
     <Folder Include="spec\synchronize\" />
     <Folder Include="spec\utils\" />
     <Folder Include="views\" />
