@@ -2,7 +2,7 @@ var builder = require('../request_helpers/request-builder');
 var internalRequestHandler = require('../request_helpers/internalRequest');
 
 var getStoreUrl = function(chainId) {
-    return 'api/FindStore/Stores/' + chainId + '?checkForHolidays=30'; //fetches special opening hours n days ahead
+    return 'api/FindStore/Stores/' + chainId + '?checkForHolidays=30'; //fetches special opening hours n days ahead.
 };
 
 var getCountyUrl = function (chainId) {
