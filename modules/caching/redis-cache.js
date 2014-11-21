@@ -7,7 +7,6 @@ var redis_lib = require("redis");
 var queuedOperations = [];
 var cli;
 
-
 /**
  * The object returned in the callback method
  */
