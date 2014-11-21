@@ -37,3 +37,5 @@ azure.err
 
 # Visual Studio
 .ntvs_analysis.dat
+*.suo
+obj/
