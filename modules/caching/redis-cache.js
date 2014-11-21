@@ -52,8 +52,9 @@ configuration.load(function (config) {
     cli.on('end', on_end);
     cli.on('ready', logger.info.bind(logger, 'Redis ready'));
 
-    var i = queuedOperations.length
+    var i = queuedOperations.length;
     while (i--) {
+        logger.trace('Dequeuing');
         queuedOperations[i]();
     }
 });
@@ -99,7 +100,7 @@ var get = function (key, callback) {
 
     if (key && (typeof key === 'string') && callback && (typeof callback === 'function')) {
         cli.get(key, function (err, reply) {
-            logger.trace('Redis lookup finished in ' + (Date.now() - start) + ' ms');
+            logger.trace('Redis lookup finished in ' + (Date.now() - start) + ' ms ' + '[' + key + ']');
             var cbo = {
                 status: "success",
                 data: null,
@@ -133,6 +134,7 @@ var queueOperation = function (cmd, args) {
 
 module.exports = exports = {
     get: function () {
+        
         if (!cli) {
             queueOperation(get, arguments);
         }
@@ -141,6 +143,7 @@ module.exports = exports = {
         }
     },
     cache: function () {
+        
         if (!cli) {
             queueOperation(cache, arguments);
         }
