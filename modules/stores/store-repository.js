@@ -5,6 +5,10 @@ var getStoreUrl = function(chainId) {
     return 'api/FindStore/Stores/' + chainId + '?checkForHolidays=30'; //fetches special opening hours n days ahead
 };
 
+var getCountyUrl = function (chainId) {
+    return 'api/FindStore/AllStoresInCounties/' + chainId;
+};
+
 var getStoreRequest = function(chainId) {
 
     return builder.createRequestBody({
@@ -12,6 +16,13 @@ var getStoreRequest = function(chainId) {
         servicepath: getStoreUrl(chainId)
     });
 };
+
+var getCountyRequest = function(chainId) {
+    return builder.createRequestBody({
+        servicename: 'allStoresInCounties',
+        servicepath: getCountyUrl(chainId)
+    });
+}
 
 var getStores = function repository(chainId, cb) {
     internalRequestHandler.makeRequest(
@@ -23,5 +34,6 @@ var getStores = function repository(chainId, cb) {
 module.exports = {
     getStores : getStores,
     getStoreRequest :  getStoreRequest,
+    getCountyRequest : getCountyRequest,
     getStoreUrl : getStoreUrl
 };

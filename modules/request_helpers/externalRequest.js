@@ -8,32 +8,42 @@ var logger = log4js.getLogger('Module External Request');
 
 var asJson = JSON.stringify;
 
+function createUri(requestData) {
+    var baseURL = "https://preprod.service-dk.norgesgruppen.no/";
+    
+    var isOauth = false;
+    if (requestData.servicepath.toLowerCase().indexOf('oauth/') > -1) {
+        isOauth = true;
+    }
+    
+    if (requestData.environment === 'preproduction' || requestData.environment === 'local') {
+        if (isOauth) {
+            baseURL = "https://preprod.oauth.norgesgruppen.no/";
+        } else {
+            baseURL = "https://preprod.service-dk.norgesgruppen.no/";
+        }
+    } else if (requestData.environment === 'production') {
+        if (isOauth) {
+            baseURL = "https://oauth.norgesgruppen.no/";
+        } else {
+            baseURL = "https://service-dk.norgesgruppen.no/";
+        }
+    } else if (isOauth) {
+        baseURL = "https://preprod.oauth.norgesgruppen.no/";
+    }
+
+    var servicepath = requestData.servicepath;
+    if (servicepath && servicepath.length > 0 && servicepath[0] == '/')
+        servicepath = servicepath.substr(1);
+
+    return baseURL + servicepath;
+}
+
+
 var makeRequest = function (requestData, callback) {
 	logger.debug('Resolving request');
 
-	var baseURL = "https://preprod.service-dk.norgesgruppen.no/";
-
-	var isOauth = false;
-	if (requestData.servicepath.toLowerCase().indexOf('oauth/') > -1) {
-		isOauth = true;
-	}
-
-	if (requestData.environment === 'preproduction' || requestData.environment === 'local') {
-		if (isOauth) {
-			baseURL = "https://preprod.oauth.norgesgruppen.no/";
-		} else {
-			baseURL = "https://preprod.service-dk.norgesgruppen.no/";
-		}
-	} else if (requestData.environment === 'production') {
-		if (isOauth) {
-			baseURL = "https://oauth.norgesgruppen.no/";
-		} else {
-			baseURL = "https://service-dk.norgesgruppen.no/";
-		}
-	} else if (isOauth) {
-		baseURL = "https://preprod.oauth.norgesgruppen.no/";
-	}
-
+	
 	var responseObj = {
 		serviceId    : requestData.serviceId,
 		response     : {
@@ -50,7 +60,7 @@ var makeRequest = function (requestData, callback) {
 	});
 
 	var options = {
-		uri     : baseURL + requestData.servicepath,
+		uri     : createUri( requestData),
 		headers : headers,
 		timeout : 25000, // Timeout after 25 sec
 		method  : requestData.servicemethod || 'GET'

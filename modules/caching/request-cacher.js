@@ -14,6 +14,7 @@ var utils = require('util');
 var basicToken = 'Basic J8ed0(tyAop206%JHP';
 
 function hash(requestBody) {
+    
     var requestToken, hashKey, servicePath;
 
     servicePath = requestBody.servicepath.toLowerCase();
@@ -30,7 +31,6 @@ function hash(requestBody) {
     }
 
     hashKey = 'ng_service_cache_' + (requestBody.environment || "") + "_" + crypto.createHash('sha256').update(servicePath + requestToken + payload).digest('base64');
-
     return hashKey;
 }
 
@@ -94,7 +94,7 @@ RequestCacher.prototype = {
 
             if (reply.status === "success" && cacheObj && !self.isOld(cacheObj.cacheTime)) {
 
-                logger.trace('----> Got cached result in ' + (Date.now()-start) + ' ms');
+                logger.trace('--> Got cached result in ' + (Date.now()-start) + ' ms');
                 callback(cacheObj.response, null);
 
             } else {

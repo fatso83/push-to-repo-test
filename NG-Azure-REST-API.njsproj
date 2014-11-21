@@ -5,7 +5,7 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <Name>NG-Azure-REST-API</Name>
     <RootNamespace>NG-Azure-REST-API</RootNamespace>
-    <NodejsPort>1337</NodejsPort>
+    <NodejsPort>3000</NodejsPort>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -49,6 +49,7 @@
     <Compile Include="modules\response-request-verifier.js" />
     <Compile Include="modules\stores\request-adapter.js" />
     <Compile Include="modules\stores\store-repository.js" />
+    <Compile Include="modules\stores\store-utils.js" />
     <Compile Include="modules\stores\store_service.js" />
     <Compile Include="modules\synchronize\loggable.js" />
     <Compile Include="modules\synchronize\request-adapter.js" />

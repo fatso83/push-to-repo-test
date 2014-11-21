@@ -21,6 +21,17 @@ chainIds.forEach(function (chainId) {
         }
     });
 
+    storeCacher.addRequest(storesRepository.getCountyRequest(chainId), {
+        intervalInSeconds: 60 * 60,
+        refreshHandler: function (counties) {
+            if (counties) {
+                logger.info(utils.format('Refreshed county cache for %s. Got %d counties', chainId, counties.length));
+            }
+            else {
+                logger.error('An error has occurred when trying to refresh the county cache');
+            }
+        }
+    });
 });
 
 exports.start = function () {
