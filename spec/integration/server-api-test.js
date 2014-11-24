@@ -27,7 +27,7 @@ describe('slow.server tests', function () {
 
     // StoresClosestToMe
     var testCase2_43751_1147 = {
-        path: "/FindStore/StoresClosestToMe/1100/?latitude=63.4305149&longitude=10.39505280000003&minnumberofstores=1&maxNumberOfStores=0&maxDistance=1230297&filter=isopensunday",
+        path: "/api/FindStore/StoresClosestToMe/1100/?latitude=63.4305149&longitude=10.39505280000003&minnumberofstores=1&maxNumberOfStores=0&maxDistance=1230297&filter=isopensunday",
         test: function (stores, done) {
             expect(stores).to.be.an('array');
             expect(stores.length).to.be.greaterThan(90).and.lessThan(200);
@@ -36,7 +36,7 @@ describe('slow.server tests', function () {
     };
 
     var testCase3_43751_1147 = {
-        path: '/FindStore/AllStoresInCounties/1210',
+        path: '/api/FindStore/AllStoresInCounties/1210',
         test: function (counties, done) {
 
             try {
@@ -55,7 +55,7 @@ describe('slow.server tests', function () {
     };
 
     var testCase4_43751_1147 = {
-        path: '/FindStore/Stores/1300',
+        path: '/api/FindStore/Stores/1300',
         test: function (stores, done) {
             expect(stores.length).to.be.greaterThan(170).and.lessThan(210);
             done();
@@ -92,7 +92,7 @@ describe('slow.server tests', function () {
         });
     });
 
-    describe('/FindStore/StoresClosestToMe/[chainid]', function () {
+    describe('/api/FindStore/StoresClosestToMe/[chainid]', function () {
 
         it('should return lots of stores', function (done) {
 
@@ -115,7 +115,7 @@ describe('slow.server tests', function () {
                 var testCase = {
                     "environment": "preprod",
                     "servicename": "storesClosestToMe",
-                    "servicepath": "api" + testCase2_43751_1147.path,
+                    "servicepath": testCase2_43751_1147.path,
                     "frameworkVersion": "5.0.0"
                 };
 

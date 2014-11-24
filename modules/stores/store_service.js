@@ -26,7 +26,7 @@ function getClosestStores(chainId, latitude, longitude, minNumberOfStores, maxNu
     repository.getStores(chainId, function(stores) {
 
         if (stores.response.code != "200") {
-            throw new Error("Service returned... ");
+            throw new Error("Service returned... " + JSON.stringify(stores.response));
         }
 
         var i = stores.response.data.length;
