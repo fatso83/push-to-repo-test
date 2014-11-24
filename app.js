@@ -94,9 +94,9 @@ exports.start = function (overrides, cb) {
 };
 
 /* start as normal if run directly from node */
-if (require.main === module) {
+//if (require.main === module) {
 
     config.load(function (config) {
         main(config, console.log.bind(console, 'Express server listening at :' + config.port ));
     });
-}
+//}
