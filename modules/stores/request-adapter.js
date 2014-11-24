@@ -8,6 +8,7 @@ var url = require('url');
 var _ = require('lodash');
 var querystring = require('querystring');
 var isNumber = require("isnumber");
+var re_chainId = /\/(\d{4})\/?$/;
 
 function missingMandatoryParameters(params) {
     return !('longitude' in params && 'latitude' in params);
@@ -24,13 +25,18 @@ var float = parseWithFallback(parseFloat);
 
 module.exports = function (requestBody, callback) {
 
-    var parsedUrl, params, chainId;
+    var parsedUrl, params, chainId, match;
     
     // ensure easier parsing of parameters
     parsedUrl = url.parse(requestBody.servicepath.toLowerCase());
-    chainId = parsedUrl.pathname.substr(parsedUrl.pathname.lastIndexOf('/')+1);
+    match = parsedUrl.pathname.match(re_chainId);
     params = querystring.parse(parsedUrl.query);
-    
+
+    if(!match) {
+        callback(null, {data: "Missing chain id as path parameter", code: 400});
+        return;
+    }
+    chainId = match[1];
 
     if (missingMandatoryParameters(params)) {
         callback(null, {data: "Mandatory query parameters are: latitude, longitude", code: 400});
