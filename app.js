@@ -100,4 +100,3 @@ if (require.main === module) {
         main(config, console.log.bind(console, 'Express server listening at :' + config.port ));
     });
 }
-
