@@ -4,7 +4,7 @@
     "redis" : {
       "host": "ngredispreprod.redis.cache.windows.net",
       "port" : 6379,
-      "key": "3McjDJQLiQF41qG5QUl88lqfWmeWVQUvgS+y+WdN4N8="
+      "key": "A7Gjb+kcsHan+YLyWceko98OdTvwcv3BtQo9VQniJrU="
     }
   }
 }

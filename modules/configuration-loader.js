@@ -19,7 +19,7 @@ function loadConfiguration(overrides, callback) {
     var nodeenv = process.env.NODE_ENV,
         port = process.env.PORT,
         s = seraphim.createVault()
-            .on('error', logger.error.bind(console))
+            .on('error', logger.error.bind(logger))
             //Default settings
             .load({disable: {}})
             .load("defaults.json");
