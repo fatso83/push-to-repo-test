@@ -79,7 +79,7 @@ exports.load = function (overrides, callback) {
         cb(cachedConfig);
     }
     else if (calledButNotLoaded && !hasOverrides) {
-        queue.push(callback);
+        queue.push(cb);
     }
     else {
         loadConfiguration(opts, cb);
