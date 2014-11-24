@@ -58,10 +58,10 @@ function main(config, callback) {
     server.listen(app.get('port'), function () {
 
         // Warm up caches
-        if (!config.disable['cache-warmup']) {
-            var cacheWarmer = require('./modules/caching/boot-script');
-            cacheWarmer.start();
-        }
+        //if (!config.disable['cache-warmup']) {
+        //    var cacheWarmer = require('./modules/caching/boot-script');
+        //    cacheWarmer.start();
+        //}
 
         if (!config.disable['product-module']) {
             // Load data needed for the search module
