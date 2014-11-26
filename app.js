@@ -19,9 +19,6 @@ function main(config, callback) {
         path = require('path'),
         debug = require('debug')('ng-azure-rest-api');
 
-    // Set global logging level
-    log4js.setGlobalLogLevel(log4js.levels[config.logging.level]);
-
     // Routes
     var request = require('./routes/request');
     var index = require('./routes/index');

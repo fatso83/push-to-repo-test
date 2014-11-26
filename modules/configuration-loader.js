@@ -6,8 +6,10 @@
  * so make your objects hybrids; accepting both config objects and use defaults otherwise
  */
 
+var fs = require('fs');
 var seraphim = require('seraphim');
-var logger = require('log4js').getLogger('Configuration Loader');
+var log4js = require('log4js');
+var logger = log4js.getLogger('Configuration Loader');
 var calledButNotLoaded, cachedConfig, queue = [];
 
 /**
@@ -30,7 +32,14 @@ function loadConfiguration(overrides, callback) {
 
     //CONFIGURATION_PROFILE=(development/production/<none>) settings
     if (profile) {
-        s.load(profile + ".json");
+        var fileName = profile + ".json";
+
+        if (fs.existsSync(fileName)) {
+            s.load(fileName);
+        } else {
+            logger.warn('A configuration profile was specified, but no file with that name was found!');
+        }
+
     }
     if (port) {
         s.load({port: port});
@@ -48,8 +57,12 @@ function loadConfiguration(overrides, callback) {
     s.load({caching: {redis: redisConfig}});
 
     s.load(overrides)
-        .on('end', logger.debug.bind(logger, 'Configuration loaded:\n'))
         .on('end', function (config) {
+            // Set global logging level
+            log4js.setGlobalLogLevel(log4js.levels[config.logging.level]);
+
+            logger.debug('Configuration loaded:\n', config);
+
             cachedConfig = config;
             callback(config);
 
