@@ -10,7 +10,7 @@ Definition dump from the class RESTPayload in the Frameowork
 ```typescript
 export class RESTPayload {
         servicename:string;      // the service name (i.e. getTrumfProfile)
-        environment:string;      // preprod, prod, etc
+        environment:string;      // preproduction, production, etc
         servicepath:string;      // the path part of the url (after the hostname)
         servicemethod:string;    // GET, PUT, POST, DELETE, ...
         payload:any;             // only relevant for PUT and POST
@@ -19,11 +19,6 @@ export class RESTPayload {
 
 # Configuration
 Configuration is performed by looking up environment variables and loading the right configuration profile.
-
-- port - *The port to listen for connections - defaults to 3000 *
-- minimum framework version
-- logging.level *ALL|TRACE|DEBUG|INFO|WARN|ERROR*
-
 
 ## Environment variables
 
@@ -34,7 +29,10 @@ Configuration is performed by looking up environment variables and loading the r
 - REDIS_KEY *The key/password*
 
 ## Other variables that can be set in the configuration files
-
+- port - *The port to listen for connections - defaults to 3000 *
+- minimum framework version
+- logging.level *ALL|TRACE|DEBUG|INFO|WARN|ERROR*
+- caching.environment sets the request environment used when fetching data from the services. Used by the external request module and the request builder.
 
 # Description of modules
 

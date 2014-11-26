@@ -1,3 +1,6 @@
 {
-  "logging" : { "level": "WARN" }
+  "logging": {"level": "INFO"},
+  "caching": {
+    "environment": "production"
+  }
 }

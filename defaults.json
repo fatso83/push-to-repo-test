@@ -2,5 +2,7 @@
   "port": 3000,
   "logging": {"level": "INFO"},
   "minimum framework version": "5.0.0",
-  "caching": { }
+  "caching": {
+    "environment" : "preproduction"
+  }
 }
