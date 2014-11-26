@@ -1,44 +1,13 @@
-var express = require('express'),
-    compress = require('compression'),
-    cors = require('cors'),
-    logger = require('morgan'),
-    bodyParser = require('body-parser'),
-    cookieParser = require('cookie-parser'),
-    path = require('path'),
-    debug = require('debug')('ng-azure-rest-api');
+var server,
+    config = require('./modules/configuration-loader'),
+    log4js = require('log4js');
 
-var index = require('./routes/index');
+console.log('#####################')
+console.log('#####################')
+console.log(require, JSON.stringify(require))
+console.log('#####################')
+console.log('#####################')
 
-var app = express();
-var server = require('http').createServer(app);
-
-app.set('port', process.env.PORT || 2000);
-
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
-
-app.use(compress());
-app.use(cors());
-app.use(logger('dev'));
-
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-app.use(cookieParser());
-
-app.use(express.static(path.join(__dirname, 'public')));
-
-// TODO: App Routes
-app.use('/', index);
-
-// Catch 404 and forwarding to error handler
-app.use(function (req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    err.message = "That route does not exist";
-    next(err);
-});
-
-server.listen(app.get('port'), function () {
-    debug('Express server listening');
-});
-
+console.log('(require.main === module) ', (require.main === module));
+console.log('(require.main) ', require.main);
+console.log('(module) ', module);
