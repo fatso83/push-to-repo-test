@@ -1,6 +1,9 @@
 var server,
     config = require('./modules/configuration-loader'),
-    log4js = require('log4js');
+    log4js = require('log4js'),
+
+    //http://stackoverflow.com/questions/27101171/pattern-for-ifrequire-main-that-works-on-azures-iisnode/27151366
+    runningIISNode = require.main.filename.match(/iisnode/);
 
 /**
  * @param callback for integration testing
@@ -93,10 +96,13 @@ exports.start = function (overrides, cb) {
     });
 };
 
-/* start as normal if run directly from node */
-//if (require.main === module) {
+/*
+ *  start as normal if run directly from node
+ *  special treatment in the case of running IISNode (Azure)
+**/
+if (require.main === module || runningIISNode) {
 
     config.load(function (config) {
         main(config, console.log.bind(console, 'Express server listening at :' + config.port ));
     });
-//}
+}
