@@ -1,5 +1,5 @@
 {
-  "logging" : { "level": "TRACE" },
+  "logging" : { "level": "WARN" },
   "caching" : {
     "redis" : {
       "host": "ngredisprod.redis.cache.windows.net",
