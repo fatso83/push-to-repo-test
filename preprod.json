@@ -1,3 +1,10 @@
 {
-  "logging" : { "level": "DEBUG" }
+  "logging" : { "level": "WARN" },
+  "caching" : {
+    "redis" : {
+      "host": "ngredispreprod.redis.cache.windows.net",
+      "port" : 6379,
+      "key": "A7Gjb+kcsHan+YLyWceko98OdTvwcv3BtQo9VQniJrU="
+    }
+  }
 }

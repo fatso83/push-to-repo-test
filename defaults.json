@@ -1,6 +1,12 @@
 {
   "port": 3000,
-  "logging": {"level": "INFO"},
+  "logging": {"level": "TRACE"},
   "minimum framework version": "5.0.0",
-  "caching": { }
+  "caching": {
+    "redis": {
+      "host": "ngredisdev.redis.cache.windows.net",
+      "port": 6379,
+      "key": "5SziauARAm7mWus0zl3sfv4OwccMVEtwIh5vMgp/D7c="
+    }
+  }
 }

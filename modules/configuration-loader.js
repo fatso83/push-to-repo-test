@@ -16,36 +16,21 @@ var calledButNotLoaded, cachedConfig, queue = [];
  * @param callback called with the config object as argument
  */
 function loadConfiguration(overrides, callback) {
-    var profile = process.env.CONFIGURATION_PROFILE,
-        redisConfig = {},
+    var nodeenv = process.env.NODE_ENV,
         port = process.env.PORT,
-        redisUri = process.env.REDIS_URI,
-        redisPort = process.env.REDIS_PORT,
-        redisKey = process.env.REDIS_KEY,
         s = seraphim.createVault()
             .on('error', logger.error.bind(logger))
             //Default settings
             .load({disable: {}})
             .load("defaults.json");
 
-    //CONFIGURATION_PROFILE=(development/production/<none>) settings
-    if (profile) {
-        s.load(profile + ".json");
+    //NODE_ENV (development/production/<none>) settings
+    if (nodeenv) {
+        s.load(nodeenv + ".json");
     }
     if (port) {
         s.load({port: port});
     }
-
-    if (!redisUri) {
-        logger.warn('No Redis host explicitly set using REDIS_URI. Falling back to localhost ... ');
-        redisConfig.host = '127.0.0.1';
-        redisConfig.port = 6379;
-    } else {
-        redisConfig.host = redisUri;
-        redisConfig.port = redisPort;
-        redisConfig.key = redisKey;
-    }
-    s.load({caching: {redis: redisConfig}});
 
     s.load(overrides)
         .on('end', logger.debug.bind(logger, 'Configuration loaded:\n'))
