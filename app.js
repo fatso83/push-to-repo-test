@@ -45,6 +45,8 @@ function main(config, callback) {
     app.use('/', index);
     app.use('/request', request);
     app.use('/api/FindStore', require('./routes/find-store'));
+    app.use('/loaderio-c3741ebb643657e965b349ec5d11ab7e', require('./routes/loaderio'));
+
 
     // Catch 404 and forwarding to error handler
     app.use(function (req, res, next) {
