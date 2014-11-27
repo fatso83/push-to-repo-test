@@ -1,4 +1,4 @@
-//var newrelic = require('newrelic'),
+var newrelic = require('newrelic');
 var server,
     config = require('./modules/configuration-loader'),
     log4js = require('log4js'),
