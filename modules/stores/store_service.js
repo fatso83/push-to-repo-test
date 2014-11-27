@@ -53,7 +53,7 @@ function getClosestStores(chainId, latitude, longitude, minNumberOfStores, maxNu
 
             storeArray = util.filterByOpeninghours(storeArray, filter);
             storeArray = util.filterByLimits(storeArray, minNumberOfStores, maxNumberOfStores, maxDistance);
-            storeArray = util.limitNumberOfSpecialOpeningHoursAhead(storeArray, 7);
+            //storeArray = util.limitNumberOfSpecialOpeningHoursAhead(storeArray, 7);
 
             var today = moment().tz("Europe/Oslo");
             util.applyTodaysOpeningHours(today, storeArray);
