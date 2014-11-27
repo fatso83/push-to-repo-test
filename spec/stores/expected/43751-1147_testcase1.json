@@ -1,0 +1,94 @@
+[
+  {
+    "store": {
+      "name": "Kiwi 356 Parkveien",
+      "location": {
+        "latitude": 59.9210996731,
+        "longitude": 10.7294905411
+      },
+      "id": 7080000974528,
+      "description": "",
+      "services": "BIB Full",
+      "link": "",
+      "email": "kiwi.parkveien@kiwi.no",
+      "openinghours": {
+        "days": [
+          {
+            "date": null,
+            "label": "Hverdager",
+            "to": "23:00",
+            "from": "07:00"
+          },
+          {
+            "date": null,
+            "label": "Lørdag",
+            "to": "23:00",
+            "from": "09:00"
+          }
+        ],
+        "special": [
+          {
+            "date": "2014-11-30",
+            "label": "1. søndag i advent",
+            "to": "",
+            "from": ""
+          },
+          {
+            "date": "2014-12-07",
+            "label": "2. søndag i advent",
+            "to": "20:00",
+            "from": "14:00"
+          },
+          {
+            "date": "2014-12-14",
+            "label": "3. søndag i advent",
+            "to": "20:00",
+            "from": "14:00"
+          },
+          {
+            "date": "2014-12-21",
+            "label": "4. søndag i advent",
+            "to": "20:00",
+            "from": "14:00"
+          },
+          {
+            "date": "2014-12-24",
+            "label": "Julaften",
+            "to": "16:00",
+            "from": "07:00"
+          },
+          {
+            "date": "2014-12-25",
+            "label": "1.juledag",
+            "to": "",
+            "from": ""
+          },
+          {
+            "date": "2014-12-26",
+            "label": "2.juledag",
+            "to": "",
+            "from": ""
+          }
+        ],
+        "today": {
+          "date": "2014-11-20",
+          "label": "Dagens åpningstider",
+          "to": "23:00",
+          "from": "07:00"
+        },
+        "isopenlate": true,
+        "isopenonsunday": false
+      },
+      "zipcode": "0350",
+      "zipcitycode": "OSLO",
+      "municipalitid": 301,
+      "regionname": "ØST",
+      "visitaddress": "Parkveien 8",
+      "phone": "23 20 21 90",
+      "chainid": 1100,
+      "countyid": 3,
+      "fax": "23 20 21 91"
+    },
+    "distance": 0.46439995530655931
+  }
+]
