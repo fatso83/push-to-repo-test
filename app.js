@@ -1,4 +1,5 @@
-var server,
+var newrelic = require('newrelic'),
+    server,
     config = require('./modules/configuration-loader'),
     log4js = require('log4js'),
 
