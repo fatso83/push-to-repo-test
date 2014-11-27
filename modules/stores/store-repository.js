@@ -33,7 +33,6 @@ var getStores = function repository(chainId, cb) {
     );
 };
 
-
 module.exports = {
     getStores : getStores,
     getStoreRequest :  getStoreRequest,
