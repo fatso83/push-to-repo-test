@@ -159,7 +159,7 @@ module.exports = {
     isNumber : isNumber,
     filterByLimits : filterByLimits,
     filterByOpeninghours : filterByOpeninghours,
-    limitNumberOfSpecialOpeningHoursAhead : limitNumberOfSpecialOpeningHoursAhead,
+    //limitNumberOfSpecialOpeningHoursAhead : limitNumberOfSpecialOpeningHoursAhead,
     applyTodaysOpeningHours : applyTodaysOpeningHours,
     isValidLocation : isValidLocation
 
