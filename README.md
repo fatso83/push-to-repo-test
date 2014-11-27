@@ -3,19 +3,38 @@
 This REST API serves as a layer in front of the NGT services, dealing with the requests coming from the framework
 and also doing caching of the NGT services.
 
-#The request data format
+#The request data format used internally
 
 Definition dump from the class RESTPayload in the Frameowork
 
 ```typescript
 export class RESTPayload {
         servicename:string;      // the service name (i.e. getTrumfProfile)
-        environment:string;      // preprod, prod, etc
+        environment:string;      // preproduction, production, etc
         servicepath:string;      // the path part of the url (after the hostname)
         servicemethod:string;    // GET, PUT, POST, DELETE, ...
         payload:any;             // only relevant for PUT and POST
         headers:Array<any>;
 ```
+
+# Configuration
+Configuration is performed by looking up environment variables and loading the right configuration profile.
+
+## Environment variables
+
+- CONFIGURATION_PROFILE *The basename of the json file to load*
+- PORT *The port to listen for connections - defaults to 3000 *
+- REDIS_URI *The redis host*
+- REDIS_PORT *The redis port - the client does not support HTTPS on 6380 yet*
+- REDIS_KEY *The key/password*
+
+## Other variables that can be set in the configuration files
+- port - *The port to listen for connections - defaults to 3000 *
+- minimum framework version
+- logging.level *ALL|TRACE|DEBUG|INFO|WARN|ERROR*
+- caching.environment sets the request environment used when fetching data from the services. Used by the external request module and the request builder.
+
+# Description of modules
 
 ## RequestCacher
     1. Receives the requestBody object in handleRequest and does a call using the 'externalRequest' module
@@ -24,18 +43,13 @@ export class RESTPayload {
     4. The two last fields are only used if they exist, so they are not compulsory.
     5. Results are refreshed as configured
 
-# Improvements to service caching
-There needs to be improvements to the current caching
+## PollingCacher
+Used for warming and refreshing caches. A thin wrapper around the `RequestCacher`, that is internally for the
+actual caching logic.
 
-## Non-standard error passing
-Our redisCache module does not use the standard convention in node of having an error as the first callback argument.
-
-## Required caching module for NGT services:
-    * Should be able to warmup the cache before being hit by supplying it with a list of urls or request bodies
-    * Configurable refresh interval
-    * Needs per-service caching logic:
-        * which urls to warm up
-        * how often to refresh the cache
-    * Can reuse points 1-4 in the old module
-    * Needs to change #5  to support configurable intervals
-
+```javascript
+var p = new PollingCacher();
+p.addRequest(requestBody, { intervalInSeconds: 60 }
+p.addRequest(requestBody2, { intervalInSeconds: 60*60*24 }
+p.start();
+```

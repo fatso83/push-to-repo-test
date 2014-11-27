@@ -6,8 +6,10 @@
  * so make your objects hybrids; accepting both config objects and use defaults otherwise
  */
 
+var fs = require('fs');
 var seraphim = require('seraphim');
-var logger = require('log4js').getLogger('Configuration Loader');
+var log4js = require('log4js');
+var logger = log4js.getLogger('Configuration Loader');
 var calledButNotLoaded, cachedConfig, queue = [];
 
 /**
@@ -16,25 +18,51 @@ var calledButNotLoaded, cachedConfig, queue = [];
  * @param callback called with the config object as argument
  */
 function loadConfiguration(overrides, callback) {
-    var nodeenv = process.env.NODE_ENV,
+    var profile = process.env.CONFIGURATION_PROFILE,
+        redisConfig = {},
         port = process.env.PORT,
+        redisUri = process.env.REDIS_URI,
+        redisPort = process.env.REDIS_PORT,
+        redisKey = process.env.REDIS_KEY,
         s = seraphim.createVault()
             .on('error', logger.error.bind(logger))
             //Default settings
             .load({disable: {}})
             .load("defaults.json");
 
-    //NODE_ENV (development/production/<none>) settings
-    if (nodeenv) {
-        s.load(nodeenv + ".json");
+    //CONFIGURATION_PROFILE=(development/production/<none>) settings
+    if (profile) {
+        var fileName = profile + ".json";
+
+        if (fs.existsSync(fileName)) {
+            s.load(fileName);
+        } else {
+            logger.warn('A configuration profile was specified, but no file with that name was found!');
+        }
+
     }
     if (port) {
         s.load({port: port});
     }
 
+    if (!redisUri) {
+        logger.warn('No Redis host explicitly set using REDIS_URI. Falling back to localhost ... ');
+        redisConfig.host = '127.0.0.1';
+        redisConfig.port = 6379;
+    } else {
+        redisConfig.host = redisUri;
+        redisConfig.port = redisPort;
+        redisConfig.key = redisKey;
+    }
+    s.load({caching: {redis: redisConfig}});
+
     s.load(overrides)
-        .on('end', logger.debug.bind(logger, 'Configuration loaded:\n'))
         .on('end', function (config) {
+            // Set global logging level
+            log4js.setGlobalLogLevel(log4js.levels[config.logging.level]);
+
+            logger.debug('Configuration loaded:\n', config);
+
             cachedConfig = config;
             callback(config);
 

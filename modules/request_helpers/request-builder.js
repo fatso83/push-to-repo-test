@@ -1,4 +1,13 @@
-var _ = require('lodash');
+var _ = require('lodash'),
+    config;
+
+/*
+ *  Async operation, but we expect it to be loaded by app.js by now, effectively
+ *  making it a synchronous request
+ */
+require('../configuration-loader').load(function(loadedConfig){
+   config = loadedConfig;
+});
 
 function createRequestBody(opts) {
     if(!( ('servicename' in opts) && ('servicepath' in opts))) {
@@ -6,8 +15,8 @@ function createRequestBody(opts) {
     }
 
     var defaults = {
-        "environment": "preprod",
-        "frameworkVersion": "5.0.0",
+        "environment": config.caching.environment,
+        "frameworkVersion":  config['minimum framework version'],
         "headers": []
     };
 
@@ -15,5 +24,10 @@ function createRequestBody(opts) {
 }
 
 module.exports = exports = {
-    createRequestBody : createRequestBody
+    createRequestBody : createRequestBody,
+
+    // for testing
+    setConfig : function(fakeConfig) {
+        config = fakeConfig;
+    }
 };
