@@ -23,7 +23,7 @@ function routeToRequestHandler(res, serviceName, url) {
     });
 
     requestHandler.handleRequest(body, function (result) {
-        logger.trace('Request took ', Date.now() - t, 'ms to process');
+        logger.info('Request took ', Date.now() - t, 'ms to process');
         res.status(result.response.code || 500).jsonp(result.response.data);
     });
 }

@@ -1,5 +1,5 @@
 {
-  "logging": {"level": "TRACE"},
+  "logging": {"level": "INFO"},
   "caching": {
     "environment": "production"
   }
