@@ -24,14 +24,15 @@ var localServices = {
     'productSearchGetProductById': productSearchModule.search,
 
     // can't be cached
-    'storesClosestToMe': require('../stores/request-adapter'),
-
+    'storesClosestToMe': require('../stores/request-adapter').closestToMe,
+    'storesGetSingleStore': require('../stores/request-adapter').getSingleStore,
+    
     // cached requests
     'productDetails2': cachingRequestHandler,
     'recommendations': cachingRequestHandler,
     'brandMatch': cachingRequestHandler,
+    'allStoresInCounties': cachingRequestHandler, // preliminary name
     'storesGetStore': cachingRequestHandler,
-    'allStoresInCounties': cachingRequestHandler // preliminary name
 };
 
 var isLocalService = function (requestBody) {
@@ -62,6 +63,7 @@ var makeRequest = function (requestBody, callback) {
 
     if (method) {
         method(requestBody, function (response, error) {
+            
             if (error) {
                 responseObj.response.data = error.data || {};
                 responseObj.response.code = error.code || 500;

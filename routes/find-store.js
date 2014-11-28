@@ -40,6 +40,10 @@ router.get('/AllStoresInCounties/:chainid', cors(), function (req, res) {
 
 // fetches all stores
 router.get('/Stores/:chainid', cors(), function (req, res) {
-    routeToRequestHandler(res, 'storesGetStore', storesRepository.getStoreUrl(req.params.chainid));
+    if (req.query && req.query.storeId) {
+        routeToRequestHandler(res, 'storesGetSingleStore', req.originalUrl);
+    } else {
+        routeToRequestHandler(res, 'storesGetStore', storesRepository.getStoreUrl(req.params.chainid));
+    }
 });
 module.exports = router;

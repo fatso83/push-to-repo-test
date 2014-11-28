@@ -62,6 +62,7 @@
     <Compile Include="modules\terms_caching\terms_cacher.js" />
     <Compile Include="modules\Utils.js" />
     <Compile Include="routes\find-store.js" />
+    <Compile Include="routes\loaderio.js" />
     <Compile Include="routes\index.js" />
     <Compile Include="routes\request.js" />
     <Compile Include="spec\integration\requestHandler.slow.test.js" />

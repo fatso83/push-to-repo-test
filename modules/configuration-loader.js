@@ -48,6 +48,8 @@ function loadConfiguration(overrides, callback) {
     if (!redisUri) {
         logger.warn('No Redis host explicitly set using REDIS_URI. Falling back to localhost ... ');
         redisConfig.host = '127.0.0.1';
+        //redisConfig.host = 'ngredisdev.redis.cache.windows.net';
+        //redisConfig.key = '5SziauARAm7mWus0zl3sfv4OwccMVEtwIh5vMgp/D7c=';
         redisConfig.port = 6379;
     } else {
         redisConfig.host = redisUri;

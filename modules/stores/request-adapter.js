@@ -23,26 +23,51 @@ var parseWithFallback = function (parser) {
 var int = parseWithFallback(parseInt);
 var float = parseWithFallback(parseFloat);
 
-module.exports = function (requestBody, callback) {
-
+function getSingleStore(requestBody, callback) {
     var parsedUrl, params, chainId, match;
     
     // ensure easier parsing of parameters
     parsedUrl = url.parse(requestBody.servicepath.toLowerCase());
     match = parsedUrl.pathname.match(re_chainId);
     params = querystring.parse(parsedUrl.query);
-
-    if(!match) {
-        callback(null, {data: "Missing chain id as path parameter", code: 400});
+    
+    if (!match) {
+        callback(null, { data: "Missing chain id as path parameter", code: 400 });
         return;
     }
     chainId = match[1];
 
-    if (missingMandatoryParameters(params)) {
-        callback(null, {data: "Mandatory query parameters are: latitude, longitude", code: 400});
+    try {
+        service.getSingleStore(
+            int(chainId),
+            params.storeid,
+            callback
+        );
+    } catch (err) {
+        callback(null, err);
+    }
+}
+
+function closestToMe(requestBody, callback) {
+    
+    var parsedUrl, params, chainId, match;
+    
+    // ensure easier parsing of parameters
+    parsedUrl = url.parse(requestBody.servicepath.toLowerCase());
+    match = parsedUrl.pathname.match(re_chainId);
+    params = querystring.parse(parsedUrl.query);
+    
+    if (!match) {
+        callback(null, { data: "Missing chain id as path parameter", code: 400 });
         return;
     }
-
+    chainId = match[1];
+    
+    if (missingMandatoryParameters(params)) {
+        callback(null, { data: "Mandatory query parameters are: latitude, longitude", code: 400 });
+        return;
+    }
+    
     try {
         service.getClosestStores(
             int(chainId),
@@ -58,3 +83,7 @@ module.exports = function (requestBody, callback) {
         callback(null, err);
     }
 };
+
+
+exports.closestToMe = closestToMe;
+exports.getSingleStore = getSingleStore;
