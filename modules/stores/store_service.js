@@ -52,7 +52,7 @@ function getSingleStore(chainId, storeId, callback) {
 
 
 
-// TODO: parametres as object
+// TODO: parametres as object would be prettier
 function getClosestStores(chainId, latitude, longitude, minNumberOfStores, maxNumberOfStores, maxDistance, filter, callback) {
     var myPos = { "latitude": latitude, "longitude": longitude };
 

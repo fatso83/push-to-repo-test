@@ -6,7 +6,9 @@ var storeCacher = new PollingCacher();
 var storesRepository = require('../../modules/stores/store-repository');
 
 // cache stores
-var chainIds = [1100, 1210, 1300];
+var chainIds = [1100, 1210, 1220, 1270, 1300, 1320];
+
+
 chainIds.forEach(function (chainId) {
 
     storeCacher.addRequest(storesRepository.getStoreRequest(chainId), {
