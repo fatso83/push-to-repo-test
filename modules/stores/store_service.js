@@ -6,8 +6,6 @@ var geolib = require('geolib');
 var moment = require('moment-timezone');
 var util = require('./store-utils');
 var repository;
-var log4js = require('log4js');
-var logger = log4js.getLogger('Store service');
 
 var inMemRepo = {
     getStores: function repository(chainId, cb) {
@@ -18,41 +16,9 @@ var inMemRepo = {
 repository = require('./store-repository.js');
 //repository = inMemRepo; 
 
-function getSingleStore(chainId, storeId, callback) {
-
-    var foundstore = {};
-    var err;
-    try {
-        if (storeId) {
-
-            repository.getStores(chainId, function(stores) {
-
-                if (stores.response.code != "200") {
-                    throw new Error("Service returned... " + JSON.stringify(stores.response));
-                }
-
-                var storeArray = stores.response.data;
-                var i = storeArray.length;
-                while (i--) {
-                    var store = storeArray[i];
-                    logger.info(store.id);
-                    if (store && store.id == storeId) {
-                        foundstore = store;
-                        break;
-                    }
-                }
-                if (callback)
-                    callback(foundstore, null);
-            });
-        }
-    } catch (err) {
-        callback(null, err);
-    }
-}
 
 
-
-// TODO: parametres as object would be prettier
+// TODO: parametres as object
 function getClosestStores(chainId, latitude, longitude, minNumberOfStores, maxNumberOfStores, maxDistance, filter, callback) {
     var myPos = { "latitude": latitude, "longitude": longitude };
 
@@ -87,7 +53,7 @@ function getClosestStores(chainId, latitude, longitude, minNumberOfStores, maxNu
 
             storeArray = util.filterByOpeninghours(storeArray, filter);
             storeArray = util.filterByLimits(storeArray, minNumberOfStores, maxNumberOfStores, maxDistance);
-            //storeArray = util.limitNumberOfSpecialOpeningHoursAhead(storeArray, 7);
+            //storeArray = util.limitNumberOfSpecialOpeningHoursAhead(storeArray, 35);
 
             var today = moment().tz("Europe/Oslo");
             util.applyTodaysOpeningHours(today, storeArray);
@@ -105,7 +71,6 @@ function createStoreDistanceObject(storeObject, distance) {
 }
 
 exports.getClosestStores = getClosestStores;
-exports.getSingleStore = getSingleStore;
 
 exports.setRepository = function(repo) {
     repository = repo;
