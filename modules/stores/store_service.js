@@ -35,7 +35,7 @@ function getSingleStore(chainId, storeId, callback) {
                 var i = storeArray.length;
                 while (i--) {
                     var store = storeArray[i];
-                    logger.info(store.id);
+                    logger.trace(store.id);
                     if (store && store.id == storeId) {
                         foundstore = store;
                         break;
