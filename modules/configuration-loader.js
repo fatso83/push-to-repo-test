@@ -51,8 +51,8 @@ function loadConfiguration(overrides, callback) {
         //redisConfig.host = 'ngredisdev.redis.cache.windows.net';
         //redisConfig.key = '5SziauARAm7mWus0zl3sfv4OwccMVEtwIh5vMgp/D7c=';
         
-        redisConfig.host = 'ngredisprod.redis.cache.windows.net';
-        redisConfig.key = 'rrDI7EQuUROEv945pUGc978aQUE306DkxnyNiVI5qqE=';
+        //redisConfig.host = 'ngredisprod.redis.cache.windows.net';
+        //redisConfig.key = 'rrDI7EQuUROEv945pUGc978aQUE306DkxnyNiVI5qqE=';
         
         //redisConfig.host = '127.0.0.1';
         redisConfig.port = 6379;

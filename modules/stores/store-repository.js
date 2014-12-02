@@ -38,5 +38,6 @@ module.exports = {
     getStores : getStores,
     getStoreRequest :  getStoreRequest,
     getCountyRequest : getCountyRequest,
-    getStoreUrl : getStoreUrl
+    getStoreUrl : getStoreUrl,
+    getCountyUrl : getCountyUrl,
 };
