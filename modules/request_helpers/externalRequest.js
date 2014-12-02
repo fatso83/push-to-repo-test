@@ -78,6 +78,8 @@ var makeRequest = function (requestData, callback) {
 
 	request(options, function (error, response, body) {
 
+	    logger.info('making request ' + options.uri);
+
 		if (error) {
 			logger.error('Got error', asJson(error));
 			if (error.code && error.code === "ETIMEDOUT") {

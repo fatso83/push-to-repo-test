@@ -39,3 +39,4 @@ azure.err
 .ntvs_analysis.dat
 *.suo
 obj/
+bin/
