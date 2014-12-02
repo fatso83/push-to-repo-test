@@ -8,8 +8,9 @@ var getStoreUrl = function (chainId, checkForHolidaysDaysAhead) {
     return 'api/FindStore/Stores/' + chainId + '?checkForHolidays=' + checkForHolidays; //fetches special opening hours n days ahead.
 };
 
-var getCountyUrl = function (chainId) {
-    return 'api/FindStore/AllStoresInCounties/' + chainId;
+var getCountyUrl = function (chainId, checkForHolidaysDaysAhead) {
+    var checkForHolidays = checkForHolidaysDaysAhead | defaultCheckForHolidaysDaysAhead;
+    return 'api/FindStore/AllStoresInCounties/' + chainId + '?checkForHolidays=' + checkForHolidays;
 };
 
 var getStoreRequest = function(chainId) {
