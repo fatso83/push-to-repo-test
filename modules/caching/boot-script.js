@@ -15,6 +15,16 @@ chainIds.forEach(function (chainId) {
         intervalInSeconds: 60 * 60,
         refreshHandler: function (stores) {
             if (stores) {
+                
+                var i = stores.length;
+                while (i--) {
+                    var store = stores[i];
+                    if (store && store.id == "7080000009619") {
+                        logger.info("inf.br");
+                    }
+                }
+                
+
                 logger.info(utils.format('Refreshed store cache for %s. Got %d stores', chainId, stores.length));
             }
             else {

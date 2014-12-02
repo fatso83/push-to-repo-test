@@ -35,7 +35,7 @@ router.get('/StoresClosestToMe/:chainid', cors(), function (req, res) {
 
 // fetches stores grouped on counties
 router.get('/AllStoresInCounties/:chainid', cors(), function (req, res) {
-    routeToRequestHandler(res, 'allStoresInCounties', storesRepository.getStoreUrl(req.params.chainid));
+    routeToRequestHandler(res, 'allStoresInCounties', storesRepository.getCountyUrl(req.params.chainid));
 });
 
 // fetches all stores
