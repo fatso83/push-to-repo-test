@@ -20,7 +20,7 @@ function createUri(requestData) {
         if (isOauth) {
             baseURL = "https://preprod.oauth.norgesgruppen.no/";
         } else {
-            baseURL = "https://preprod.service-dk.norgesgruppen.no/";
+            baseURL = "https://service-dk.norgesgruppen.no/";
         }
     } else if (requestData.environment === 'production') {
         if (isOauth) {
