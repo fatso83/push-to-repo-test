@@ -3,7 +3,6 @@
  */
 
 var geolib = require('geolib');
-var moment = require('moment-timezone');
 var util = require('./store-utils');
 var repository;
 var log4js = require('log4js');
@@ -72,8 +71,7 @@ function getClosestStores(chainId, latitude, longitude, minNumberOfStores, maxNu
         storesWithDistance = util.filterByOpeninghours(storesWithDistance, filter);
         storesWithDistance = util.filterByLimits(storesWithDistance, minNumberOfStores, maxNumberOfStores, maxDistance);
 
-        var today = moment().tz("Europe/Oslo");
-        util.applyTodaysOpeningHours(today, storesWithDistance);
+        util.applyTodaysOpeningHours(new Date(), storesWithDistance);
 
         callback(null, storesWithDistance);
     });

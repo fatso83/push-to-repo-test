@@ -1,4 +1,6 @@
-﻿function isNumber(n) {
+﻿var moment = require('moment-timezone');
+
+function isNumber(n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
@@ -85,7 +87,12 @@ function limitNumberOfSpecialOpeningHoursAhead(storeArray, limit) {
     return storeArray;
 }
 
-function applyTodaysOpeningHours(today, stores) {
+/**
+ * @param currentDate {Date} the current date
+ * @param stores Store[]
+ */
+function applyTodaysOpeningHours(currentDate, stores) {
+    var today = moment(currentDate).tz("Europe/Oslo");
 
     var i = stores.length;
     while (i--) {
