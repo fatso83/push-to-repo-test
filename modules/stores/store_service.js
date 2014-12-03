@@ -7,6 +7,7 @@ var util = require('./store-utils');
 var repository;
 var log4js = require('log4js');
 var logger = log4js.getLogger('Store service');
+var _ = require('lodash');
 
 repository = require('./store-repository.js');
 
@@ -24,25 +25,15 @@ function getSingleStore(chainId, storeId, callback) {
         return callback(new TypeError('Missing parameter storeId'));
     }
 
-    var foundstore = {};
-
     repository.getStores(chainId, function (err, stores) {
 
         if (err) {
             return callback(err);
         }
 
-        var storeArray = stores;
-        var i = storeArray.length;
-        while (i--) {
-            var store = storeArray[i];
-            if (store && store.id === storeId) {
-                foundstore = store;
-                break;
-            }
-        }
-
-        callback(null, foundstore);
+        callback(null, _.find(stores, function (store) {
+            return store.id === storeId;
+        }) );
     });
 }
 
