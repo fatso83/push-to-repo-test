@@ -81,7 +81,7 @@ var makeRequest = function (requestData, callback) {
 	    logger.info('making request ' + options.uri);
 
 		if (error) {
-			logger.error('Got error', asJson(error));
+			logger.error('Got error on external request', asJson(error));
 			if (error.code && error.code === "ETIMEDOUT") {
 				responseObj.response.code = 408;
 				responseObj.response.data = {message : "Request timeout"};

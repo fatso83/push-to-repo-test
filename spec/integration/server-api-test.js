@@ -30,7 +30,7 @@ describe('slow.server tests', function () {
         path: "/api/FindStore/StoresClosestToMe/1100/?latitude=63.4305149&longitude=10.39505280000003&minnumberofstores=1&maxNumberOfStores=0&maxDistance=1230297&filter=isopensunday",
         test: function (stores, done) {
             expect(stores).to.be.an('array');
-            expect(stores.length).to.be.greaterThan(90).and.lessThan(200);
+            expect(stores.length).to.equal(4);
             done();
         }
     };
@@ -83,7 +83,7 @@ describe('slow.server tests', function () {
 
             request.get('http://localhost:1337' + testCase3_43751_1147.path, function (err, res, body) {
                 if (err) {
-                    done(err);
+                    return done(err);
                 }
 
                 testCase3_43751_1147.test(JSON.parse(body), done);
@@ -98,7 +98,7 @@ describe('slow.server tests', function () {
 
             request.get('http://localhost:1337' + testCase2_43751_1147.path, function (err, res, body) {
                 if (err) {
-                    done(err);
+                    return done(err);
                 }
 
                 testCase2_43751_1147.test(JSON.parse(body), done);

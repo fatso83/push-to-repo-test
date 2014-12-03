@@ -25,49 +25,56 @@ var float = parseWithFallback(parseFloat);
 
 function getSingleStore(requestBody, callback) {
     var parsedUrl, params, chainId, match;
-    
+
     // ensure easier parsing of parameters
     parsedUrl = url.parse(requestBody.servicepath.toLowerCase());
     match = parsedUrl.pathname.match(re_chainId);
     params = querystring.parse(parsedUrl.query);
-    
+
     if (!match) {
-        callback(null, { data: "Missing chain id as path parameter", code: 400 });
+        callback(null, {data: "Missing chain id as path parameter", code: 400});
         return;
     }
     chainId = match[1];
 
-    try {
-        service.getSingleStore(
-            int(chainId),
-            params.storeid,
-            callback
-        );
-    } catch (err) {
-        callback(null, err);
-    }
+    service.getSingleStore(
+        int(chainId),
+        params.storeid,
+        function (err, result) {
+            if (err) {
+                callback(null, err);
+            }
+            else {
+                callback(result);
+            }
+        }
+    );
 }
 
+/**
+ * @param requestBody
+ * @param callback(result, err) UNCONVENTIONAL USE in internalRequestHandler
+ */
 function closestToMe(requestBody, callback) {
-    
+
     var parsedUrl, params, chainId, match;
-    
+
     // ensure easier parsing of parameters
     parsedUrl = url.parse(requestBody.servicepath.toLowerCase());
     match = parsedUrl.pathname.match(re_chainId);
     params = querystring.parse(parsedUrl.query);
-    
+
     if (!match) {
-        callback(null, { data: "Missing chain id as path parameter", code: 400 });
+        callback({data: "Missing chain id as path parameter", code: 400});
         return;
     }
     chainId = match[1];
-    
+
     if (missingMandatoryParameters(params)) {
-        callback(null, { data: "Mandatory query parameters are: latitude, longitude", code: 400 });
+        callback({data: "Mandatory query parameters are: latitude, longitude", code: 400});
         return;
     }
-    
+
     try {
         service.getClosestStores(
             int(chainId),
@@ -77,12 +84,16 @@ function closestToMe(requestBody, callback) {
             int(params.maxnumberofstores, null),
             float(params.maxdistance, null),
             params.filter || "",
-            callback
+
+            // adapter for the big mistake in not following conventions in internalRequestHandler
+            function(err, result) {
+                callback(result, err);
+            }
         );
     } catch (err) {
         callback(null, err);
     }
-};
+}
 
 
 exports.closestToMe = closestToMe;

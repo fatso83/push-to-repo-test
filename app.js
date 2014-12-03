@@ -1,4 +1,6 @@
-var newrelic = require('newrelic');
+// do not remove - module containing state
+require('newrelic');
+
 var server,
     config = require('./modules/configuration-loader'),
     log4js = require('log4js'),

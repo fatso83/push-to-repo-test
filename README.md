@@ -3,26 +3,12 @@
 This REST API serves as a layer in front of the NGT services, dealing with the requests coming from the framework
 and also doing caching of the NGT services.
 
-#The request data format used internally
-
-Definition dump from the class RESTPayload in the Frameowork
-
-```typescript
-export class RESTPayload {
-        servicename:string;      // the service name (i.e. getTrumfProfile)
-        environment:string;      // preproduction, production, etc
-        servicepath:string;      // the path part of the url (after the hostname)
-        servicemethod:string;    // GET, PUT, POST, DELETE, ...
-        payload:any;             // only relevant for PUT and POST
-        headers:Array<any>;
-```
-
 # Configuration
 Configuration is performed by looking up environment variables and loading the right configuration profile.
 
 ## Environment variables
 
-- CONFIGURATION_PROFILE *The basename of the json file to load*
+- CONFIGURATION_PROFILE *The basename of the json file to load*.
 - PORT *The port to listen for connections - defaults to 3000 *
 - REDIS_URI *The redis host*
 - REDIS_PORT *The redis port - the client does not support HTTPS on 6380 yet*
@@ -53,3 +39,20 @@ p.addRequest(requestBody, { intervalInSeconds: 60 }
 p.addRequest(requestBody2, { intervalInSeconds: 60*60*24 }
 p.start();
 ```
+
+# Implementation notes
+
+##The request data format used internally
+
+Definition dump from the class RESTPayload in the Frameowork
+
+```typescript
+export class RESTPayload {
+        servicename:string;      // the service name (i.e. getTrumfProfile)
+        environment:string;      // preproduction, production, etc
+        servicepath:string;      // the path part of the url (after the hostname)
+        servicemethod:string;    // GET, PUT, POST, DELETE, ...
+        payload:any;             // only relevant for PUT and POST
+        headers:Array<any>;
+```
+

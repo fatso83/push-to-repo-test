@@ -15,7 +15,7 @@ describe('Store service', function () {
         var inMemRepository = {
             getStores: 
                 function repository(chainId, cb) {
-                    cb(require('./fixtures/kiwistores'));
+                    cb(null, require('./fixtures/kiwistores'));
                 }
         };
 
@@ -25,7 +25,9 @@ describe('Store service', function () {
 
         function testCase(chainId, lat, lon, maxdistance, filter, testCaseFileName, callback) {
 
-            storeService.getClosestStores(chainId, lat, lon, 1, 0, maxdistance, filter, function (actualResults) {
+            storeService.getClosestStores(chainId, lat, lon, 1, 0, maxdistance, filter, function (err, actualResults) {
+                if(err) { return callback(err); }
+
                 var expectedResults = require(testCaseFileName);
 
                 for (var i = 0, actual, expected; i < actualResults.length; i++) {
@@ -50,13 +52,7 @@ describe('Store service', function () {
         });
 
         it('should ignore stores with invalid location data', function () {
-            var storesWithNullLocation =
-            {
-                "response":
-                {
-                    "code": 200,
-                    "origin": "testcode",
-                    "data": [
+            var storesWithNullLocation = [
                         {
                             
                             "name": "Kiwi 104 Moholt",
@@ -73,12 +69,11 @@ describe('Store service', function () {
                                 "longitude": null
                             }
                         }
-                    ]
-                }
-            };
+                    ];
+
             var repoReturningStoresWithNullInLocation = {
                 getStores: function repository(chainId, cb) {
-                    cb(storesWithNullLocation);
+                    cb(null, storesWithNullLocation);
                 }
             };
 
@@ -87,8 +82,9 @@ describe('Store service', function () {
             var maxDistance = 10;
             var maxNumberOfStores = 10;
             var minNumberOfStores = 1;
+            var chainId = 1100;
             storeService.getClosestStores(
-                0, 0, minNumberOfStores, maxNumberOfStores, maxDistance, null, function (res) {
+                chainId, 0, 0, minNumberOfStores, maxNumberOfStores, maxDistance, null, function (err , res) {
                     expect(res).to.eql([{store: storesWithNullLocation[0], distance: 0}]);
                 }
             );
