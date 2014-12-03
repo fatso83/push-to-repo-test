@@ -27,9 +27,9 @@ describe('Store service', function () {
             });
         });
 
-        it('should return null for store not found', function () {
+        it('should return falsey value for store not found', function () {
             storeService.getSingleStore(1100, -1, function (err, res) {
-                expect(res).to.equal(null);
+                expect(res).to.not.be.ok;
             });
         });
 

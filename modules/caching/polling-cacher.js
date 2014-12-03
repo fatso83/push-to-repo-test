@@ -16,13 +16,15 @@ PollingRequestCacher.prototype.start = function () {
         };
 
         var doRequest = function () {
-            opts.requestCacher.refresh(opts.request, function () {
+            opts.requestCacher.refresh(opts.request, function (data, error) {
+
                 var fn = opts.refreshHandler || defaultLogger;
 
                 try {
-                    fn.apply(null, arguments);
+                    fn(error, data);
                 } catch (err) {
                     /* cannot allow the refreshHandler to take down the server */
+                    logger.error('An error occurred in the refresh handler', err);
                 }
             });
         };
@@ -45,7 +47,7 @@ PollingRequestCacher.prototype.stop = function () {
  * @param req
  * @param opts options (some mandatory)
  * @param opts.intervalInSeconds the intervalInSeconds between each refresh (in seconds)
- * @param [opts.refreshHandler] function to call on success. Do nothing as default
+ * @param [opts.refreshHandler] function to call on success. Do nothing as default. Uses Node convention of having error as first parameter.
  *
  * Internal:
  * @param opts.requestCacherStub
