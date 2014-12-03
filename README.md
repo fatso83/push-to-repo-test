@@ -14,6 +14,12 @@ Configuration is performed by looking up environment variables and loading the r
 - REDIS_PORT *The redis port - the client does not support HTTPS on 6380 yet*
 - REDIS_KEY *The key/password*
 
+** Tip:** These may be passed in as the app i started, i.e. 
+```
+$ PORT='3000' REDIS_URI='def' node app.js
+```
+** Note for Visual Studio Users:** variables are set in the project file (view properties) and wil load when application is started on debug (F5)
+
 ## Other variables that can be set in the configuration files
 - port - *The port to listen for connections - defaults to 3000 *
 - minimum framework version

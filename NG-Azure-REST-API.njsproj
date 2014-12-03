@@ -6,6 +6,10 @@
     <Name>NG-Azure-REST-API</Name>
     <RootNamespace>NG-Azure-REST-API</RootNamespace>
     <NodejsPort>3000</NodejsPort>
+    <Environment>REDIS_URI=ngredisdev.redis.cache.windows.net
+REDIS_PORT=6379
+REDIS_KEY=5SziauARAm7mWus0zl3sfv4OwccMVEtwIh5vMgp/D7c=
+CONFIGURATION_PROFILE=development</Environment>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
