@@ -86,91 +86,106 @@ function filterByOpeninghours(storeArray, filter) {
 }
 
 function limitNumberOfSpecialOpeningHoursAhead(storeArray, limit) {
-    if (!storeArray || limit === 0)
+    if (!storeArray || limit === 0) {
         return storeArray;
+    }
 
     var i = storeArray.length;
     while (i--) {
         var elem = storeArray[i];
         var isvalid = elem && elem.store && elem.store.openinghours && elem.store.openinghours && elem.store.openinghours.special || false;
-        if (!isvalid)
+
+        if (!isvalid) {
             continue;
+        }
+
         elem.store.openinghours.special = elem.store.openinghours.special.slice(0, limit);
     }
 
     return storeArray;
 }
 
+function applyWeekdayRules(today, openinghours) {
+    var dayOfWeek = parseInt(today.format("d"), 10);
+    var isWeekday = (parseInt(dayOfWeek, 10) <= 5);
+    var todayWeekdayName = getDayOfWeekConstant(dayOfWeek).toLowerCase();
+    var everydayFrom = '';
+    var everydayTo = '';
+
+    openinghours.days.forEach(function (day) {
+        if (day.label.toLowerCase() === todayWeekdayName) {
+            openinghours.today.from = day.from;
+            openinghours.today.to = day.to;
+        }
+        if (day.label.toLowerCase() === "hverdager") {
+            everydayFrom = day.from;
+            everydayTo = day.to;
+        }
+    });
+
+    if (isWeekday && !(openinghours.today.from || openinghours.today.to)) {
+        openinghours.today.from = everydayFrom;
+        openinghours.today.to = everydayTo;
+    }
+}
+function tryUsingSpecialOpeningHours(openingHours, today) {
+    openingHours.special.map(function (special) {
+        if (special.date === today.format("YYYY-MM-DD")) {
+            openingHours.today.from = special.from;
+            openingHours.today.to = special.to;
+        }
+    });
+}
+
+function updateTodaysOpeningHours(openingHours, today) {
+
+    // update date field for today
+    openingHours.today.date = today.format("YYYY-MM-DD");
+
+    openingHours.today.from = null;
+    openingHours.today.to = null;
+
+    if (openingHours.special) {
+        tryUsingSpecialOpeningHours(openingHours, today);
+    }
+
+    if (!(openingHours.today.from || openingHours.today.to)) {
+        applyWeekdayRules(today, openingHours);
+    }
+}
+
+function hasTodaysOpeningHoursField(elem) {
+    return (elem && elem.store && elem.store.openinghours && elem.store.openinghours.today) || false;
+}
+
 /**
  * @param currentDate {Date} the current date
- * @param stores Store[]
+ * @param stores [] stores with distance { store : Object, distance : Number }
  */
 function applyTodaysOpeningHours(currentDate, stores) {
     var today = moment(currentDate).tz("Europe/Oslo");
 
-    var i = stores.length;
-    while (i--) {
+    stores.forEach(function (store) {
+        var openingHours;
 
-        var elem = stores[i];
-        var hasopeninghours = elem && elem.store && elem.store.openinghours && elem.store.openinghours.today || false;
-        if (!hasopeninghours)
-            continue;
-
-        var openinghours = elem.store.openinghours;
-
-        // if cached version is up to date (!), no worries
-        if (openinghours.today.date === today.format("YYYY-MM-DD"))
-            continue;
-
-        // update date for today
-        openinghours.today.date = today.format("YYYY-MM-DD");
-
-        openinghours.today.from = '';
-        openinghours.today.to = '';
-
-        // TODO: splitte ut
-        // if not, overwrite with special openinghours, if any
-        if (openinghours.special) {
-            openinghours.special.map(function (special) {
-                if (special.date === today.format("YYYY-MM-DD")) {
-                    openinghours.today.from = special.from;
-                    openinghours.today.to = special.to;
-                }
-                return;
-            });
+        if (!hasTodaysOpeningHoursField(store)) {
+            return;
         }
 
-        // if not, apply ordinary weekday rules
-        if (openinghours.today.from === '' && openinghours.today.to === '') {
-            var dayOfWeek = parseInt(today.format("d"), 10);
-            var todayWeekdayName = getDayOfWeekConstant(dayOfWeek).toLowerCase();
-            var everydayFrom = '';
-            var everydayTo = '';
+        openingHours = store.store.openinghours;
 
-            openinghours.days.forEach(function (day) {
-                if (day.label.toLowerCase() === todayWeekdayName) {
-                    openinghours.today.from = day.from;
-                    openinghours.today.to = day.to;
-                }
-                if (day.label.toLowerCase() === "hverdager") {
-                    everydayFrom = day.from;
-                    everydayTo = day.to;
-                }
-            });
-
-            if (openinghours.today.from === '' && openinghours.today.to === '' && (parseInt(dayOfWeek, 10) <= 5)) {
-                openinghours.today.from = everydayFrom;
-                openinghours.today.to = everydayTo;
-            }
+        // update when needed
+        if (openingHours.today.date !== today.format("YYYY-MM-DD")) {
+            updateTodaysOpeningHours(openingHours, today);
         }
-    }
+    });
 }
 
 module.exports = {
     isNumber: isNumber,
     filterByLimits: filterByLimits,
     filterByOpeninghours: filterByOpeninghours,
-    //limitNumberOfSpecialOpeningHoursAhead : limitNumberOfSpecialOpeningHoursAhead,
+    limitNumberOfSpecialOpeningHoursAhead: limitNumberOfSpecialOpeningHoursAhead,
     applyTodaysOpeningHours: applyTodaysOpeningHours,
     isValidLocation: isValidLocation
 
