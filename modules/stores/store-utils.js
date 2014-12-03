@@ -1,5 +1,19 @@
 ﻿var moment = require('moment-timezone');
 
+var daysOfTheWeek = {
+    1: "Mandag",
+    2: "Tirsdag",
+    3: "Onsdag",
+    4: "Torsdag",
+    5: "Fredag",
+    6: "Lørdag",
+    7: "Søndag"
+};
+
+function getDayOfWeekConstant(dayOfWeek) {
+    return daysOfTheWeek[dayOfWeek];
+}
+
 function isNumber(n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
 }
@@ -72,7 +86,7 @@ function filterByOpeninghours(storeArray, filter) {
 }
 
 function limitNumberOfSpecialOpeningHoursAhead(storeArray, limit) {
-    if (!storeArray || limit == 0)
+    if (!storeArray || limit === 0)
         return storeArray;
 
     var i = storeArray.length;
@@ -105,7 +119,7 @@ function applyTodaysOpeningHours(currentDate, stores) {
         var openinghours = elem.store.openinghours;
 
         // if cached version is up to date (!), no worries
-        if (openinghours.today.date == today.format("YYYY-MM-DD"))
+        if (openinghours.today.date === today.format("YYYY-MM-DD"))
             continue;
 
         // update date for today
@@ -118,7 +132,7 @@ function applyTodaysOpeningHours(currentDate, stores) {
         // if not, overwrite with special openinghours, if any
         if (openinghours.special) {
             openinghours.special.map(function (special) {
-                if (special.date == today.format("YYYY-MM-DD")) {
+                if (special.date === today.format("YYYY-MM-DD")) {
                     openinghours.today.from = special.from;
                     openinghours.today.to = special.to;
                 }
@@ -127,49 +141,28 @@ function applyTodaysOpeningHours(currentDate, stores) {
         }
 
         // if not, apply ordinary weekday rules
-        if (openinghours.today.from == '' && openinghours.today.to == '') {
+        if (openinghours.today.from === '' && openinghours.today.to === '') {
             var dayOfWeek = parseInt(today.format("d"), 10);
             var todayWeekdayName = getDayOfWeekConstant(dayOfWeek).toLowerCase();
             var everydayFrom = '';
             var everydayTo = '';
 
             openinghours.days.forEach(function (day) {
-                if (day.label.toLowerCase() == todayWeekdayName) {
+                if (day.label.toLowerCase() === todayWeekdayName) {
                     openinghours.today.from = day.from;
                     openinghours.today.to = day.to;
                 }
-                if (day.label.toLowerCase() == "hverdager") {
+                if (day.label.toLowerCase() === "hverdager") {
                     everydayFrom = day.from;
                     everydayTo = day.to;
                 }
             });
 
-            if (openinghours.today.from == '' && openinghours.today.to == '' && (parseInt(dayOfWeek, 10) <= 5)) {
+            if (openinghours.today.from === '' && openinghours.today.to === '' && (parseInt(dayOfWeek, 10) <= 5)) {
                 openinghours.today.from = everydayFrom;
                 openinghours.today.to = everydayTo;
             }
         }
-    }
-}
-
-function getDayOfWeekConstant(dayOfWeek) {
-    switch (dayOfWeek) {
-        case 1:
-            return "Mandag";
-        case 2:
-            return "Tirsdag";
-        case 3:
-            return "Onsdag";
-        case 4:
-            return "Torsdag";
-        case 5:
-            return "Fredag";
-        case 6:
-            return "Lørdag";
-        case 7:
-            return "Søndag";
-        default:
-            return "";
     }
 }
 
