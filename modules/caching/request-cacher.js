@@ -122,15 +122,21 @@ RequestCacher.prototype = {
                     cacheObj.response = res.response.data;
 
                     this._redisCache.cache(cacheObj.key, cacheObj, function (reply) {
-                        logger.trace('Did cache result', reply);
+                        if(reply.status && reply.status === 'success') {
+                            logger.trace('Successful cached ' + cacheObj.key);
+                        } else {
+                            logger.error('Failed to cache ' + cacheObj.key);
+                        }
                     });
                 }
 
             } else if (this.canUseStaleResult()) {
+                logger.warn('Request failed. Using stale results for ' + fwServiceRequest.servicename);
 
                 cacheObj.response = this._currentResult.data.response;
 
             } else {
+                logger.error('Request failed. Cannot refresh cache for' + fwServiceRequest.servicename);
                 error = res.response;
             }
 

@@ -39,13 +39,15 @@ function getSingleStore(requestBody, callback) {
 
     service.getSingleStore(
         int(chainId),
-        params.storeid,
+        int(params.storeid),
         function (err, result) {
             if (err) {
                 callback(null, err);
             }
+            else if(result) { callback(result); }
             else {
-                callback(result);
+                // none found
+                callback(null, { code : 404 });
             }
         }
     );
