@@ -22,7 +22,7 @@ describe('slow.server tests', function () {
 
     after(function (done) {
         app.stop(done);
-        console.log('Server API Test duration',(Date.now()-testStart));
+        //console.log('Server API Test duration',(Date.now()-testStart));
     });
 
     // StoresClosestToMe
@@ -74,6 +74,20 @@ describe('slow.server tests', function () {
                 testCase4_43751_1147.test(JSON.parse(body), done);
             });
 
+        });
+
+        it('should return a single store when there is a storeid parameter', function(done) {
+            request.get('http://localhost:1337/api/FindStore/Stores/1100?storeId=7080000908660', function (err, res, body) {
+                expect(JSON.parse(body).email).to.equal('kiwi.soras@kiwi.no');
+                done();
+            });
+        });
+
+        it('should return 404 when a storeid parameter is specified but none is found', function(done) {
+            request.get('http://localhost:1337/api/FindStore/Stores/1100?storeId=-1', function (err, res, body) {
+                expect(res.statusCode).to.equal(404);
+                done();
+            });
         });
 
     });
