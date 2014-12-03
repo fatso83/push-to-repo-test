@@ -108,6 +108,9 @@ function applyTodaysOpeningHours(currentDate, stores) {
         if (openinghours.today.date == today.format("YYYY-MM-DD"))
             continue;
 
+        // update date for today
+        openinghours.today.date = today.format("YYYY-MM-DD");
+
         openinghours.today.from = '';
         openinghours.today.to = '';
 
@@ -125,12 +128,12 @@ function applyTodaysOpeningHours(currentDate, stores) {
 
         // if not, apply ordinary weekday rules
         if (openinghours.today.from == '' && openinghours.today.to == '') {
-            var dayOfWeek = today.format("d");
+            var dayOfWeek = parseInt(today.format("d"), 10);
             var todayWeekdayName = getDayOfWeekConstant(dayOfWeek).toLowerCase();
             var everydayFrom = '';
             var everydayTo = '';
 
-            openinghours.days.map(function (day) {
+            openinghours.days.forEach(function (day) {
                 if (day.label.toLowerCase() == todayWeekdayName) {
                     openinghours.today.from = day.from;
                     openinghours.today.to = day.to;
@@ -150,7 +153,7 @@ function applyTodaysOpeningHours(currentDate, stores) {
 }
 
 function getDayOfWeekConstant(dayOfWeek) {
-    switch (parseInt(dayOfWeek, 10)) {
+    switch (dayOfWeek) {
         case 1:
             return "Mandag";
         case 2:
