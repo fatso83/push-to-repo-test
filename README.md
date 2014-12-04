@@ -3,6 +3,24 @@
 This REST API serves as a layer in front of the NGT services, dealing with the requests coming from the framework
 and also doing caching of the NGT services.
 
+# Getting started
+Install a local redis server and fire it up: `redis-server`.
+See the CONFIGURATION section for how to override settings, for instance using an Azure instance of Redis.
+
+```
+node app.js
+```
+
+# Running Tests
+
+# Run all tests
+Run `npm test` from the top directory
+
+## Excluding slow integration tests
+```
+mocha --recursive  --invert --grep '^slow.' spec/
+```
+
 # Configuration
 Configuration is performed by looking up environment variables and loading the right configuration profile.
 Passwords/keys should not be checked in.
