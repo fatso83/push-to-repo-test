@@ -29,8 +29,6 @@ Passwords/keys should not be checked in.
 The following will also work in Windows using CygWin. Env vars can also be set in your IDE.
 
 ```
-export REDIS_URI=our-redis-server.redis.cache.windows.net
-export REDIS_PORT=6379
 export REDIS_KEY=rrDI123lkjADSFASDE=
 export CONFIGURATION_PROFILE=production
 

@@ -19,15 +19,12 @@ var calledButNotLoaded, cachedConfig, queue = [];
  */
 function loadConfiguration(overrides, callback) {
     var profile = process.env.CONFIGURATION_PROFILE,
-        redisConfig = {},
         port = process.env.PORT,
-        redisUri = process.env.REDIS_URI,
-        redisPort = process.env.REDIS_PORT,
         redisKey = process.env.REDIS_KEY,
         s = seraphim.createVault()
             .on('error', logger.error.bind(logger))
             //Default settings
-            .load({disable: {}})
+            .load({disable: {}, caching: {redis: {}}})
             .load("defaults.json");
 
     //CONFIGURATION_PROFILE=(development/production/<none>) settings
@@ -45,16 +42,14 @@ function loadConfiguration(overrides, callback) {
         s.load({port: port});
     }
 
-    if (!redisUri) {
-        logger.warn('No Redis host explicitly set using REDIS_URI. Falling back to localhost ... ');
-        redisConfig.host = '127.0.0.1';
-        redisConfig.port = 6379;
-    } else {
-        redisConfig.host = redisUri;
-        redisConfig.port = redisPort;
-        redisConfig.key = redisKey;
+    if (redisKey) {
+        s.load({caching: {redis: {key: redisKey}}});
     }
-    s.load({caching: {redis: redisConfig}});
+
+    if (process.env.LOG_LEVEL) {
+        s.load({logging: {level: process.env.LOG_LEVEL}});
+    }
+
 
     s.load(overrides)
         .on('end', function (config) {
@@ -62,6 +57,12 @@ function loadConfiguration(overrides, callback) {
             log4js.setGlobalLogLevel(log4js.levels[config.logging.level]);
 
             logger.debug('Configuration loaded:\n', config);
+
+            if (!config.caching.redis.host) {
+                logger.error('No Redis host configured!');
+                process.exit(1);
+
+            }
 
             cachedConfig = config;
             callback(config);
