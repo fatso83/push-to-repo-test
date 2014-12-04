@@ -10,12 +10,12 @@ var asJson = JSON.stringify;
 
 function createUri(requestData) {
     var baseURL = "https://preprod.service-dk.norgesgruppen.no/";
-    
+
     var isOauth = false;
     if (requestData.servicepath.toLowerCase().indexOf('oauth/') > -1) {
         isOauth = true;
     }
-    
+
     if (requestData.environment === 'preproduction' || requestData.environment === 'local') {
         if (isOauth) {
             baseURL = "https://preprod.oauth.norgesgruppen.no/";
@@ -34,87 +34,105 @@ function createUri(requestData) {
 
     var servicepath = requestData.servicepath;
     if (servicepath && servicepath.length > 0 && servicepath[0] === '/') {
-		servicepath = servicepath.substr(1);
-	}
+        servicepath = servicepath.substr(1);
+    }
 
     return baseURL + servicepath;
 }
 
 
 var makeRequest = function (requestData, callback) {
-	logger.debug('Resolving request');
+    logger.debug('Resolving request');
 
-	
-	var responseObj = {
-		serviceId    : requestData.serviceId,
-		response     : {
-			code   : 0,
-			origin : 'ngt',
-			data   : {}
-		}
-	};
 
-	var headers = {};
-	requestData.headers.forEach(function (header) {
-		var h = Object.keys(header);
-		headers[h[0]] = header[h[0]];
-	});
+    var responseObj = {
+        serviceId: requestData.serviceId,
+        response: {
+            code: 0,
+            origin: 'ngt',
+            data: {}
+        }
+    };
 
-	var options = {
-		uri     : createUri( requestData),
-		headers : headers,
-		timeout : 25000, // Timeout after 25 sec
-		method  : requestData.servicemethod || 'GET'
-	};
+    var headers = {};
+    requestData.headers.forEach(function (header) {
+        var h = Object.keys(header);
+        headers[h[0]] = header[h[0]];
+    });
 
-	logger.debug('POSTing to: ' + options.uri);
+    var options = {
+        uri: createUri(requestData),
+        headers: headers,
+        timeout: 25000, // Timeout after 25 sec
+        method: requestData.servicemethod || 'GET'
+    };
 
-	if (requestData.servicemethod === 'POST') {
-		options.json = requestData.payload || "";
-	}
+    logger.debug('POSTing to: ' + options.uri);
 
-	options.startTime = Date.now();
+    if (requestData.servicemethod === 'POST') {
+        options.json = requestData.payload || "";
+    }
 
-	request(options, function (error, response, body) {
+    options.startTime = Date.now();
 
-	    logger.trace('Resolved request for ' + options.uri);
+    request(options, function (error, response, body) {
 
-		if (error) {
-			logger.error('Got error on external request', asJson(error));
-			if (error.code && error.code === "ETIMEDOUT") {
-				responseObj.response.code = 408;
-				responseObj.response.data = {message : "Request timeout"};
-			} else {
-				responseObj.response.code = 500;
-				responseObj.response.data = {message : "Server not found"};
-			}
+        logger.trace('Resolved request for ' + options.uri);
 
-			callback(responseObj);
-			return;
-		}
+        if (error) {
+            logger.error('Got error on external request', asJson(error));
+            if (error.code && error.code === "ETIMEDOUT") {
+                responseObj.response.code = 408;
+                responseObj.response.data = {message: "Request timeout"};
+            } else {
+                responseObj.response.code = 500;
+                responseObj.response.data = {message: "Server not found"};
+            }
 
-		try {
-			logger.trace(util.format('Got response for %s with code %d (%d KB)', requestData.servicename, response.statusCode, Math.round(body.length/1024)));
+            callback(responseObj);
+            return;
+        }
 
-			responseObj.response.code = response.statusCode;
+        try {
+            logger.trace(util.format('Got response for %s with code %d (%d KB)', requestData.servicename, response.statusCode, Math.round(body.length / 1024)));
 
-			if (typeof body === 'string') {
-				try {
-					responseObj.response.data = JSON.parse(body);
-				} catch (err) {
-					responseObj.response.data = body;
-				}
-			} else {
-				responseObj.response.data = body;
-			}
-		} catch (err) {
-			logger.error('Caught error processing request', err);
-			responseObj.response.code = 500;
-			responseObj.response.data = {error : "Error processing response from NGT service"};
-		}
+            responseObj.response.code = response.statusCode;
 
-		callback(responseObj);
-	});
+            if (typeof body === 'string') {
+                try {
+                    responseObj.response.data = JSON.parse(body);
+
+                    if (requestData.servicename === 'storesGetStore') {
+                        loggingInDespair(responseObj.response.data);
+                    }
+
+                } catch (err) {
+                    responseObj.response.data = body;
+                }
+            } else {
+                responseObj.response.data = body;
+            }
+        } catch (err) {
+            logger.error('Caught error processing request', err);
+            responseObj.response.code = 500;
+            responseObj.response.data = {error: "Error processing response from NGT service"};
+        }
+
+        callback(responseObj);
+    });
 };
 
-exports.makeRequest  = makeRequest;
+var _ = require('lodash');
+var storeId = 7080001341596;
+function loggingInDespair(stores) {
+     var store = _.find(stores, function (store) {
+        return store.id === storeId;
+    });
+
+    if(store) {
+        logger.trace('Found store with id ' + storeId + ':\n', store);
+    }
+
+}
+
+exports.makeRequest = makeRequest;
