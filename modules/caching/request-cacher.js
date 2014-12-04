@@ -59,7 +59,7 @@ RequestCacher.prototype = {
         return (Date.now() - time) > this.maxAge * 1000;
     },
 
-    isWithinStaleLimit: function (time) {
+    isWithinStaleLimit: function () {
         return (Date.now() - this._currentResult.data.cacheTime) < this.maxStale * 1000;
     },
 
@@ -85,7 +85,7 @@ RequestCacher.prototype = {
         this._currentResult = null;
 
         hashKey = hash(fwServiceRequest);
-        logger.debug('Key: ', hashKey);
+        logger.debug('Key: ', hashKey, '(' + fwServiceRequest.servicepath + ')');
 
         this._redisCache.get(hashKey, function (reply) {
             var cacheObj = reply.data || null;
