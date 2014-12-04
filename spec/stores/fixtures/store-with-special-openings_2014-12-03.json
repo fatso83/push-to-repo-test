@@ -1,0 +1,86 @@
+{
+  "distance" : 0.5340946839528478,
+  "store" : {
+    "name" : "Kiwi 820 Åsane Storsenter",
+    "location" : {
+      "latitude" : 60.4664892434,
+      "longitude" : 5.3250039035
+    },
+    "id" : 7080001307189,
+    "fax" : "55196132",
+    "email" : "Kiwi.asanestorsenter@ngbutikk.net",
+    "zipcode" : "5116",
+    "countyid" : 12,
+    "visitaddress" : "Åsane Senter 42",
+    "openinghours" : {
+      "today" : {
+        "from" : "08:00",
+        "to" : "22:00",
+        "date" : "2014-12-03",
+        "label" : "Dagens åpningstider"
+      },
+      "isopenonsunday" : false,
+      "special" : [ {
+        "from" : "14:00",
+        "to" : "20:00",
+        "date" : "2014-12-07",
+        "label" : "Søndag 07.12.2014"
+      }, {
+        "from" : "14:00",
+        "to" : "20:00",
+        "date" : "2014-12-14",
+        "label" : "Søndag 14.12.2014"
+      }, {
+        "from" : "14:00",
+        "to" : "20:00",
+        "date" : "2014-12-21",
+        "label" : "Søndag 21.12.2014"
+      }, {
+        "from" : "08:00",
+        "to" : "14:00",
+        "date" : "2014-12-24",
+        "label" : "Julaften"
+      }, {
+        "from" : "",
+        "to" : "",
+        "date" : "2014-12-25",
+        "label" : "1.juledag"
+      }, {
+        "from" : "",
+        "to" : "",
+        "date" : "2014-12-26",
+        "label" : "2.juledag"
+      }, {
+        "from" : "08:00",
+        "to" : "18:00",
+        "date" : "2014-12-31",
+        "label" : "Nyttårsaften"
+      }, {
+        "from" : "",
+        "to" : "",
+        "date" : "2015-01-01",
+        "label" : "Nyttårsdag"
+      } ],
+      "isopenlate" : false,
+      "days" : [ {
+        "from" : "08:00",
+        "to" : "22:00",
+        "date" : null,
+        "label" : "Hverdager"
+      }, {
+        "from" : "09:00",
+        "to" : "20:00",
+        "date" : null,
+        "label" : "Lørdag"
+      } ]
+    },
+    "zipcitycode" : "ULSET",
+    "municipalitid" : 1201,
+    "regionname" : "VEST",
+    "phone" : "55196131",
+    "chainid" : 1100,
+    "description" : "",
+    "services" : "BIB Full",
+    "link" : ""
+  }
+}

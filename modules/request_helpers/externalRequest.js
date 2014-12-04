@@ -33,8 +33,9 @@ function createUri(requestData) {
     }
 
     var servicepath = requestData.servicepath;
-    if (servicepath && servicepath.length > 0 && servicepath[0] == '/')
-        servicepath = servicepath.substr(1);
+    if (servicepath && servicepath.length > 0 && servicepath[0] === '/') {
+		servicepath = servicepath.substr(1);
+	}
 
     return baseURL + servicepath;
 }
@@ -74,12 +75,12 @@ var makeRequest = function (requestData, callback) {
 
 	options.startTime = Date.now();
 
-	logger.debug(options);
-
 	request(options, function (error, response, body) {
 
+	    logger.trace('Resolved request for ' + options.uri);
+
 		if (error) {
-			logger.error('Got error', asJson(error));
+			logger.error('Got error on external request', asJson(error));
 			if (error.code && error.code === "ETIMEDOUT") {
 				responseObj.response.code = 408;
 				responseObj.response.data = {message : "Request timeout"};

@@ -4,8 +4,7 @@ var azure = require('azure-storage'),
     log4js = require('log4js'),
     logger = log4js.getLogger('Synchronize Service'),
     async = require('async'),
-    Transaction = require('./transaction.js'),
-    utils = require('../../utils.js');
+    Transaction = require('./transaction.js');
 
 function createTable(name, callback) {
     service.createTableIfNotExists(name, function (error, result) {

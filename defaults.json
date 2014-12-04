@@ -3,6 +3,10 @@
   "logging": {"level": "INFO"},
   "minimum framework version": "5.0.0",
   "caching": {
-    "environment" : "preproduction"
+    "environment" : "preproduction",
+    "redis": {
+      "host": "127.0.0.1",
+      "port": 6379
+    }
   }
 }

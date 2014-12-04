@@ -35,12 +35,14 @@ router.get('/StoresClosestToMe/:chainid', cors(), function (req, res) {
 
 // fetches stores grouped on counties
 router.get('/AllStoresInCounties/:chainid', cors(), function (req, res) {
-    routeToRequestHandler(res, 'allStoresInCounties', storesRepository.getStoreUrl(req.params.chainid));
+    routeToRequestHandler(res, 'allStoresInCounties', storesRepository.getCountyUrl(req.params.chainid));
 });
 
-// fetches all stores
+// fetches all stores or a specific one
 router.get('/Stores/:chainid', cors(), function (req, res) {
-    if (req.query && req.query.storeId) {
+    var storeId = req.query && (req.query.storeId || req.query.storeid);
+
+    if (storeId) {
         routeToRequestHandler(res, 'storesGetSingleStore', req.originalUrl);
     } else {
         routeToRequestHandler(res, 'storesGetStore', storesRepository.getStoreUrl(req.params.chainid));

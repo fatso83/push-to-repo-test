@@ -22,7 +22,7 @@ describe('slow.server tests', function () {
 
     after(function (done) {
         app.stop(done);
-        console.log('Server API Test duration',(Date.now()-testStart));
+        //console.log('Server API Test duration',(Date.now()-testStart));
     });
 
     // StoresClosestToMe
@@ -30,7 +30,7 @@ describe('slow.server tests', function () {
         path: "/api/FindStore/StoresClosestToMe/1100/?latitude=63.4305149&longitude=10.39505280000003&minnumberofstores=1&maxNumberOfStores=0&maxDistance=1230297&filter=isopensunday",
         test: function (stores, done) {
             expect(stores).to.be.an('array');
-            expect(stores.length).to.be.greaterThan(90).and.lessThan(200);
+            expect(stores.length).to.equal(4);
             done();
         }
     };
@@ -76,6 +76,20 @@ describe('slow.server tests', function () {
 
         });
 
+        it('should return a single store when there is a storeid parameter', function(done) {
+            request.get('http://localhost:1337/api/FindStore/Stores/1100?storeId=7080000908660', function (err, res, body) {
+                expect(JSON.parse(body).email).to.equal('kiwi.soras@kiwi.no');
+                done();
+            });
+        });
+
+        it('should return 404 when a storeid parameter is specified but none is found', function(done) {
+            request.get('http://localhost:1337/api/FindStore/Stores/1100?storeId=-1', function (err, res, body) {
+                expect(res.statusCode).to.equal(404);
+                done();
+            });
+        });
+
     });
     describe('/FindStore/AllStoresInCounties/[chainid]', function () {
 
@@ -83,7 +97,7 @@ describe('slow.server tests', function () {
 
             request.get('http://localhost:1337' + testCase3_43751_1147.path, function (err, res, body) {
                 if (err) {
-                    done(err);
+                    return done(err);
                 }
 
                 testCase3_43751_1147.test(JSON.parse(body), done);
@@ -98,7 +112,7 @@ describe('slow.server tests', function () {
 
             request.get('http://localhost:1337' + testCase2_43751_1147.path, function (err, res, body) {
                 if (err) {
-                    done(err);
+                    return done(err);
                 }
 
                 testCase2_43751_1147.test(JSON.parse(body), done);

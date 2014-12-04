@@ -30,7 +30,15 @@ var getCountyRequest = function(chainId) {
 
 var getStores = function repository(chainId, cb) {
     internalRequestHandler.makeRequest(
-        getStoreRequest(chainId) , cb
+
+        getStoreRequest(chainId) , function(request) {
+
+            if (request.response.code !== 200) {
+                return cb(new Error("Error when fetching stores: " + JSON.stringify(request.response)));
+            }
+
+            cb(null, request.response.data);
+        }
     );
 };
 
@@ -38,5 +46,6 @@ module.exports = {
     getStores : getStores,
     getStoreRequest :  getStoreRequest,
     getCountyRequest : getCountyRequest,
-    getStoreUrl : getStoreUrl
+    getStoreUrl : getStoreUrl,
+    getCountyUrl : getCountyUrl
 };

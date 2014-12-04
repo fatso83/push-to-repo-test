@@ -1,6 +1,10 @@
 {
   "logging": {"level": "INFO"},
   "caching": {
-    "environment": "production"
+    "environment": "production",
+    "redis" : {
+      "host": "ngredispreprod.redis.cache.windows.net",
+      "port" : 6379
+    }
   }
 }
