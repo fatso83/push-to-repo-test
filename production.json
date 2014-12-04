@@ -3,7 +3,7 @@
   "caching": {
     "environment": "production",
     "redis" : {
-      "host": "ngredispreprod.redis.cache.windows.net",
+      "host": "ngredisprod.redis.cache.windows.net",
       "port" : 6379
     }
   }
