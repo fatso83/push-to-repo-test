@@ -3,6 +3,7 @@ var expect = require('chai').expect;
 var sinon = require('sinon');
 var _ = require('lodash');
 var RequestCacher = require('../modules/caching/request-cacher');
+var SimpleCache = require('../modules/caching/simple-cache');
 
 describe('RequestCacher', function () {
 
@@ -147,38 +148,43 @@ describe('RequestCacher', function () {
 
         cacher.handleRequest(requestBody, function () {
             var hash = RequestCacher.hash(requestBody);
-            expect(cacher.memCache.get(hash)).to.be.ok;
+            expect(cacher._memCache.get(hash)).to.be.ok;
         });
     });
 
     it('should only cache result in memory if explicitly set', function () {
         setupExternalRequestToOnlyRespondSuccessfullyOnce();
 
+        var hash = RequestCacher.hash(requestBody),
+        inMemCache= new SimpleCache();
+
         cacher = new RequestCacher({
             stubs: {
                 redisCache: redisCacheStub,
-                externalRequest: externalRequestStub
+                externalRequest: externalRequestStub,
+                memCache : inMemCache
             }
         });
 
         cacher.handleRequest(requestBody, function () {
-            var hash = RequestCacher.hash(requestBody);
-            expect(cacher.memCache.hasOwnProperty(hash)).to.not.be.ok;
+            expect(inMemCache.get(hash)).to.not.be.ok;
         });
 
     });
 
     it('should be able to cache results in-memory as well', function (done) {
         var cacheObj = {
-            response: 'foobar',
-            cacheTime: Date.now()
-        };
+                response: 'foobar',
+                cacheTime: Date.now()
+            },
+            memCache = new SimpleCache();
+
+        memCache.set(RequestCacher.hash(requestBody), cacheObj);
 
         cacher = new RequestCacher({
-            useInMemCache: true
+            useInMemCache: true,
+            stubs : { memCache: memCache }
         });
-
-        cacher.memCache.set(RequestCacher.hash(requestBody), cacheObj);
 
         cacher.handleRequest(requestBody, function (data) {
             expect(data).to.equal('foobar');

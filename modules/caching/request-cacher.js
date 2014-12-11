@@ -47,7 +47,6 @@ function RequestCacher(opts) {
     this.maxAge = opts.maxAgeInSeconds || 60 * 60;
     this.maxStale = opts.maxStaleInSeconds || 0;
     this.useInMemCache = !!opts.useInMemCache || false;
-    this.memCache = opts.memCache || (new SimpleMemCache());
 
     if (!opts.stubs) {
         opts.stubs = {};
@@ -55,13 +54,14 @@ function RequestCacher(opts) {
 
     this._redisCache = opts.stubs.redisCache || require('./redis-cache');
     this._externalRequest = opts.stubs.externalRequest || require('../request_helpers/externalRequest');
+    this._memCache = opts.stubs.memCache || SimpleMemCache.getSharedInstance();
 }
 
 RequestCacher.prototype = {
 
     updateMemCache: function (cacheObj) {
         if (this.useInMemCache) {
-            this.memCache.set(cacheObj.key, cacheObj);
+            this._memCache.set(cacheObj.key, cacheObj);
         }
     },
 
@@ -98,7 +98,7 @@ RequestCacher.prototype = {
         logger.debug('Key: ', hashKey, '(' + fwServiceRequest.servicepath + ')');
 
         // return early if we have a fresh, in-mem cached version
-        cachedObj = this.memCache.get(hashKey);
+        cachedObj = this._memCache.get(hashKey);
         if (cachedObj && !this.isOld(cachedObj.cacheTime)) {
             logger.trace('Using in-mem cache for ' + hashKey);
             return callback(cachedObj.response);

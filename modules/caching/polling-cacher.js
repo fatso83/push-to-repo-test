@@ -47,6 +47,7 @@ PollingRequestCacher.prototype.stop = function () {
  * @param req
  * @param opts options (some mandatory)
  * @param opts.intervalInSeconds the intervalInSeconds between each refresh (in seconds)
+ * @param {boolean} opts.useInMemCache
  * @param [opts.refreshHandler] function to call on success. Do nothing as default. Uses Node convention of having error as first parameter.
  *
  * Internal:
@@ -58,6 +59,7 @@ PollingRequestCacher.prototype.addRequest = function (req, opts) {
     }
 
     var requestCacher = opts.requestCacherStub || new RequestCacher({
+            useInMemCache : opts.useInMemCache,
             maxAgeInSeconds: FOREVER,
             maxStaleInSeconds: FOREVER
         });

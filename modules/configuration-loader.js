@@ -11,6 +11,7 @@ var seraphim = require('seraphim');
 var log4js = require('log4js');
 var logger = log4js.getLogger('Configuration Loader');
 var calledButNotLoaded, cachedConfig, queue = [];
+var SimpleCache = require('./caching/simple-cache');
 
 /**
  * Load configuration from files and set any overrides.
@@ -50,6 +51,7 @@ function loadConfiguration(overrides, callback) {
         s.load({logging: {level: process.env.LOG_LEVEL}});
     }
 
+    s.load({caching: {sharedInMemCache: new SimpleCache() }});
 
     s.load(overrides)
         .on('end', function (config) {

@@ -2,6 +2,14 @@ function SimpleCache() {
     this.db = {};
 }
 
+/** Singleton method - making it possible to share a global in-mem cache */
+var instance;
+SimpleCache.getSharedInstance = function() {
+    if(!instance) { instance = new SimpleCache(); }
+
+    return instance;
+};
+
 SimpleCache.prototype.set = function (key,val) {
     this.db[key] = val;
 };

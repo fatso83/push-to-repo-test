@@ -13,6 +13,7 @@ chainIds.forEach(function (chainId) {
     var FIVE_MINUTES = 5*60;
 
     storeCacher.addRequest(storesRepository.getStoreRequest(chainId), {
+        useInMemCache : true,
         intervalInSeconds: FIVE_MINUTES,
         refreshHandler: function (err, stores) {
             if (stores) {
@@ -25,6 +26,7 @@ chainIds.forEach(function (chainId) {
     });
 
     storeCacher.addRequest(storesRepository.getCountyRequest(chainId), {
+        useInMemCache : true,
         intervalInSeconds: FIVE_MINUTES,
         refreshHandler: function (err, counties) {
             if (counties) {
