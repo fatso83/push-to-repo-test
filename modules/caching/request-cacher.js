@@ -14,7 +14,7 @@ var utils = require('util');
 var basicToken = 'Basic J8ed0(tyAop206%JHP';
 
 function hash(requestBody) {
-    
+
     var requestToken, hashKey, servicePath;
 
     servicePath = requestBody.servicepath.toLowerCase();
@@ -44,6 +44,8 @@ function hash(requestBody) {
 function RequestCacher(opts) {
     this.maxAge = opts.maxAgeInSeconds || 60 * 60;
     this.maxStale = opts.maxStaleInSeconds || 0;
+    this.memCache = {};
+    this.useInMemCache = !!opts.useInMemCache || false;
 
     if (!opts.stubs) {
         opts.stubs = {};
@@ -54,6 +56,12 @@ function RequestCacher(opts) {
 }
 
 RequestCacher.prototype = {
+
+    updateMemCache: function (cacheObj) {
+        if (this.useInMemCache) {
+            this.memCache[cacheObj.key] = cacheObj;
+        }
+    },
 
     isOld: function (time) {
         return (Date.now() - time) > this.maxAge * 1000;
@@ -87,6 +95,15 @@ RequestCacher.prototype = {
         hashKey = hash(fwServiceRequest);
         logger.debug('Key: ', hashKey, '(' + fwServiceRequest.servicepath + ')');
 
+        // return early if we have a fresh, in-mem cached version
+        if (this.memCache.hasOwnProperty(hashKey)) {
+            var cachedObj = this.memCache[hashKey];
+
+            if (!this.isOld(cachedObj.cacheTime)) {
+                return callback(cachedObj.response);
+            }
+        }
+
         this._redisCache.get(hashKey, function (reply) {
             var cacheObj = reply.data || null;
 
@@ -94,7 +111,7 @@ RequestCacher.prototype = {
 
             if (reply.status === "success" && cacheObj && !self.isOld(cacheObj.cacheTime)) {
 
-                logger.trace('--> Got cached result in ' + (Date.now()-start) + ' ms');
+                logger.trace('--> Got cached result in ' + (Date.now() - start) + ' ms');
                 callback(cacheObj.response, null);
 
             } else {
@@ -121,8 +138,10 @@ RequestCacher.prototype = {
                     cacheObj.cacheTime = Date.now();
                     cacheObj.response = res.response.data;
 
+                    this.updateMemCache(cacheObj);
+
                     this._redisCache.cache(cacheObj.key, cacheObj, function (reply) {
-                        if(reply.status && reply.status === 'success') {
+                        if (reply.status && reply.status === 'success') {
                             logger.trace('Successful cached ' + cacheObj.key);
                         } else {
                             logger.error('Failed to cache ' + cacheObj.key);

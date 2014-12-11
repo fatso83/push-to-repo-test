@@ -111,22 +111,80 @@ describe('RequestCacher', function () {
         this.clock.tick(5 * 1000);
         cacher.handleRequest(requestBody, verifyResult);
         this.clock.tick(1000 * 1000);
-        cacher.handleRequest(requestBody, function(result, error) {
-           expect(result).to.equal(null);
+        cacher.handleRequest(requestBody, function (result, error) {
+            expect(result).to.equal(null);
         });
     }));
 
-    it('the hash function should treat the service path consistently as lowercase', function() {
+    it('the hash function should treat the service path consistently as lowercase', function () {
         var req1 = _.extend({}, requestBody),
-        req2 = _.extend({}, requestBody),
-        hash = RequestCacher.hash;
+            req2 = _.extend({}, requestBody),
+            hash = RequestCacher.hash;
 
         req1.servicepath = req1.servicepath.toUpperCase();
         req2.servicepath = req2.servicepath.toLowerCase();
 
-       expect(hash(req1)).to.equal(hash(req2));
+        expect(hash(req1)).to.equal(hash(req2));
     });
 
+    it('should take an option of using in-mem cache', function () {
+        cacher = new RequestCacher({
+            useInMemCache: true
+        });
+        expect(cacher.useInMemCache).to.be.ok;
+    });
+
+    it('should be able to cache results in-memory as well', function () {
+        setupExternalRequestToOnlyRespondSuccessfullyOnce();
+
+        cacher = new RequestCacher({
+            useInMemCache : true,
+            stubs: {
+                redisCache: redisCacheStub,
+                externalRequest: externalRequestStub
+            }
+        });
+
+        cacher.handleRequest(requestBody, function () {
+            var hash = RequestCacher.hash(requestBody);
+            expect(cacher.memCache.hasOwnProperty(hash)).to.equal(true);
+        });
+    });
+
+    it('should only cache result in memory if explicitly set', function() {
+        setupExternalRequestToOnlyRespondSuccessfullyOnce();
+
+        cacher = new RequestCacher({
+            stubs: {
+                redisCache: redisCacheStub,
+                externalRequest: externalRequestStub
+            }
+        });
+
+        cacher.handleRequest(requestBody, function () {
+            var hash = RequestCacher.hash(requestBody);
+            expect(cacher.memCache.hasOwnProperty(hash)).to.not.be.ok;
+        });
+
+    });
+
+    it('should be able to cache results in-memory as well', function (done) {
+        var cacheObj = {
+            response: 'foobar',
+            cacheTime: Date.now()
+        };
+
+        cacher = new RequestCacher({
+            useInMemCache: true
+        });
+
+        cacher.memCache[RequestCacher.hash(requestBody)] = cacheObj;
+
+        cacher.handleRequest(requestBody, function(data)  {
+            expect(data).to.equal('foobar');
+            done();
+        });
+    });
 
     function setupExternalRequestToOnlyRespondSuccessfullyOnce() {
         var callCount = 0;
