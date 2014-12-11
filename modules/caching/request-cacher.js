@@ -10,6 +10,7 @@
 var crypto = require('crypto');
 var logger = require('log4js').getLogger('RequestCacher');
 var utils = require('util');
+var SimpleMemCache = require('./simple-cache');
 
 var basicToken = 'Basic J8ed0(tyAop206%JHP';
 
@@ -39,13 +40,14 @@ function hash(requestBody) {
  *
  * @param opts.maxAgeInSeconds how long a cached response should be valid before being refreshed
  * @param opts.maxStaleInSeconds how long we are willing to use a stale cache in case of failing service requests
+ * @param {boolean} opts.useInMemCache
  * @constructor
  */
 function RequestCacher(opts) {
     this.maxAge = opts.maxAgeInSeconds || 60 * 60;
     this.maxStale = opts.maxStaleInSeconds || 0;
-    this.memCache = {};
     this.useInMemCache = !!opts.useInMemCache || false;
+    this.memCache = opts.memCache || (new SimpleMemCache());
 
     if (!opts.stubs) {
         opts.stubs = {};
@@ -59,7 +61,7 @@ RequestCacher.prototype = {
 
     updateMemCache: function (cacheObj) {
         if (this.useInMemCache) {
-            this.memCache[cacheObj.key] = cacheObj;
+            this.memCache.set(cacheObj.key, cacheObj);
         }
     },
 
@@ -88,7 +90,7 @@ RequestCacher.prototype = {
      */
     handleRequest: function (fwServiceRequest, callback) {
         logger.debug('Handling request for ' + fwServiceRequest.servicename);
-        var hashKey, self = this, start = Date.now();
+        var hashKey, self = this, start = Date.now(), cachedObj;
 
         this._currentResult = null;
 
@@ -96,23 +98,21 @@ RequestCacher.prototype = {
         logger.debug('Key: ', hashKey, '(' + fwServiceRequest.servicepath + ')');
 
         // return early if we have a fresh, in-mem cached version
-        if (this.memCache.hasOwnProperty(hashKey)) {
-            var cachedObj = this.memCache[hashKey];
-
-            if (!this.isOld(cachedObj.cacheTime)) {
-                return callback(cachedObj.response);
-            }
+        cachedObj = this.memCache.get(hashKey);
+        if (cachedObj && !this.isOld(cachedObj.cacheTime)) {
+            logger.trace('Using in-mem cache for ' + hashKey);
+            return callback(cachedObj.response);
         }
 
         this._redisCache.get(hashKey, function (reply) {
-            var cacheObj = reply.data || null;
+            cachedObj = reply.data || null;
 
             this._currentResult = reply;
 
-            if (reply.status === "success" && cacheObj && !self.isOld(cacheObj.cacheTime)) {
+            if (reply.status === "success" && cachedObj && !self.isOld(cachedObj.cacheTime)) {
 
                 logger.trace('--> Got cached result in ' + (Date.now() - start) + ' ms');
-                callback(cacheObj.response, null);
+                callback(cachedObj.response, null);
 
             } else {
                 self.refresh(fwServiceRequest, callback);

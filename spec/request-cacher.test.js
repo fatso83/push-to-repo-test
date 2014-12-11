@@ -138,7 +138,7 @@ describe('RequestCacher', function () {
         setupExternalRequestToOnlyRespondSuccessfullyOnce();
 
         cacher = new RequestCacher({
-            useInMemCache : true,
+            useInMemCache: true,
             stubs: {
                 redisCache: redisCacheStub,
                 externalRequest: externalRequestStub
@@ -147,11 +147,11 @@ describe('RequestCacher', function () {
 
         cacher.handleRequest(requestBody, function () {
             var hash = RequestCacher.hash(requestBody);
-            expect(cacher.memCache.hasOwnProperty(hash)).to.equal(true);
+            expect(cacher.memCache.get(hash)).to.be.ok;
         });
     });
 
-    it('should only cache result in memory if explicitly set', function() {
+    it('should only cache result in memory if explicitly set', function () {
         setupExternalRequestToOnlyRespondSuccessfullyOnce();
 
         cacher = new RequestCacher({
@@ -178,9 +178,9 @@ describe('RequestCacher', function () {
             useInMemCache: true
         });
 
-        cacher.memCache[RequestCacher.hash(requestBody)] = cacheObj;
+        cacher.memCache.set(RequestCacher.hash(requestBody), cacheObj);
 
-        cacher.handleRequest(requestBody, function(data)  {
+        cacher.handleRequest(requestBody, function (data) {
             expect(data).to.equal('foobar');
             done();
         });
