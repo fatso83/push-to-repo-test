@@ -40,3 +40,4 @@ azure.err
 *.suo
 obj/
 bin/
+dump.rdb
