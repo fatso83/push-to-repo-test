@@ -51,8 +51,6 @@ function loadConfiguration(overrides, callback) {
         s.load({logging: {level: process.env.LOG_LEVEL}});
     }
 
-    s.load({caching: {sharedInMemCache: new SimpleCache() }});
-
     s.load(overrides)
         .on('end', function (config) {
             // Set global logging level
