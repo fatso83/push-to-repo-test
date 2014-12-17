@@ -16,11 +16,6 @@ var createRedisCacheStub = function () {
         cache: function (key, val, cb) {
             this.db[key] = val;
             cb({status: "success", error: null});
-        },
-
-        delete: function (key, cb) {
-            delete this.db[key];
-            cb();
         }
     };
 };

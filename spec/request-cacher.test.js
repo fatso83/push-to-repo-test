@@ -7,7 +7,6 @@ var SimpleCache = require('../modules/caching/simple-cache');
 
 describe('RequestCacher', function () {
 
-
     var redisCacheStub, spy, cacher,
         externalRequestStub = {},
         requestBody = {

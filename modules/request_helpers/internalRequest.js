@@ -32,7 +32,7 @@ var localServices = {
     'recommendations': cachingRequestHandler,
     'brandMatch': cachingRequestHandler,
     'allStoresInCounties': cachingRequestHandler, // preliminary name
-    'storesGetStore': cachingRequestHandler,
+    'storesGetStore': cachingRequestHandler
 };
 
 var isLocalService = function (requestBody) {
