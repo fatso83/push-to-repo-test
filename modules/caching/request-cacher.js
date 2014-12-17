@@ -44,6 +44,7 @@ function hash(requestBody) {
  * @constructor
  */
 function RequestCacher(opts) {
+    opts = opts || {};
     this.maxAge = opts.maxAgeInSeconds || 60 * 60;
     this.maxStale = opts.maxStaleInSeconds || 0;
     this.useInMemCache = !!opts.useInMemCache || false;

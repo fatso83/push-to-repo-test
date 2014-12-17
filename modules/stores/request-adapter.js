@@ -4,11 +4,17 @@
  */
 
 var service = require('./store_service');
+var storeRepo = require('./store-repository');
 var url = require('url');
 var _ = require('lodash');
 var querystring = require('querystring');
 var isNumber = require("isnumber");
 var re_chainId = /\/(\d{4})\/?$/;
+
+// these requests should already be in a warm cache that is regularly updated,
+// so there is no need to configure the caching
+var RequestCacher = require('../caching/request-cacher');
+var requestCacher = new RequestCacher();
 
 function missingMandatoryParameters(params) {
     return !('longitude' in params && 'latitude' in params);
@@ -44,10 +50,12 @@ function getSingleStore(requestBody, callback) {
             if (err) {
                 callback(null, err);
             }
-            else if(result) { callback(result); }
+            else if (result) {
+                callback(result);
+            }
             else {
                 // none found
-                callback(null, { code : 404 });
+                callback(null, {code: 404});
             }
         }
     );
@@ -88,7 +96,7 @@ function closestToMe(requestBody, callback) {
             params.filter || "",
 
             // adapter for the big mistake in not following conventions in internalRequestHandler
-            function(err, result) {
+            function (err, result) {
                 callback(result, err);
             }
         );
@@ -97,6 +105,25 @@ function closestToMe(requestBody, callback) {
     }
 }
 
+function getChainIdPathParam(servicepath) {
+    var parsedUrl=url.parse(servicepath);
+    var regExp = /.*\/([0-9]+)\/?/;
+    return  parsedUrl.pathname.match(regExp)[1];
+}
+
+// We ask for a standard representation of the url to hit our warm cache
+function getAllStoresInCounties(requestBody, callback) {
+    var chainId = getChainIdPathParam(requestBody.servicepath);
+    requestCacher.handleRequest(storeRepo.getCountyRequest(chainId), callback);
+}
+
+// We ask for a standard representation of the url to hit our warm cache
+function getAllStores(requestBody, callback) {
+    var chainId = getChainIdPathParam(requestBody.servicepath);
+    requestCacher.handleRequest(storeRepo.getStoreRequest(chainId), callback);
+}
 
 exports.closestToMe = closestToMe;
 exports.getSingleStore = getSingleStore;
+exports.getAllStoresInCounties = getAllStoresInCounties;
+exports.getAllStores = getAllStores;
