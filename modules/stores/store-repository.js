@@ -1,5 +1,5 @@
 
-var internalRequestHandler = require('../request_helpers/internalRequest');
+var internalRequestHandler = require('../request_helpers/internal-request');
 var requestBuilder = require('./../request_helpers/request-builder');
 
 var defaultCheckForHolidaysDaysAhead = 35;

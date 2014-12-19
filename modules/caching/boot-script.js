@@ -10,10 +10,10 @@ var chainIds = [1100, 1210, 1220, 1270, 1300, 1320];
 
 chainIds.forEach(function (chainId) {
 
-    var FIVE_MINUTES = 5*60;
+    var FIVE_MINUTES = 5 * 60;
 
     pollingCacher.addRequest(storesRepository.getStoreRequest(chainId), {
-        useInMemCache : true,
+        useInMemCache: true,
         intervalInSeconds: FIVE_MINUTES,
         refreshHandler: function (err, stores) {
             if (stores) {
@@ -26,7 +26,7 @@ chainIds.forEach(function (chainId) {
     });
 
     pollingCacher.addRequest(storesRepository.getCountyRequest(chainId), {
-        useInMemCache : true,
+        useInMemCache: true,
         intervalInSeconds: FIVE_MINUTES,
         refreshHandler: function (err, counties) {
             if (counties) {

@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var config = null;
 
-var requestHandler = require('../requestHandler');
+var requestHandler = require('../request_helpers/request-handler');
 
 /*
  *  Async operation, but we expect it to be loaded by app.js by now, effectively

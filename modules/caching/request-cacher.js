@@ -55,7 +55,7 @@ function RequestCacher(opts) {
     }
 
     this._redisCache = opts.stubs.redisCache || require('./redis-cache');
-    this._externalRequest = opts.stubs.externalRequest || require('../request_helpers/externalRequest');
+    this._externalRequest = opts.stubs.externalRequest || require('../request_helpers/external-request');
     this._memCache = opts.stubs.memCache || SimpleMemCache.getSharedInstance();
 }
 

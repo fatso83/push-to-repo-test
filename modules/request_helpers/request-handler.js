@@ -18,9 +18,9 @@
 
 'use strict';
 
-var intRequest = require('./request_helpers/internalRequest');
-var extRequest = require('./request_helpers/externalRequest');
-var Utils = require('./Utils');
+var intRequest = require('./internal-request');
+var extRequest = require('./external-request');
+var utils = require('./../utils');
 var log4js = require('log4js');
 var logger = log4js.getLogger('Request Handler');
 
@@ -90,7 +90,7 @@ function handleRequest(body, callback) {
 
     if (!validateRequest(body)) {
         errorMessage = invalidRequestErrorMessage;
-    } else if (!Utils.isMinimumRequiredVersion(frameworkVersion, requiredMinimumFrameworkVersion)) {
+    } else if (!utils.isMinimumRequiredVersion(frameworkVersion, requiredMinimumFrameworkVersion)) {
         errorMessage = oldFrameworkErrorMessage;
     }
 

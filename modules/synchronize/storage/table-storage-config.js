@@ -1,4 +1,4 @@
-var utils = require('./../../Utils.js')
+var utils = require('./../../utils')
 
 var tableStorage = {
     account: 'ngts',

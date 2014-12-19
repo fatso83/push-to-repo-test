@@ -5,7 +5,7 @@ var request = require('request');
 var app = require('../../app');
 var expect = require('chai').expect;
 
-describe('slow.server tests', function () {
+describe('slow.stores tests', function () {
     var testStart;
 
     // ngt servers are slow
