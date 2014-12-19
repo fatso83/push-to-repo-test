@@ -95,11 +95,13 @@ var cache = function (key, data, callback) {
  * @param callback(callbackObj)
  */
 var get = function (key, callback) {
-    var start = Date.now();
+    var startTime = process.hrtime();
 
     if (key && (typeof key === 'string') && callback && (typeof callback === 'function')) {
         cli.get(key, function (err, reply) {
-            logger.trace('Redis lookup finished in ' + (Date.now() - start) + ' ms ' + '[' + key + ']');
+            var diff = process.hrtime(startTime);
+            logger.trace('Redis lookup finished in ' + (diff[0] * 1e9 + diff[1]) + ' nanoseconds ' + '[' + key + ']');
+
             var cbo = {
                 status: "success",
                 data: null,

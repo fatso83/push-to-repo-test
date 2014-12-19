@@ -39,7 +39,11 @@ function getSingleStore(chainId, storeId, callback) {
 
 
 function getClosestStores(chainId, latitude, longitude, minNumberOfStores, maxNumberOfStores, maxDistance, filter, callback) {
-    var myPos = {"latitude": latitude, "longitude": longitude};
+
+    var myPos = {
+        "latitude": latitude,
+        "longitude": longitude
+    };
 
     repository.getStores(chainId, function (err, stores) {
 
