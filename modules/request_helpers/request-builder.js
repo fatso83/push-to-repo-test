@@ -68,7 +68,7 @@ function logTimer(description, startTime) {
  * @param {object} res
  */
 function routeToRequest(req, res) {
-    logger.trace(requestStartedMessage, req.serviceName);
+    logger.trace(requestStartedMessage, req.servicename);
 
     var startTime = process.hrtime();
     var frameworkRequest = getFrameworkRequest(req);

@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var cors = require('cors');
 
-var requestBuilder = require('../modules/request_helpers/request-builder');
+var requestHandler = require('../modules/request_helpers/request-handler');
 
 var log4js = require('log4js');
 var logger = log4js.getLogger('Root Request Router');
@@ -18,7 +18,7 @@ router.post('/', cors(), function (req, res) {
 
 	var body = req.body;
 
-	requestBuilder.routeToRequest(body, function(result) {
+	requestHandler.handleRequest(body, function(result) {
 		res.status(result.response.code || 500).json(result);
 	});
 });

@@ -4,7 +4,7 @@ var log4js = require('log4js'),
     chai = require('chai'),
     assert = chai.assert;
 
-describe('slow.Synchronize table storage', function () {
+describe('slow.synchronize table storage', function () {
 
     this.timeout(10000);
 
