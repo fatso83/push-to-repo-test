@@ -44,10 +44,12 @@ function getSingleStore(requestBody, callback) {
             if (err) {
                 callback(null, err);
             }
-            else if(result) { callback(result); }
+            else if (result) {
+                callback(result);
+            }
             else {
                 // none found
-                callback(null, { code : 404 });
+                callback(null, {code: 404});
             }
         }
     );
@@ -59,7 +61,10 @@ function getSingleStore(requestBody, callback) {
  */
 function closestToMe(requestBody, callback) {
 
-    var parsedUrl, params, chainId, match;
+    var parsedUrl,
+        params,
+        chainId,
+        match;
 
     // ensure easier parsing of parameters
     parsedUrl = url.parse(requestBody.servicepath.toLowerCase());
@@ -88,7 +93,8 @@ function closestToMe(requestBody, callback) {
             params.filter || "",
 
             // adapter for the big mistake in not following conventions in internalRequestHandler
-            function(err, result) {
+            // FELO: Big LOL
+            function (err, result) {
                 callback(result, err);
             }
         );

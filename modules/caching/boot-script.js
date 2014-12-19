@@ -2,7 +2,7 @@ var utils = require('util');
 var PollingCacher = require('./polling-cacher');
 var logger = require('log4js').getLogger('boot-script');
 
-var storeCacher = new PollingCacher();
+var pollingCacher = new PollingCacher();
 var storesRepository = require('../../modules/stores/store-repository');
 
 // cache stores
@@ -12,7 +12,7 @@ chainIds.forEach(function (chainId) {
 
     var FIVE_MINUTES = 5*60;
 
-    storeCacher.addRequest(storesRepository.getStoreRequest(chainId), {
+    pollingCacher.addRequest(storesRepository.getStoreRequest(chainId), {
         useInMemCache : true,
         intervalInSeconds: FIVE_MINUTES,
         refreshHandler: function (err, stores) {
@@ -25,7 +25,7 @@ chainIds.forEach(function (chainId) {
         }
     });
 
-    storeCacher.addRequest(storesRepository.getCountyRequest(chainId), {
+    pollingCacher.addRequest(storesRepository.getCountyRequest(chainId), {
         useInMemCache : true,
         intervalInSeconds: FIVE_MINUTES,
         refreshHandler: function (err, counties) {
@@ -41,8 +41,8 @@ chainIds.forEach(function (chainId) {
 
 exports.start = function () {
     logger.info('Starting warming of caches');
-    storeCacher.start();
+    pollingCacher.start();
 };
 exports.stop = function () {
-    storeCacher.stop();
+    pollingCacher.stop();
 };

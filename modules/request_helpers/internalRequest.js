@@ -32,7 +32,7 @@ var localServices = {
     'recommendations': cachingRequestHandler,
     'brandMatch': cachingRequestHandler,
     'allStoresInCounties': cachingRequestHandler, // preliminary name
-    'storesGetStore': cachingRequestHandler,
+    'storesGetStore': cachingRequestHandler
 };
 
 var isLocalService = function (requestBody) {
@@ -45,7 +45,6 @@ var getMethod = function (serviceName) {
     var res = localServices[serviceName];
     return res || false;
 };
-
 
 var makeRequest = function (requestBody, callback) {
     logger.debug('Resolving request for service ', requestBody.servicename);

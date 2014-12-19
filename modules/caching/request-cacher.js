@@ -16,7 +16,9 @@ var basicToken = 'Basic J8ed0(tyAop206%JHP';
 
 function hash(requestBody) {
 
-    var requestToken, hashKey, servicePath;
+    var requestToken,
+        hashKey,
+        servicePath;
 
     servicePath = requestBody.servicepath.toLowerCase();
     requestToken = basicToken;
@@ -90,7 +92,10 @@ RequestCacher.prototype = {
      */
     handleRequest: function (fwServiceRequest, callback) {
         logger.debug('Handling request for ' + fwServiceRequest.servicename);
-        var hashKey, self = this, start = Date.now(), cachedObj;
+        var hashKey,
+            self = this,
+            start = Date.now(),
+            cachedObj;
 
         this._currentResult = null;
 
@@ -155,7 +160,7 @@ RequestCacher.prototype = {
                 cacheObj.response = this._currentResult.data.response;
 
             } else {
-                logger.error('Request failed. Cannot refresh cache for' + fwServiceRequest.servicename);
+                logger.error('Request failed. Cannot refresh cache for ' + fwServiceRequest.servicename);
                 error = res.response;
             }
 

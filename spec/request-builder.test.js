@@ -9,7 +9,12 @@ describe('Request builder', function () {
            caching : { environment : 'my-environment'}
        });
 
-        var res = requestBuilder.createRequestBody({servicepath : '/foobar/baz', servicename : 'myservice'});
+        var res = requestBuilder.createRequestBody(
+            {
+                servicepath : '/foobar/baz',
+                servicename : 'myservice'
+            }
+        );
         expect(res.environment).to.equal('my-environment');
     });
 });
