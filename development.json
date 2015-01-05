@@ -1,0 +1,9 @@
+{
+  "logging" : { "level": "DEBUG" },
+  "caching" : {
+    "redis" : {
+      "host": "ngredisdev.redis.cache.windows.net",
+      "port" : 6379
+    }
+  }
+}

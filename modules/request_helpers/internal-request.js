@@ -6,12 +6,14 @@ var logger = log4js.getLogger('Internal Request Resolver');
 // caching
 var RequestCacher = require('../caching/request-cacher');
 var ONE_DAY = 24 * 60 * 60;
-var requestCacher = new RequestCacher({maxAgeInSeconds: ONE_DAY});
+var FOUR_HOURS = 4 * 60 * 60;
+var requestCacher = new RequestCacher({maxAgeInSeconds: ONE_DAY, maxStaleInSeconds: FOUR_HOURS});
 var cachingRequestHandler = requestCacher.handleRequest.bind(requestCacher);
 
 var productSearchModule = require('./../productSearch/searchUtil');
 var trumfTermsAndConditionsModule = require('./../terms_caching/terms_cacher');
 var persistenceSyncModule = require('./../synchronize/request-adapter');
+var storesModule = require('../stores/request-adapter');
 
 var localServices = {
     'persistenceSynchronize': persistenceSyncModule.synchronize,
@@ -22,19 +24,19 @@ var localServices = {
     'productSearchGetProductsForGroup': productSearchModule.search,
     'productSearchGetAllCategories': productSearchModule.search,
     'productSearchGetProductById': productSearchModule.search,
+    'allStoresInCounties': storesModule.getAllStoresInCounties,
+    'storesGetStore': storesModule.getAllStores,
 
     // can't be cached
-    'storesClosestToMe': require('../stores/request-adapter').closestToMe,
-    'storesGetSingleStore': require('../stores/request-adapter').getSingleStore,
-    
+    'storesClosestToMe': storesModule.closestToMe,
+    'storesGetSingleStore': storesModule.getSingleStore,
+
     // cached requests
     'productDetails2': cachingRequestHandler,
     'recommendations': cachingRequestHandler,
     'brandMatch': cachingRequestHandler,
-    'allStoresInCounties': cachingRequestHandler, // preliminary name
-    'storesGetStore': cachingRequestHandler,
-    'vacancies' : cachingRequestHandler,
-    'shoppingListGroups' : cachingRequestHandler
+    'vacancies': cachingRequestHandler,
+    'shoppingListGroups': cachingRequestHandler
 };
 
 var isLocalService = function (requestBody) {
@@ -64,7 +66,7 @@ var makeRequest = function (requestBody, callback) {
 
     if (method) {
         method(requestBody, function (response, error) {
-            
+
             if (error) {
                 responseObj.response.data = error.data || {};
                 responseObj.response.code = error.code || 500;

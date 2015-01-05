@@ -5,10 +5,10 @@ var _ = require('lodash');
 
 describe('Store service', function () {
     var DELTA_IN_PERCENT = 0.5,
-        kiwiStoresFixture = require('./fixtures/kiwistores'),
+
         inMemRepository = {
             getStores: function repository(chainId, cb) {
-                cb(null, kiwiStoresFixture);
+                cb(null, require('./fixtures/kiwistores'));
             }
         };
 
