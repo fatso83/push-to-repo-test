@@ -1,6 +1,4 @@
 var expect = require('chai').expect;
-var assert = require('chai').assert;
-
 var request = require('request');
 var app = require('../../../app');
 
@@ -48,11 +46,5 @@ describe('slow.vacancies service', function () {
                 return done(error);
             });
         });
-
-        it('should have description', function (done) {
-            done();
-        });
-
     });
-
 });

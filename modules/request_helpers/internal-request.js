@@ -33,7 +33,8 @@ var localServices = {
     'brandMatch': cachingRequestHandler,
     'allStoresInCounties': cachingRequestHandler, // preliminary name
     'storesGetStore': cachingRequestHandler,
-    'vacancies' : cachingRequestHandler
+    'vacancies' : cachingRequestHandler,
+    'shoppingListGroups' : cachingRequestHandler
 };
 
 var isLocalService = function (requestBody) {

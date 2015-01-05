@@ -5,7 +5,7 @@ var logger = log4js.getLogger('Redis Cache');
 var configuration = require('../configuration-loader');
 var redis_lib = require("redis");
 var queuedOperations = [];
-var cli;
+var cli = null;
 
 /**
  * The object returned in the callback method
@@ -95,9 +95,8 @@ var cache = function (key, data, callback) {
  * @param callback(callbackObj)
  */
 var get = function (key, callback) {
-    var startTime = process.hrtime();
-
     if (key && (typeof key === 'string') && callback && (typeof callback === 'function')) {
+        var startTime = process.hrtime();
         cli.get(key, function (err, reply) {
             var diff = process.hrtime(startTime);
             logger.trace('Redis lookup finished in ' + (diff[0] * 1e9 + diff[1]) + ' nanoseconds ' + '[' + key + ']');
@@ -115,12 +114,18 @@ var get = function (key, callback) {
                     cbo.error = "Key not found";
                 }
             } else {
-                cbo.data = JSON.parse((reply || "").toString());
+                try {
+                    cbo.data = JSON.parse((reply || "").toString());
+                }
+                catch (e) {
+                    cbo.error = e;
+                    return callback(cbo);
+                }
             }
-            callback(cbo);
+            return callback(cbo);
         });
     } else {
-        callback({
+        return callback({
             status: "error",
             error: "Missing parameters (key, callback)"
         });
@@ -128,14 +133,14 @@ var get = function (key, callback) {
 };
 
 var queueOperation = function (cmd, args) {
-    queuedOperations.push(function() {
+    queuedOperations.push(function () {
         cmd.apply(null, args);
     });
 };
 
-module.exports = exports = {
+module.exports = {
     get: function () {
-        
+
         if (!cli) {
             queueOperation(get, arguments);
         }
@@ -144,7 +149,7 @@ module.exports = exports = {
         }
     },
     cache: function () {
-        
+
         if (!cli) {
             queueOperation(cache, arguments);
         }

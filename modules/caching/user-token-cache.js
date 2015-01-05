@@ -9,7 +9,9 @@ var memCache = null;
 
 var tokenExpireInYears = 1;
 var tokenCacheRedisChannel = 'userTokenStorage';
-var redisUserTokenSet = 'userTokens';
+var redisUserTokenSet = 'userTokensSet';
+
+var errorMessageNotReady = 'User token cache is not ready';
 
 var ready = function () {
     return !!(redisClient && memCache);
@@ -27,11 +29,25 @@ var handleRedisMessage = function (channel, message) {
     }
 };
 
-var initialMemCache = function (error, result) {
-    if (!error) {
-        var userTokens = result;
-        // TODO: save to memStorage
+var initialMemCache = function (error, results) {
 
+    if (!error) {
+        var tokens = [];
+
+        for (i = 0; i < results.length; i += 2) {
+            var token = results[i].toString();
+            var expireDate = parseInt(results[i + 1].toString());
+            if (isNaN(token)) {
+                tokens.push({
+                    token: token,
+                    expireDate: expireDate
+                });
+            }
+        }
+
+        tokens.forEach(function (data) {
+            memCache.set(data.token, data.expireDate);
+        });
     } else {
         logger.error(error);
     }
@@ -39,7 +55,10 @@ var initialMemCache = function (error, result) {
 
 var initialize = function () {
     redisClient.on('message', handleRedisMessage);
-    redisClient.smembers(redisUserTokenSet, initialMemCache);
+    var now = new Date();
+    var expireDate = new Date();
+    expireDate.setUTCFullYear(expireDate.getUTCFullYear() + tokenExpireInYears);
+    redisClient.zrange(redisUserTokenSet, 0, expireDate.getTime(), 'withscores', initialMemCache);
 };
 
 configuration.load(function (config) {
@@ -82,7 +101,7 @@ var hasExpired = function (jsonDate) {
  */
 var hasValidToken = function (token, callback) {
     if (!ready()) {
-        return callback(new Error('User token cache is not ready'), null);
+        return callback(new Error(errorMessageNotReady), null);
     }
 
     var expireDate = memCache.get(token);
@@ -91,7 +110,7 @@ var hasValidToken = function (token, callback) {
     }
 
     var startTime = process.hrtime();
-    redisClient.get(token, function (error, reply) {
+    redisClient.zscore(redisUserTokenSet, token, function (error, reply) {
         var diff = process.hrtime(startTime);
         logger.trace('Redis lookup finished in ' + (diff[0] * 1e9 + diff[1]) + ' nanoseconds ');
         return callback(error, !hasExpired(reply));
@@ -106,7 +125,7 @@ var hasValidToken = function (token, callback) {
  */
 var saveToken = function (token, publish, callback) {
     if (!ready()) {
-        return callback(new Error('User token cache is not ready'), null);
+        return callback(new Error(errorMessageNotReady));
     }
 
     var expireDate = new Date();
@@ -119,10 +138,13 @@ var saveToken = function (token, publish, callback) {
     memCache.set(token, expireDate);
 
     if (publish) {
-        redisClient.sadd(redisUserTokenSet, function (error) {
-            if(!error){
-                return callback(error);
+        var args = [redisUserTokenSet, expireDate.getTime(), token];
+        redisClient.zadd(args, function (error) {
+            if (error) {
+                logger.error(error);
             }
+
+            return callback(error);
         });
 
         redisClient.publish(tokenCacheRedisChannel, message);
