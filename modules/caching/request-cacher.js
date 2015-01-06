@@ -16,9 +16,9 @@ var basicToken = 'Basic J8ed0(tyAop206%JHP';
 
 function hash(requestBody) {
 
-    var requestToken,
-        hashKey,
-        servicePath;
+    var requestToken = null,
+        hashKey = null,
+        servicePath = null;
 
     servicePath = requestBody.servicepath.toLowerCase();
     requestToken = basicToken;
@@ -37,6 +37,17 @@ function hash(requestBody) {
     return hashKey;
 }
 
+function validBasicAuthenticationHeader(request) {
+    if (request.headers && Array.isArray(request.headers)) {
+        for (var i = 0; i < request.headers.length; i++) {
+            var header = request.headers[i];
+            if (header.authorization && header.authorization.indexOf('Basic') > -1) {
+                //var token = header.authorization.replace('Basic ', '');
+                return header.authorization === basicToken;
+            }
+        }
+    }
+}
 
 /**
  *
@@ -50,6 +61,8 @@ function RequestCacher(opts) {
     this.maxAge = opts.maxAgeInSeconds || 60 * 60;
     this.maxStale = opts.maxStaleInSeconds || 0;
     this.useInMemCache = !!opts.useInMemCache || false;
+    this.basicToken = !!opts.basicToken;
+    this.bearerToken = !!opts.bearerToken;
 
     if (!opts.stubs) {
         opts.stubs = {};
@@ -59,6 +72,7 @@ function RequestCacher(opts) {
     this._externalRequest = opts.stubs.externalRequest || require('../request_helpers/external-request');
     this._memCache = opts.stubs.memCache || SimpleMemCache.getSharedInstance();
 }
+
 
 RequestCacher.prototype = {
 
@@ -96,12 +110,17 @@ RequestCacher.prototype = {
         var hashKey,
             self = this,
             start = Date.now(),
-            cachedObj;
+            cachedObj = null;
 
         this._currentResult = null;
 
         hashKey = hash(fwServiceRequest);
         logger.debug('Key: ', hashKey, '(' + fwServiceRequest.servicepath + ')');
+
+        // refresh if we don´t have a valid authentication header
+        if (this.basicToken && !validBasicAuthenticationHeader(fwServiceRequest)) {
+            return self.refresh(fwServiceRequest, callback);
+        }
 
         // return early if we have a fresh, in-mem cached version
         cachedObj = this._memCache.get(hashKey);
@@ -112,16 +131,12 @@ RequestCacher.prototype = {
 
         this._redisCache.get(hashKey, function (reply) {
             cachedObj = reply.data || null;
-
             this._currentResult = reply;
-
             if (reply.status === "success" && cachedObj && !self.isOld(cachedObj.cacheTime)) {
-
                 logger.trace('--> Got cached result in ' + (Date.now() - start) + ' ms');
-                callback(cachedObj.response, null);
-
+                return callback(cachedObj.response, null);
             } else {
-                self.refresh(fwServiceRequest, callback);
+                return self.refresh(fwServiceRequest, callback);
             }
         }.bind(this));
     },
@@ -157,7 +172,6 @@ RequestCacher.prototype = {
 
             } else if (this.canUseStaleResult()) {
                 logger.warn('Request failed. Using stale results for ' + fwServiceRequest.servicename);
-
                 cacheObj.response = this._currentResult.data.response;
 
             } else {
@@ -174,4 +188,3 @@ RequestCacher.prototype = {
 RequestCacher.hash = hash;
 
 module.exports = RequestCacher;
-
