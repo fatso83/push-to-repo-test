@@ -23,8 +23,8 @@ function hash(requestBody) {
     servicePath = requestBody.servicepath.toLowerCase();
     requestToken = basicToken;
     requestBody.headers.forEach(function (header) {
-        if (header.Authorization) {
-            requestToken = header.Authorization;
+        if (header.authorization) {
+            requestToken = header.authorization;
         }
     });
 
