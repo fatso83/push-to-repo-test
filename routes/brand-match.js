@@ -14,8 +14,10 @@ router.post('/:chainid', cors(), function (req, res) {
 
     var request = {
         serviceName: 'brandMatch',
+        serviceMethod: 'POST',
         url: req.originalUrl,
-        headers: req.headers
+        headers: req.headers,
+        payload: req.body
     };
 
     requestBuilder.routeToRequest(request, res);

@@ -5,12 +5,14 @@ var logger = log4js.getLogger('Internal Request Resolver');
 
 // caching
 var RequestCacher = require('../caching/request-cacher');
+
 var ONE_DAY = 24 * 60 * 60;
 var FOUR_HOURS = 4 * 60 * 60;
-var requestCacher = new RequestCacher({maxAgeInSeconds: ONE_DAY, maxStaleInSeconds: FOUR_HOURS});
-var requestCacherBasic = new RequestCacher({maxAgeInSeconds: ONE_DAY, maxStaleInSeconds: FOUR_HOURS, basicToken: true});
 
+var requestCacher = new RequestCacher({maxAgeInSeconds: ONE_DAY, maxStaleInSeconds: FOUR_HOURS});
 var cachingRequestHandler = requestCacher.handleRequest.bind(requestCacher);
+
+var requestCacherBasic = new RequestCacher({maxAgeInSeconds: ONE_DAY, maxStaleInSeconds: FOUR_HOURS, basicToken: true});
 var cachingBasicRequestHandler = requestCacherBasic.handleRequest.bind(requestCacherBasic);
 
 var productSearchModule = require('./../productSearch/searchUtil');
@@ -27,6 +29,8 @@ var localServices = {
     'productSearchGetProductsForGroup': productSearchModule.search,
     'productSearchGetAllCategories': productSearchModule.search,
     'productSearchGetProductById': productSearchModule.search,
+
+    // custom handlers
     'allStoresInCounties': storesModule.getAllStoresInCounties,
     'storesGetStore': storesModule.getAllStores,
 
@@ -48,7 +52,6 @@ var isLocalService = function (requestBody) {
     var serviceName = requestBody.servicename;
     return serviceName in localServices;
 };
-
 
 var getMethod = function (serviceName) {
     var res = localServices[serviceName];
@@ -89,7 +92,6 @@ var makeRequest = function (requestBody, callback) {
         callback(responseObj);
     }
 };
-
 
 exports.makeRequest = makeRequest;
 exports.isLocalService = isLocalService;

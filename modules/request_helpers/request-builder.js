@@ -48,6 +48,8 @@ function getFrameworkRequest(req) {
     return {
         servicename: req.serviceName,
         servicepath: req.url,
+        servicemethod: req.serviceMethod,
+        payload: req.payload,
         headers: req.headers
     };
 }
