@@ -9,11 +9,26 @@ var RequestCacher = require('../caching/request-cacher');
 var ONE_DAY = 24 * 60 * 60;
 var FOUR_HOURS = 4 * 60 * 60;
 
-var requestCacher = new RequestCacher({maxAgeInSeconds: ONE_DAY, maxStaleInSeconds: FOUR_HOURS});
+var requestCacher = new RequestCacher({
+    maxAgeInSeconds: ONE_DAY,
+    maxStaleInSeconds: FOUR_HOURS
+});
 var cachingRequestHandler = requestCacher.handleRequest.bind(requestCacher);
 
-var requestCacherBasic = new RequestCacher({maxAgeInSeconds: ONE_DAY, maxStaleInSeconds: FOUR_HOURS, basicToken: true});
+var requestCacherBasic = new RequestCacher({
+    maxAgeInSeconds: ONE_DAY,
+    maxStaleInSeconds: FOUR_HOURS,
+    basicToken: true
+});
 var cachingBasicRequestHandler = requestCacherBasic.handleRequest.bind(requestCacherBasic);
+
+var requestCacherBearer = new RequestCacher({
+    maxAgeInSeconds: ONE_DAY,
+    maxStaleInSeconds: FOUR_HOURS,
+    basicToken: true,
+    bearerToken: true
+});
+var cachingBearerRequestHandler = requestCacherBearer.handleRequest.bind(requestCacherBearer);
 
 var productSearchModule = require('./../productSearch/searchUtil');
 var trumfTermsAndConditionsModule = require('./../terms_caching/terms_cacher');
@@ -40,12 +55,15 @@ var localServices = {
 
     // cached requests
     'productDetails2': cachingRequestHandler,
-    'recommendations': cachingRequestHandler,
 
     // requires basic authentication
     'shoppingListGroup': cachingBasicRequestHandler,
     'brandMatch': cachingBasicRequestHandler,
-    'vacancies': cachingBasicRequestHandler
+    'vacancies': cachingBasicRequestHandler,
+    'synonyms': cachingBasicRequestHandler,
+
+    // additional functionality using bearer token
+    'recommendations': cachingBearerRequestHandler
 };
 
 var isLocalService = function (requestBody) {

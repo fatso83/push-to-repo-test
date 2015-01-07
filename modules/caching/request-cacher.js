@@ -4,7 +4,7 @@
  * Caches results based on the request environment, service path, authorization header , and payload
  * The two last fields are only used if they exist, so they are not compulsory.
  *
- * Requests will have their cache updated once maxAgeInSeconds is surpassed, but only if the request is succesful
+ * Requests will have their cache updated once maxAgeInSeconds is surpassed, but only if the request is successful
  */
 
 var crypto = require('crypto');
@@ -15,7 +15,7 @@ var SimpleMemCache = require('./simple-cache');
 var userTokenCache = require('./user-token-cache');
 
 
-function hash(requestBody) {
+function hash(requestBody, userRequest) {
 
     var requestToken = null,
         hashKey = null,
@@ -26,8 +26,8 @@ function hash(requestBody) {
     // Assume basic token
     requestToken = utils.basicAuthentication();
     requestBody.headers.forEach(function (header) {
-        // Only care about overriding in case of bearer tokens
-        if (header.authorization && (header.authorization.indexOf('Bearer ') > -1)) {
+        // Overriding in case the request returns unique results for each user (token)
+        if (userRequest && header.authorization && (header.authorization.indexOf('Bearer ') > -1)) {
             requestToken = header.authorization;
         }
     });
@@ -50,12 +50,17 @@ function validBasicAuthenticationHeader(request) {
                     return header.authorization === utils.basicAuthentication();
                 }
                 // Also check if user has a bearer token
+
                 if (header.authorization.indexOf('Bearer') > -1) {
-                    var bearerToken = header.authorization.replace('Bearer ', '');
-                    userTokenCache.hasValidToken(bearerToken, function (error, result) {
-                        return !!(!error && result);
-                    });
+                    return true;
+                    /*
+                     var bearerToken = header.authorization.replace('Bearer ', '');
+                     userTokenCache.hasValidToken(bearerToken, function (error, result) {
+                     return !!(!error && result);
+                     });
+                     */
                 }
+
             }
         }
     }
@@ -75,6 +80,7 @@ function RequestCacher(opts) {
     this.useInMemCache = !!opts.useInMemCache || false;
     this.basicToken = !!opts.basicToken;
     this.bearerToken = !!opts.bearerToken;
+    this.requireBearerToken = !!opts.requireBearerToken;
 
     if (!opts.stubs) {
         opts.stubs = {};
@@ -126,11 +132,12 @@ RequestCacher.prototype = {
 
         this._currentResult = null;
 
-        hashKey = hash(fwServiceRequest);
+        hashKey = hash(fwServiceRequest, this.bearerToken);
         logger.debug('Key: ', hashKey, '(' + fwServiceRequest.servicepath + ')');
 
         // refresh if we don´t have a valid authentication header
         if (this.basicToken && !validBasicAuthenticationHeader(fwServiceRequest)) {
+            fwServiceRequest.hashKey = hashKey;
             return self.refresh(fwServiceRequest, callback);
         }
 
@@ -148,17 +155,32 @@ RequestCacher.prototype = {
                 logger.trace('--> Got cached result in ' + (Date.now() - start) + ' ms');
                 return callback(cachedObj.response, null);
             } else {
+                fwServiceRequest.hashKey = hashKey;
                 return self.refresh(fwServiceRequest, callback);
             }
         }.bind(this));
     },
 
+    /**
+     *
+     * @param {object} fwServiceRequest
+     * @param {string} fwServiceRequest.hashKey
+     * @param cb
+     */
     refresh: function (fwServiceRequest, cb) {
-        var error, cacheObj = {
-            key: hash(fwServiceRequest),
-            cacheTime: null,
-            response: null
-        };
+
+        var error,
+            cacheObj = {
+                key: null,
+                cacheTime: null,
+                response: null
+            };
+        
+        if (fwServiceRequest.hashKey) {
+            cacheObj.key = fwServiceRequest.hashKey;
+        } else {
+            cacheObj.key = hash(fwServiceRequest);
+        }
 
         logger.trace('Getting data from server (using external request)');
 

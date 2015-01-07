@@ -2,10 +2,10 @@ var requestBuilder = require('./../request_helpers/request-builder');
 var utils = require('../utils');
 
 module.exports = {
-    getVacancyRequest: function (chainId) {
+    getRecommendationsRequest: function (chainId) {
         return requestBuilder.createRequestBody({
-            servicename: 'vacancies',
-            servicepath: 'api/data/vacancies/' + chainId,
+            servicename: 'recommendations',
+            servicepath: 'api/uidata/recommendations/' + chainId,
             headers: {
                 authorization: utils.basicAuthentication()
             }

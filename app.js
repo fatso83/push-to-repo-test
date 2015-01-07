@@ -5,7 +5,7 @@ var server,
     config = require('./modules/configuration-loader'),
     log4js = require('log4js'),
 
-    //http://stackoverflow.com/questions/27101171/pattern-for-ifrequire-main-that-works-on-azures-iisnode/27151366
+//http://stackoverflow.com/questions/27101171/pattern-for-ifrequire-main-that-works-on-azures-iisnode/27151366
     runningIISNode = require.main.filename.match(/iisnode/);
 
 /**
@@ -48,11 +48,13 @@ function main(config, callback) {
     app.use('/request', request);
 
     app.use('/api/uidata/brandmatch', require('./routes/brand-match'));
+    app.use('/api/uidata/recommendations', require('./routes/recommendations'));
 
     app.use('/api/FindStore', require('./routes/find-store'));
 
     app.use('/api/data/shoppinglistgroup', require('./routes/shopping-list-group'));
     app.use('/api/data/vacancies', require('./routes/vacancies'));
+    app.use('/api/data/synonyms', require('./routes/synonyms'));
 
     // Catch 404 and forwarding to error handler
     app.use(function (req, res, next) {
@@ -82,7 +84,9 @@ function main(config, callback) {
                     callback();
                 }
             });
-        } else { callback(); }
+        } else {
+            callback();
+        }
 
     });
 }
@@ -105,10 +109,10 @@ exports.start = function (overrides, cb) {
 /*
  *  start as normal if run directly from node
  *  special treatment in the case of running IISNode (Azure)
-**/
+ **/
 if (require.main === module || runningIISNode) {
 
     config.load(function (config) {
-        main(config, console.log.bind(console, 'Express server listening at :' + config.port ));
+        main(config, console.log.bind(console, 'Express server listening at :' + config.port));
     });
 }
