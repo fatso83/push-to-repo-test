@@ -165,9 +165,9 @@ RequestCacher.prototype = {
      *
      * @param {object} fwServiceRequest
      * @param {string} fwServiceRequest.hashKey
-     * @param cb
+     * @param callback
      */
-    refresh: function (fwServiceRequest, cb) {
+    refresh: function (fwServiceRequest, callback) {
 
         var error,
             cacheObj = {
@@ -175,7 +175,7 @@ RequestCacher.prototype = {
                 cacheTime: null,
                 response: null
             };
-        
+
         if (fwServiceRequest.hashKey) {
             cacheObj.key = fwServiceRequest.hashKey;
         } else {
@@ -213,7 +213,7 @@ RequestCacher.prototype = {
                 error = res.response;
             }
 
-            cb(cacheObj.response, error);
+            callback(cacheObj.response, error);
         }.bind(this));
     }
 };
