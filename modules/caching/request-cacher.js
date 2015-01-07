@@ -9,10 +9,11 @@
 
 var crypto = require('crypto');
 var logger = require('log4js').getLogger('RequestCacher');
-var utils = require('util');
+var util = require('util');
+var utils = require('../utils');
 var SimpleMemCache = require('./simple-cache');
+var userTokenCache = require('./user-token-cache');
 
-var basicToken = 'Basic J8ed0(tyAop206%JHP';
 
 function hash(requestBody) {
 
@@ -21,9 +22,12 @@ function hash(requestBody) {
         servicePath = null;
 
     servicePath = requestBody.servicepath.toLowerCase();
-    requestToken = basicToken;
+
+    // Assume basic token
+    requestToken = utils.basicAuthentication();
     requestBody.headers.forEach(function (header) {
-        if (header.authorization) {
+        // Only care about overriding in case of bearer tokens
+        if (header.authorization && (header.authorization.indexOf('Bearer ') > -1)) {
             requestToken = header.authorization;
         }
     });
@@ -41,9 +45,17 @@ function validBasicAuthenticationHeader(request) {
     if (request.headers && Array.isArray(request.headers)) {
         for (var i = 0; i < request.headers.length; i++) {
             var header = request.headers[i];
-            if (header.authorization && header.authorization.indexOf('Basic') > -1) {
-                //var token = header.authorization.replace('Basic ', '');
-                return header.authorization === basicToken;
+            if (header.authorization) {
+                if (header.authorization.indexOf('Basic') > -1) {
+                    return header.authorization === utils.basicAuthentication();
+                }
+                // Also check if user has a bearer token
+                if (header.authorization.indexOf('Bearer') > -1) {
+                    var bearerToken = header.authorization.replace('Bearer ', '');
+                    userTokenCache.hasValidToken(bearerToken, function (error, result) {
+                        return !!(!error && result);
+                    });
+                }
             }
         }
     }
@@ -152,7 +164,7 @@ RequestCacher.prototype = {
 
         this._externalRequest.makeRequest(fwServiceRequest, function (res) {
             var code = res.response.code;
-            logger.trace(utils.format('Got response for %s with code %d', fwServiceRequest.servicename, code));
+            logger.trace(util.format('Got response for %s with code %d', fwServiceRequest.servicename, code));
 
             if (code === 200 || code === 201 || code === 204) {
                 if (res.response.data) {

@@ -85,7 +85,7 @@ var hasExpired = function (jsonDate) {
         try {
             expireDate = JSON.parse(jsonDate);
         } catch (e) {
-            return callback(e, null);
+            return true;
         }
     }
 
@@ -111,6 +111,7 @@ var hasValidToken = function (token, callback) {
 
     var startTime = process.hrtime();
     redisClient.zscore(redisUserTokenSet, token, function (error, reply) {
+
         var diff = process.hrtime(startTime);
         logger.trace('Redis lookup finished in ' + (diff[0] * 1e9 + diff[1]) + ' nanoseconds ');
         return callback(error, !hasExpired(reply));
@@ -131,14 +132,14 @@ var saveToken = function (token, publish, callback) {
     var expireDate = new Date();
     expireDate.setUTCFullYear(expireDate.getUTCFullYear() + tokenExpireInYears);
     var message = {
-        expireDate: expireDate,
+        expireDate: expireDate.getTime(),
         token: token
     };
 
-    memCache.set(token, expireDate);
+    memCache.set(token, message.expireDate);
 
     if (publish) {
-        var args = [redisUserTokenSet, expireDate.getTime(), token];
+        var args = [redisUserTokenSet, message.expireDate, token];
         redisClient.zadd(args, function (error) {
             if (error) {
                 logger.error(error);

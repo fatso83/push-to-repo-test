@@ -40,10 +40,10 @@ var localServices = {
 
     // cached requests
     'productDetails2': cachingRequestHandler,
-    'shoppingListGroups': cachingRequestHandler,
     'recommendations': cachingRequestHandler,
 
     // requires basic authentication
+    'shoppingListGroup': cachingBasicRequestHandler,
     'brandMatch': cachingBasicRequestHandler,
     'vacancies': cachingBasicRequestHandler
 };

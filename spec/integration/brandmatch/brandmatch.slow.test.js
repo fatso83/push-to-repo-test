@@ -21,9 +21,9 @@ describe('slow.brandmatch service', function () {
         app.stop(done);
     });
 
-    describe('/data/brandmatch/', function () {
+    describe('/uidata/brandmatch/', function () {
         it('should return all brandmatches for chainId 1100', function (done) {
-            request.post('http://localhost:1337/api/data/brandmatch/1100', function (error, res, body) {
+            request.post('http://localhost:1337/api/uidata/brandmatch/1100', function (error, res, body) {
 
                 var brandMatches = JSON.parse(body);
 

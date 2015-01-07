@@ -46,8 +46,12 @@ function main(config, callback) {
 
     app.use('/', index);
     app.use('/request', request);
-    app.use('/api/FindStore', require('./routes/find-store'));
+
     app.use('/api/uidata/brandmatch', require('./routes/brand-match'));
+
+    app.use('/api/FindStore', require('./routes/find-store'));
+
+    app.use('/api/data/shoppinglistgroup', require('./routes/shopping-list-group'));
     app.use('/api/data/vacancies', require('./routes/vacancies'));
 
     // Catch 404 and forwarding to error handler
