@@ -58,4 +58,25 @@ router.get('/Stores/:chainid', cors(), function (req, res) {
     requestBuilder.routeToRequest(request, res);
 });
 
+router.get('/Municipalities', cors(), function (req, res) {
+
+    var request = {
+        serviceName: 'municipalities',
+        url: req.originalUrl,
+        headers: req.headers
+    };
+
+    requestBuilder.routeToRequest(request, res);
+});
+
+router.get('/Counties', cors(), function (req, res) {
+    var request = {
+        serviceName: 'counties',
+        url: req.originalUrl,
+        headers: req.headers
+    };
+
+    requestBuilder.routeToRequest(request, res);
+});
+
 module.exports = router;

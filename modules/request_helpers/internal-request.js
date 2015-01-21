@@ -61,6 +61,8 @@ var localServices = {
     'brandMatch': cachingBasicRequestHandler,
     'vacancies': cachingBasicRequestHandler,
     'synonyms': cachingBasicRequestHandler,
+    'municipalities': cachingBasicRequestHandler,
+    'counties': cachingBasicRequestHandler,
 
     // additional functionality using bearer token
     'recommendations': cachingBearerRequestHandler

@@ -1,6 +1,6 @@
-
 var internalRequestHandler = require('../request_helpers/internal-request');
 var requestBuilder = require('./../request_helpers/request-builder');
+var utils = require('./../utils');
 
 var defaultCheckForHolidaysDaysAhead = 35;
 
@@ -17,7 +17,6 @@ var getCountyUrl = function (chainId, checkForHolidaysDaysAhead) {
 var getStoreRequest = function (chainId) {
 
     requestBuilder = require('./../request_helpers/request-builder');
-
     return requestBuilder.createRequestBody({
         servicename: 'storesGetStore',
         servicepath: getStoreUrl(chainId)
@@ -25,6 +24,7 @@ var getStoreRequest = function (chainId) {
 };
 
 var getCountyRequest = function (chainId) {
+
     return requestBuilder.createRequestBody({
         servicename: 'allStoresInCounties',
         servicepath: getCountyUrl(chainId)
@@ -32,6 +32,7 @@ var getCountyRequest = function (chainId) {
 };
 
 var getStores = function repository(chainId, cb) {
+
     internalRequestHandler.makeRequest(
         getStoreRequest(chainId), function (request) {
 
@@ -44,10 +45,21 @@ var getStores = function repository(chainId, cb) {
     );
 };
 
+var getMunicipalities = function () {
+    return requestBuilder.createRequestBody({
+        servicename: 'municipalities',
+        servicepath: 'api/findstore/municipalities',
+        headers: {
+            authorization: utils.basicAuthentication()
+        }
+    });
+};
+
 module.exports = {
     getStores: getStores,
     getStoreRequest: getStoreRequest,
     getCountyRequest: getCountyRequest,
     getStoreUrl: getStoreUrl,
-    getCountyUrl: getCountyUrl
+    getCountyUrl: getCountyUrl,
+    getMunicipalities: getMunicipalities
 };

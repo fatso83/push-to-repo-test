@@ -12,14 +12,14 @@ var synonymsRepository = require('../services/synonyms-repository');
 // cache stores
 var chainIds = [1100, 1210, 1220, 1270, 1300, 1320];
 
-chainIds.forEach(function (chainId) {
+var ONE_MINUTE = 60;
+var FIVE_MINUTES = 5 * ONE_MINUTE;
+var TEN_MINUTES = 10 * ONE_MINUTE;
+var HALF_HOUR = 30 * ONE_MINUTE;
+var ONE_HOUR = 60 * ONE_MINUTE;
+var ONE_DAY = 24 * ONE_HOUR;
 
-    var ONE_MINUTE = 60;
-    var FIVE_MINUTES = 5 * ONE_MINUTE;
-    var TEN_MINUTES = 10 * ONE_MINUTE;
-    var HALF_HOUR = 30 * ONE_MINUTE;
-    var ONE_HOUR = 60 * ONE_MINUTE;
-    var ONE_DAY = 24 * ONE_HOUR;
+chainIds.forEach(function (chainId) {
 
     pollingCacher.addRequest(storesRepository.getStoreRequest(chainId), {
         useInMemCache: true,
@@ -131,14 +131,32 @@ chainIds.forEach(function (chainId) {
                 logger.error('An error has occurred when trying to refresh the synonyms cache');
             }
         }
-    })
+    });
+});
 
+pollingCacher.addRequest(storesRepository.getMunicipalities(), {
+    useInMemCache: true,
+    intervalInSeconds: ONE_DAY,
+    refreshHandler: function (err, municipalities) {
+
+        if (err) {
+            logger.error(err);
+        }
+
+        if (municipalities) {
+            logger.info(utils.format('Refreshed municipalities cache. Got %d municipalities', municipalities.length));
+        }
+        else {
+            logger.error('An error has occurred when trying to refresh the municipalities cache');
+        }
+    }
 });
 
 exports.start = function () {
     logger.info('Starting warming of caches');
     pollingCacher.start();
 };
+
 exports.stop = function () {
     pollingCacher.stop();
 };

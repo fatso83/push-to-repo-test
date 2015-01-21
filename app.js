@@ -56,6 +56,7 @@ function main(config, callback) {
     app.use('/api/data/vacancies', require('./routes/vacancies'));
     app.use('/api/data/synonyms', require('./routes/synonyms'));
 
+
     // Catch 404 and forwarding to error handler
     app.use(function (req, res, next) {
         var err = new Error('Not Found');
