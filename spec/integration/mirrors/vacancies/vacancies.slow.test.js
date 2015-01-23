@@ -1,16 +1,15 @@
 var expect = require('chai').expect;
 var request = require('request');
-var app = require('../../../app');
-var utils = require('../../../modules/utils');
+var app = require('../../../../app');
+var utils = require('../../../../modules/utils');
 
-describe('slow.vacancies service', function () {
+describe('slow.integration.mirrors.shopping-list-group service', function () {
 
     this.timeout(30000);
 
-    // This test Assumes there´s a vacancy item: 7183.
     var mock = {
         URL: 'http://localhost:1337/api/data/vacancies/1100',
-        vacancyId: 7183
+        vacancyId: null
     };
 
     before(function (done) {
@@ -42,6 +41,7 @@ describe('slow.vacancies service', function () {
                 var vacancies = JSON.parse(body);
                 expect(vacancies).to.be.an('array');
                 expect(vacancies).to.have.length.above(5);
+                mock.vacancyId = vacancies[0].vacancyId;
                 return done(error);
             });
         });
@@ -58,7 +58,9 @@ describe('slow.vacancies service', function () {
             request(options, function (error, res, body) {
                 var vacancyItem = JSON.parse(body);
                 expect(vacancyItem).to.be.an('object');
-                expect(vacancyItem).to.include.keys(['applicationurl', 'commence', 'companyname', 'contactpersonname']);
+                expect(vacancyItem).to.include.keys([
+                    'applicationurl', 'commence', 'companyname', 'contactpersonname'
+                ]);
                 expect(vacancyItem).to.have.deep.property('companyname', 'KIWI');
                 return done(error);
             });

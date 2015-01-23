@@ -1,6 +1,6 @@
 var expect = require('chai').expect;
 
-describe('slow.user-token-cache', function () {
+describe('slow.integration.redis-cache.user-token-cache', function () {
 
     this.timeout(6000);
 

@@ -1,11 +1,11 @@
 var expect = require('chai').expect;
 var request = require('request');
-var app = require('../../../app');
-var utils = require('../../../modules/utils');
+var app = require('../../../../app');
+var utils = require('../../../../modules/utils');
 
 // This test assumes there are First Price products which are of category "Drikkevarer".
 
-describe('slow.brandmatch service', function () {
+describe('slow.integration.mirrors.brandmatch service', function () {
 
     this.timeout(6000);
 

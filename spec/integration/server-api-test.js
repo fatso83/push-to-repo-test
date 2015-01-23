@@ -1,6 +1,6 @@
 // Example tests taken from the NGSharingPrototypeServer project
 
-
+/**
 var request = require('request');
 var app = require('../../app');
 var expect = require('chai').expect;
@@ -147,3 +147,4 @@ describe('slow.stores tests', function () {
         });
     });
 });
+**/
