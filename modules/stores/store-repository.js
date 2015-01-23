@@ -55,11 +55,22 @@ var getMunicipalities = function () {
     });
 };
 
+var getCounties = function () {
+    return requestBuilder.createRequestBody({
+        servicename: 'counties',
+        servicepath: 'api/findstore/counties',
+        headers: {
+            authorization: utils.basicAuthentication()
+        }
+    });
+};
+
 module.exports = {
     getStores: getStores,
     getStoreRequest: getStoreRequest,
     getCountyRequest: getCountyRequest,
     getStoreUrl: getStoreUrl,
     getCountyUrl: getCountyUrl,
-    getMunicipalities: getMunicipalities
+    getMunicipalities: getMunicipalities,
+    getCounties: getCounties
 };

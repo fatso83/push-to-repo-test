@@ -152,6 +152,24 @@ pollingCacher.addRequest(storesRepository.getMunicipalities(), {
     }
 });
 
+pollingCacher.addRequest(storesRepository.getCounties(), {
+    useInMemCache: true,
+    intervalInSeconds: ONE_DAY,
+    refreshHandler: function (err, counties) {
+
+        if (err) {
+            logger.error(err);
+        }
+
+        if (counties) {
+            logger.info(utils.format('Refreshed counties cache. Got %d counties', counties.length));
+        }
+        else {
+            logger.error('An error has occurred when trying to refresh the counties cache');
+        }
+    }
+});
+
 exports.start = function () {
     logger.info('Starting warming of caches');
     pollingCacher.start();
