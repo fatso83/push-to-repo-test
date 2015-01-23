@@ -3,20 +3,23 @@ var router = express.Router();
 var cors = require('cors');
 
 var log4js = require('log4js');
-var logger = log4js.getLogger('Vacancies');
+var logger = log4js.getLogger('BrandMatch');
 
-var requestBuilder = require('../modules/request_helpers/request-builder');
+var requestBuilder = require('../../modules/request_helpers/request-builder');
 
 //enable pre-flight cors
 router.options('/', cors());
 
-router.get('/:chainid', cors(), function (req, res) {
+router.post('/:chainid', cors(), function (req, res) {
 
     var request = {
-        serviceName: 'vacancies',
+        serviceName: 'brandMatch',
+        serviceMethod: 'POST',
         url: req.originalUrl,
-        headers: req.headers
+        headers: req.headers,
+        payload: req.body
     };
+
     requestBuilder.routeToRequest(request, res);
 });
 

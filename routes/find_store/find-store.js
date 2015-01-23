@@ -2,8 +2,8 @@ var express = require('express');
 var router = express.Router();
 var cors = require('cors');
 
-var storesRepository = require('../modules/stores/store-repository');
-var requestBuilder = require('../modules/request_helpers/request-builder');
+var storesRepository = require('../../modules/stores/store-repository');
+var requestBuilder = require('../../modules/request_helpers/request-builder');
 
 var log4js = require('log4js');
 var logger = log4js.getLogger('FindStore');

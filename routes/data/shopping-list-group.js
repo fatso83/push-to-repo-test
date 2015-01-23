@@ -3,9 +3,9 @@ var router = express.Router();
 var cors = require('cors');
 
 var log4js = require('log4js');
-var logger = log4js.getLogger('Synonyms');
+var logger = log4js.getLogger('Shopping list group');
 
-var requestBuilder = require('../modules/request_helpers/request-builder');
+var requestBuilder = require('../../modules/request_helpers/request-builder');
 
 //enable pre-flight cors
 router.options('/', cors());
@@ -13,7 +13,7 @@ router.options('/', cors());
 router.get('/:chainid', cors(), function (req, res) {
 
     var request = {
-        serviceName: 'synonyms',
+        serviceName: 'shoppingListGroup',
         url: req.originalUrl,
         headers: req.headers
     };

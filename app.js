@@ -47,14 +47,14 @@ function main(config, callback) {
     app.use('/', index);
     app.use('/request', request);
 
-    app.use('/api/uidata/brandmatch', require('./routes/brand-match'));
-    app.use('/api/uidata/recommendations', require('./routes/recommendations'));
+    app.use('/api/uidata/brandmatch', require('./routes/ui_data/brand-match'));
+    app.use('/api/uidata/recommendations', require('./routes/ui_data/recommendations'));
 
-    app.use('/api/FindStore', require('./routes/find-store'));
+    app.use('/api/FindStore', require('./routes/find_store/find-store'));
 
-    app.use('/api/data/shoppinglistgroup', require('./routes/shopping-list-group'));
-    app.use('/api/data/vacancies', require('./routes/vacancies'));
-    app.use('/api/data/synonyms', require('./routes/synonyms'));
+    app.use('/api/data/shoppinglistgroup', require('./routes/data/shopping-list-group'));
+    app.use('/api/data/vacancies', require('./routes/data/vacancies'));
+    app.use('/api/data/synonyms', require('./routes/data/synonyms'));
 
     // Catch 404 and forwarding to error handler
     app.use(function (req, res, next) {
