@@ -9,12 +9,14 @@ var RequestCacher = require('../caching/request-cacher');
 var ONE_DAY = 24 * 60 * 60;
 var FOUR_HOURS = 4 * 60 * 60;
 
+// Request handler
 var requestCacher = new RequestCacher({
     maxAgeInSeconds: ONE_DAY,
     maxStaleInSeconds: FOUR_HOURS
 });
 var cachingRequestHandler = requestCacher.handleRequest.bind(requestCacher);
 
+// Basic request handler
 var requestCacherBasic = new RequestCacher({
     maxAgeInSeconds: ONE_DAY,
     maxStaleInSeconds: FOUR_HOURS,
@@ -22,6 +24,7 @@ var requestCacherBasic = new RequestCacher({
 });
 var cachingBasicRequestHandler = requestCacherBasic.handleRequest.bind(requestCacherBasic);
 
+// Bearer request handler
 var requestCacherBearer = new RequestCacher({
     maxAgeInSeconds: ONE_DAY,
     maxStaleInSeconds: FOUR_HOURS,
@@ -63,6 +66,7 @@ var localServices = {
     'synonyms': cachingBasicRequestHandler,
     'municipalities': cachingBasicRequestHandler,
     'counties': cachingBasicRequestHandler,
+    'postalAddress': cachingBasicRequestHandler,
 
     // additional functionality using bearer token
     'recommendations': cachingBearerRequestHandler

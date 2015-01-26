@@ -55,15 +55,16 @@ function main(config, callback) {
     app.use('/api/data/shoppinglistgroup', require('./routes/data/shopping-list-group'));
     app.use('/api/data/vacancies', require('./routes/data/vacancies'));
     app.use('/api/data/synonyms', require('./routes/data/synonyms'));
+    app.use('/api/data/postaladdress', require('./routes/data/postal-address'));
 
     // Catch 404 and forwarding to error handler
     app.use(function (req, res, next) {
-        var err = new Error('Not Found');
+        var error = new Error('Not Found');
 
-        err.status = 404;
-        err.message = "That route does not exist";
+        error.status = 404;
+        error.message = "That route does not exist";
 
-        next(err);
+        next(error);
     });
 
     server.listen(app.get('port'), function () {

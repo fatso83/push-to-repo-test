@@ -42,7 +42,7 @@ describe('slow.integration.mirrors.shopping-list-group service', function () {
                 var vacancies = JSON.parse(body);
                 expect(vacancies).to.be.an('array');
                 expect(vacancies).to.have.length.above(5);
-                mock.vacancyId = vacancies[0].vacancyId;
+                mock.vacancyId = vacancies[0].vacancyid;
                 return done(error);
             });
         });
