@@ -2,13 +2,14 @@ var expect = require('chai').expect;
 var request = require('request');
 var app = require('../../../../app');
 var utils = require('../../../../modules/utils');
+var testConfig = require('../../integration-test-config');
 
 describe('slow.integration.mirrors.shopping-list-group service', function () {
 
-    this.timeout(30000);
+    this.timeout(testConfig.timeout.HALF_MINUTE);
 
     var mock = {
-        URL: 'http://localhost:1337/api/data/vacancies/1100',
+        URL: testConfig.URL + 'api/data/vacancies/' + testConfig.chainId,
         vacancyId: null
     };
 
@@ -29,7 +30,7 @@ describe('slow.integration.mirrors.shopping-list-group service', function () {
 
     describe('/data/vacancies/', function () {
 
-        it('should return all vacancies for chainId 1100', function (done) {
+        it('should return all vacancies for chainId ' + testConfig.chainId, function (done) {
             var options = {
                 url: mock.URL,
                 headers: {

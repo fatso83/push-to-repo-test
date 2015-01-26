@@ -2,13 +2,14 @@ var expect = require('chai').expect;
 var request = require('request');
 var app = require('../../../../app');
 var utils = require('../../../../modules/utils');
+var testConfig = require('../../integration-test-config');
 
 describe('slow.integration.mirrors.synonyms service', function () {
 
-    this.timeout(30000);
+    this.timeout(testConfig.timeout.HALF_MINUTE);
 
     var mock = {
-        URL: 'http://localhost:1337/api/data/synonyms/1100',
+        URL: testConfig.URL + 'api/data/synonyms/' + testConfig.chainId,
         synonym: null
     };
 
@@ -44,7 +45,7 @@ describe('slow.integration.mirrors.synonyms service', function () {
                 expect(synonyms).to.be.an('array');
                 expect(synonyms).to.have.length.above(10);
                 expect(synonyms[0]).to.include.keys([
-                        'title','shoppingListGroupId']
+                        'title', 'shoppingListGroupId']
                 );
 
                 mock.synonym = synonyms[0];

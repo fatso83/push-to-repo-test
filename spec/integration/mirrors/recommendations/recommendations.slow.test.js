@@ -2,13 +2,14 @@ var expect = require('chai').expect;
 var request = require('request');
 var app = require('../../../../app');
 var utils = require('../../../../modules/utils');
+var testConfig = require('../../integration-test-config');
 
 describe('slow.integration.mirrors.recommendations service', function () {
 
-    this.timeout(30000);
+    this.timeout(testConfig.timeout.HALF_MINUTE);
 
     var mock = {
-        URL: 'http://localhost:1337/api/uidata/recommendations/1100',
+        URL: testConfig.URL + 'api/uidata/recommendations/1100',
         recommendation: null
     };
 
@@ -45,7 +46,7 @@ describe('slow.integration.mirrors.recommendations service', function () {
                 expect(recommendations[0]).to.include.keys([
                         'category', 'detailstype', 'freetext', 'icons', 'id',
                         'imageid', 'price', 'promotiontags', 'showicons', 'subtitle',
-                        'title', 'title','type']
+                        'title', 'title', 'type']
                 );
 
                 mock.recommendation = recommendations[0];

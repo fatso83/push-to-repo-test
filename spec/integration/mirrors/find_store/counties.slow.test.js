@@ -2,13 +2,14 @@ var expect = require('chai').expect;
 var request = require('request');
 var app = require('../../../../app');
 var utils = require('../../../../modules/utils');
+var testConfig = require('../../integration-test-config');
 
 describe('slow.integration.mirrors.find-store.counties service', function () {
 
-    this.timeout(30000);
+    this.timeout(testConfig.timeout.HALF_MINUTE);
 
     var mock = {
-        URL: 'http://localhost:1337/api/findstore/counties/',
+        URL: testConfig.URL + 'api/findstore/counties/',
         county: null
     };
 

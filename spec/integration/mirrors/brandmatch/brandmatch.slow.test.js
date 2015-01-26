@@ -2,15 +2,16 @@ var expect = require('chai').expect;
 var request = require('request');
 var app = require('../../../../app');
 var utils = require('../../../../modules/utils');
+var testConfig = require('../../integration-test-config');
 
 // This test assumes there are First Price products which are of category "Drikkevarer".
 
 describe('slow.integration.mirrors.brandmatch service', function () {
 
-    this.timeout(6000);
+    this.timeout(testConfig.timeout.HALF_MINUTE);
 
     var mock = {
-        URL: 'http://localhost:1337/api/uidata/brandmatch/1100',
+        URL: testConfig.URL + 'api/uidata/brandmatch/' + testConfig.chainId,
         requestBody: {
             "brand": "First Price",
             "productdetailslist": [
@@ -47,7 +48,7 @@ describe('slow.integration.mirrors.brandmatch service', function () {
     });
 
     describe('/uidata/brandmatch/', function () {
-        it('should return all brandmatches for chainId 1100 with given example', function (done) {
+        it('should return all brandmatches for chainId ' + testConfig.chainId + ' with given example', function (done) {
 
             var options = {
                 url: mock.URL,
