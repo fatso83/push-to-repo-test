@@ -1,5 +1,6 @@
-var builder = require('../request_helpers/request-builder');
-var internalRequestHandler = require('../request_helpers/internalRequest');
+var internalRequestHandler = require('../request_helpers/internal-request');
+var requestBuilder = require('./../request_helpers/request-builder');
+var utils = require('./../utils');
 
 var defaultCheckForHolidaysDaysAhead = 35;
 
@@ -13,25 +14,27 @@ var getCountyUrl = function (chainId, checkForHolidaysDaysAhead) {
     return 'api/FindStore/AllStoresInCounties/' + chainId + '?checkForHolidays=' + checkForHolidays;
 };
 
-var getStoreRequest = function(chainId) {
+var getStoreRequest = function (chainId) {
 
-    return builder.createRequestBody({
+    requestBuilder = require('./../request_helpers/request-builder');
+    return requestBuilder.createRequestBody({
         servicename: 'storesGetStore',
         servicepath: getStoreUrl(chainId)
     });
 };
 
-var getCountyRequest = function(chainId) {
-    return builder.createRequestBody({
+var getCountyRequest = function (chainId) {
+
+    return requestBuilder.createRequestBody({
         servicename: 'allStoresInCounties',
         servicepath: getCountyUrl(chainId)
     });
-}
+};
 
 var getStores = function repository(chainId, cb) {
-    internalRequestHandler.makeRequest(
 
-        getStoreRequest(chainId) , function(request) {
+    internalRequestHandler.makeRequest(
+        getStoreRequest(chainId), function (request) {
 
             if (request.response.code !== 200) {
                 return cb(new Error("Error when fetching stores: " + JSON.stringify(request.response)));
@@ -42,10 +45,32 @@ var getStores = function repository(chainId, cb) {
     );
 };
 
+var getMunicipalities = function () {
+    return requestBuilder.createRequestBody({
+        servicename: 'municipalities',
+        servicepath: 'api/findstore/municipalities',
+        headers: {
+            authorization: utils.basicAuthentication()
+        }
+    });
+};
+
+var getCounties = function () {
+    return requestBuilder.createRequestBody({
+        servicename: 'counties',
+        servicepath: 'api/findstore/counties',
+        headers: {
+            authorization: utils.basicAuthentication()
+        }
+    });
+};
+
 module.exports = {
-    getStores : getStores,
-    getStoreRequest :  getStoreRequest,
-    getCountyRequest : getCountyRequest,
-    getStoreUrl : getStoreUrl,
-    getCountyUrl : getCountyUrl
+    getStores: getStores,
+    getStoreRequest: getStoreRequest,
+    getCountyRequest: getCountyRequest,
+    getStoreUrl: getStoreUrl,
+    getCountyUrl: getCountyUrl,
+    getMunicipalities: getMunicipalities,
+    getCounties: getCounties
 };

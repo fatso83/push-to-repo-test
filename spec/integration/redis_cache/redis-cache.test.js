@@ -1,7 +1,7 @@
-var redisCache = require('../../modules/caching/redis-cache');
+var redisCache = require('../../../modules/caching/redis-cache');
 var expect = require('chai').expect;
 
-describe('slow.redis-cache', function () {
+describe('slow.integration.redis-cache', function () {
 
     it('should be able to overwrite an existing key', function (done) {
         var key = 'myKey';
@@ -19,5 +19,4 @@ describe('slow.redis-cache', function () {
             });
         });
     });
-
 });

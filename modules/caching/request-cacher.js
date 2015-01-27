@@ -4,25 +4,31 @@
  * Caches results based on the request environment, service path, authorization header , and payload
  * The two last fields are only used if they exist, so they are not compulsory.
  *
- * Requests will have their cache updated once maxAgeInSeconds is surpassed, but only if the request is succesful
+ * Requests will have their cache updated once maxAgeInSeconds is surpassed, but only if the request is successful
  */
 
 var crypto = require('crypto');
 var logger = require('log4js').getLogger('RequestCacher');
-var utils = require('util');
+var util = require('util');
+var utils = require('../utils');
 var SimpleMemCache = require('./simple-cache');
+var userTokenCache = require('./user-token-cache');
 
-var basicToken = 'Basic J8ed0(tyAop206%JHP';
 
-function hash(requestBody) {
+function hash(requestBody, userRequest) {
 
-    var requestToken, hashKey, servicePath;
+    var requestToken = null,
+        hashKey = null,
+        servicePath = null;
 
     servicePath = requestBody.servicepath.toLowerCase();
-    requestToken = basicToken;
+
+    // Assume basic token
+    requestToken = utils.basicAuthentication();
     requestBody.headers.forEach(function (header) {
-        if (header.Authorization) {
-            requestToken = header.Authorization;
+        // Overriding in case the request returns unique results for each user (token)
+        if (userRequest && header.authorization && (header.authorization.indexOf('Bearer ') > -1)) {
+            requestToken = header.authorization;
         }
     });
 
@@ -35,6 +41,30 @@ function hash(requestBody) {
     return hashKey;
 }
 
+function validBasicAuthenticationHeader(request) {
+    if (request.headers && Array.isArray(request.headers)) {
+        for (var i = 0; i < request.headers.length; i++) {
+            var header = request.headers[i];
+            if (header.authorization) {
+                if (header.authorization.indexOf('Basic') > -1) {
+                    return header.authorization === utils.basicAuthentication();
+                }
+                // Also check if user has a bearer token
+
+                if (header.authorization.indexOf('Bearer') > -1) {
+                    return true;
+                    /*
+                     var bearerToken = header.authorization.replace('Bearer ', '');
+                     userTokenCache.hasValidToken(bearerToken, function (error, result) {
+                     return !!(!error && result);
+                     });
+                     */
+                }
+
+            }
+        }
+    }
+}
 
 /**
  *
@@ -48,15 +78,19 @@ function RequestCacher(opts) {
     this.maxAge = opts.maxAgeInSeconds || 60 * 60;
     this.maxStale = opts.maxStaleInSeconds || 0;
     this.useInMemCache = !!opts.useInMemCache || false;
+    this.basicToken = !!opts.basicToken;
+    this.bearerToken = !!opts.bearerToken;
+    this.requireBearerToken = !!opts.requireBearerToken;
 
     if (!opts.stubs) {
         opts.stubs = {};
     }
 
     this._redisCache = opts.stubs.redisCache || require('./redis-cache');
-    this._externalRequest = opts.stubs.externalRequest || require('../request_helpers/externalRequest');
+    this._externalRequest = opts.stubs.externalRequest || require('../request_helpers/external-request');
     this._memCache = opts.stubs.memCache || SimpleMemCache.getSharedInstance();
 }
+
 
 RequestCacher.prototype = {
 
@@ -91,12 +125,21 @@ RequestCacher.prototype = {
      */
     handleRequest: function (fwServiceRequest, callback) {
         logger.debug('Handling request for ' + fwServiceRequest.servicename);
-        var hashKey, self = this, start = Date.now(), cachedObj;
+        var hashKey,
+            self = this,
+            start = Date.now(),
+            cachedObj = null;
 
         this._currentResult = null;
 
-        hashKey = hash(fwServiceRequest);
+        hashKey = hash(fwServiceRequest, this.bearerToken);
         logger.debug('Key: ', hashKey, '(' + fwServiceRequest.servicepath + ')');
+
+        // refresh if we don´t have a valid authentication header
+        if (this.basicToken && !validBasicAuthenticationHeader(fwServiceRequest)) {
+            fwServiceRequest.hashKey = hashKey;
+            return self.refresh(fwServiceRequest, callback);
+        }
 
         // return early if we have a fresh, in-mem cached version
         cachedObj = this._memCache.get(hashKey);
@@ -107,32 +150,43 @@ RequestCacher.prototype = {
 
         this._redisCache.get(hashKey, function (reply) {
             cachedObj = reply.data || null;
-
             this._currentResult = reply;
-
             if (reply.status === "success" && cachedObj && !self.isOld(cachedObj.cacheTime)) {
-
                 logger.trace('--> Got cached result in ' + (Date.now() - start) + ' ms');
-                callback(cachedObj.response, null);
-
+                return callback(cachedObj.response, null);
             } else {
-                self.refresh(fwServiceRequest, callback);
+                fwServiceRequest.hashKey = hashKey;
+                return self.refresh(fwServiceRequest, callback);
             }
         }.bind(this));
     },
 
-    refresh: function (fwServiceRequest, cb) {
-        var error, cacheObj = {
-            key: hash(fwServiceRequest),
-            cacheTime: null,
-            response: null
-        };
+    /**
+     *
+     * @param {object} fwServiceRequest
+     * @param {string} fwServiceRequest.hashKey
+     * @param callback
+     */
+    refresh: function (fwServiceRequest, callback) {
+
+        var error,
+            cacheObj = {
+                key: null,
+                cacheTime: null,
+                response: null
+            };
+
+        if (fwServiceRequest.hashKey) {
+            cacheObj.key = fwServiceRequest.hashKey;
+        } else {
+            cacheObj.key = hash(fwServiceRequest);
+        }
 
         logger.trace('Getting data from server (using external request)');
 
         this._externalRequest.makeRequest(fwServiceRequest, function (res) {
             var code = res.response.code;
-            logger.trace(utils.format('Got response for %s with code %d', fwServiceRequest.servicename, code));
+            logger.trace(util.format('Got response for %s with code %d', fwServiceRequest.servicename, code));
 
             if (code === 200 || code === 201 || code === 204) {
                 if (res.response.data) {
@@ -152,15 +206,14 @@ RequestCacher.prototype = {
 
             } else if (this.canUseStaleResult()) {
                 logger.warn('Request failed. Using stale results for ' + fwServiceRequest.servicename);
-
                 cacheObj.response = this._currentResult.data.response;
 
             } else {
-                logger.error('Request failed. Cannot refresh cache for' + fwServiceRequest.servicename);
+                logger.error('Request failed. Cannot refresh cache for ' + fwServiceRequest.servicename);
                 error = res.response;
             }
 
-            cb(cacheObj.response, error);
+            callback(cacheObj.response, error);
         }.bind(this));
     }
 };
@@ -169,4 +222,3 @@ RequestCacher.prototype = {
 RequestCacher.hash = hash;
 
 module.exports = RequestCacher;
-

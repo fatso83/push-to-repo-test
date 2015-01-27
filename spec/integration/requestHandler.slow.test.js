@@ -2,7 +2,8 @@
  * Created by carl-erik.kopseng on 05.11.14.
  */
 
-var handler = require('../../modules/requestHandler');
+    /**
+var handler = require('../../modules/request_helpers/request-handler');
 var expect = require('chai').expect;
 
 
@@ -29,3 +30,4 @@ describe('slow.requestHandler', function () {
     });
 
 });
+     **/

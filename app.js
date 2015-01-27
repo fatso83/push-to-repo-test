@@ -5,7 +5,7 @@ var server,
     config = require('./modules/configuration-loader'),
     log4js = require('log4js'),
 
-    //http://stackoverflow.com/questions/27101171/pattern-for-ifrequire-main-that-works-on-azures-iisnode/27151366
+//http://stackoverflow.com/questions/27101171/pattern-for-ifrequire-main-that-works-on-azures-iisnode/27151366
     runningIISNode = require.main.filename.match(/iisnode/);
 
 /**
@@ -46,17 +46,25 @@ function main(config, callback) {
 
     app.use('/', index);
     app.use('/request', request);
-    app.use('/api/FindStore', require('./routes/find-store'));
 
+    app.use('/api/uidata/brandmatch', require('./routes/ui_data/brand-match'));
+    app.use('/api/uidata/recommendations', require('./routes/ui_data/recommendations'));
+
+    app.use('/api/FindStore', require('./routes/find_store/find-store'));
+
+    app.use('/api/data/shoppinglistgroup', require('./routes/data/shopping-list-group'));
+    app.use('/api/data/vacancies', require('./routes/data/vacancies'));
+    app.use('/api/data/synonyms', require('./routes/data/synonyms'));
+    app.use('/api/data/postaladdress', require('./routes/data/postal-address'));
 
     // Catch 404 and forwarding to error handler
     app.use(function (req, res, next) {
-        var err = new Error('Not Found');
+        var error = new Error('Not Found');
 
-        err.status = 404;
-        err.message = "That route does not exist";
+        error.status = 404;
+        error.message = "That route does not exist";
 
-        next(err);
+        next(error);
     });
 
     server.listen(app.get('port'), function () {
@@ -77,7 +85,9 @@ function main(config, callback) {
                     callback();
                 }
             });
-        } else { callback(); }
+        } else {
+            callback();
+        }
 
     });
 }
@@ -100,10 +110,10 @@ exports.start = function (overrides, cb) {
 /*
  *  start as normal if run directly from node
  *  special treatment in the case of running IISNode (Azure)
-**/
+ **/
 if (require.main === module || runningIISNode) {
 
     config.load(function (config) {
-        main(config, console.log.bind(console, 'Express server listening at :' + config.port ));
+        main(config, console.log.bind(console, 'Express server listening at :' + config.port));
     });
 }

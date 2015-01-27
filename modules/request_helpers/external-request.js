@@ -44,7 +44,6 @@ function createUri(requestData) {
 var makeRequest = function (requestData, callback) {
 	logger.debug('Resolving request');
 
-	
 	var responseObj = {
 		serviceId    : requestData.serviceId,
 		response     : {

@@ -67,7 +67,10 @@ function getSingleStore(requestBody, callback) {
  */
 function closestToMe(requestBody, callback) {
 
-    var parsedUrl, params, chainId, match;
+    var parsedUrl,
+        params,
+        chainId,
+        match;
 
     // ensure easier parsing of parameters
     parsedUrl = url.parse(requestBody.servicepath.toLowerCase());

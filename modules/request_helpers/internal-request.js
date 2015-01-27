@@ -5,15 +5,38 @@ var logger = log4js.getLogger('Internal Request Resolver');
 
 // caching
 var RequestCacher = require('../caching/request-cacher');
+
 var ONE_DAY = 24 * 60 * 60;
-var FOUR_HOURS= 4 * 60 * 60;
-var requestCacher = new RequestCacher({maxAgeInSeconds: ONE_DAY, maxStaleInSeconds : FOUR_HOURS});
+var FOUR_HOURS = 4 * 60 * 60;
+
+// Request handler
+var requestCacher = new RequestCacher({
+    maxAgeInSeconds: ONE_DAY,
+    maxStaleInSeconds: FOUR_HOURS
+});
 var cachingRequestHandler = requestCacher.handleRequest.bind(requestCacher);
+
+// Basic request handler
+var requestCacherBasic = new RequestCacher({
+    maxAgeInSeconds: ONE_DAY,
+    maxStaleInSeconds: FOUR_HOURS,
+    basicToken: true
+});
+var cachingBasicRequestHandler = requestCacherBasic.handleRequest.bind(requestCacherBasic);
+
+// Bearer request handler
+var requestCacherBearer = new RequestCacher({
+    maxAgeInSeconds: ONE_DAY,
+    maxStaleInSeconds: FOUR_HOURS,
+    basicToken: true,
+    bearerToken: true
+});
+var cachingBearerRequestHandler = requestCacherBearer.handleRequest.bind(requestCacherBearer);
 
 var productSearchModule = require('./../productSearch/searchUtil');
 var trumfTermsAndConditionsModule = require('./../terms_caching/terms_cacher');
 var persistenceSyncModule = require('./../synchronize/request-adapter');
-var storesModule = require('../stores/request-adapter');
+var storesAdapter = require('../stores/request-adapter');
 
 var localServices = {
     'persistenceSynchronize': persistenceSyncModule.synchronize,
@@ -24,17 +47,29 @@ var localServices = {
     'productSearchGetProductsForGroup': productSearchModule.search,
     'productSearchGetAllCategories': productSearchModule.search,
     'productSearchGetProductById': productSearchModule.search,
-    'allStoresInCounties': storesModule.getAllStoresInCounties,
-    'storesGetStore': storesModule.getAllStores,
+
+    // custom handlers
+    'allStoresInCounties': storesAdapter.getAllStoresInCounties,
+    'storesGetStore': storesAdapter.getAllStores,
 
     // can't be cached
-    'storesClosestToMe': storesModule.closestToMe,
-    'storesGetSingleStore': storesModule.getSingleStore,
+    'storesClosestToMe': storesAdapter.closestToMe,
+    'storesGetSingleStore': storesAdapter.getSingleStore,
 
     // cached requests
     'productDetails2': cachingRequestHandler,
-    'recommendations': cachingRequestHandler,
-    'brandMatch': cachingRequestHandler,
+
+    // requires basic authentication
+    'shoppingListGroup': cachingBasicRequestHandler,
+    'brandMatch': cachingBasicRequestHandler,
+    'vacancies': cachingBasicRequestHandler,
+    'synonyms': cachingBasicRequestHandler,
+    'municipalities': cachingBasicRequestHandler,
+    'counties': cachingBasicRequestHandler,
+    'postalAddress': cachingBasicRequestHandler,
+
+    // additional functionality using bearer token
+    'recommendations': cachingBearerRequestHandler
 };
 
 var isLocalService = function (requestBody) {
@@ -42,12 +77,10 @@ var isLocalService = function (requestBody) {
     return serviceName in localServices;
 };
 
-
 var getMethod = function (serviceName) {
     var res = localServices[serviceName];
     return res || false;
 };
-
 
 var makeRequest = function (requestBody, callback) {
     logger.debug('Resolving request for service ', requestBody.servicename);
@@ -65,7 +98,7 @@ var makeRequest = function (requestBody, callback) {
 
     if (method) {
         method(requestBody, function (response, error) {
-            
+
             if (error) {
                 responseObj.response.data = error.data || {};
                 responseObj.response.code = error.code || 500;
@@ -83,7 +116,6 @@ var makeRequest = function (requestBody, callback) {
         callback(responseObj);
     }
 };
-
 
 exports.makeRequest = makeRequest;
 exports.isLocalService = isLocalService;
