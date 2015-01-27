@@ -36,7 +36,7 @@ var cachingBearerRequestHandler = requestCacherBearer.handleRequest.bind(request
 var productSearchModule = require('./../productSearch/searchUtil');
 var trumfTermsAndConditionsModule = require('./../terms_caching/terms_cacher');
 var persistenceSyncModule = require('./../synchronize/request-adapter');
-var storesModule = require('../stores/request-adapter');
+var storesAdapter = require('../stores/request-adapter');
 
 var localServices = {
     'persistenceSynchronize': persistenceSyncModule.synchronize,
@@ -49,12 +49,12 @@ var localServices = {
     'productSearchGetProductById': productSearchModule.search,
 
     // custom handlers
-    'allStoresInCounties': storesModule.getAllStoresInCounties,
-    'storesGetStore': storesModule.getAllStores,
+    'allStoresInCounties': storesAdapter.getAllStoresInCounties,
+    'storesGetStore': storesAdapter.getAllStores,
 
     // can't be cached
-    'storesClosestToMe': storesModule.closestToMe,
-    'storesGetSingleStore': storesModule.getSingleStore,
+    'storesClosestToMe': storesAdapter.closestToMe,
+    'storesGetSingleStore': storesAdapter.getSingleStore,
 
     // cached requests
     'productDetails2': cachingRequestHandler,

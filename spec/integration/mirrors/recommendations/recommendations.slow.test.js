@@ -9,7 +9,7 @@ describe('slow.integration.mirrors.recommendations service', function () {
     this.timeout(testConfig.timeout.HALF_MINUTE);
 
     var mock = {
-        URL: testConfig.URL + 'api/uidata/recommendations/1100',
+        URL: testConfig.URL + 'api/uidata/recommendations/' + testConfig.chainId,
         recommendation: null
     };
 
@@ -30,7 +30,7 @@ describe('slow.integration.mirrors.recommendations service', function () {
 
     describe('/uidata/recommendations/', function () {
 
-        it('should return all recommendations', function (done) {
+        it('should return all recommendations in chain ' + testConfig.chainId, function (done) {
             var options = {
                 url: mock.URL,
                 headers: {
