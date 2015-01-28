@@ -15,18 +15,17 @@ describe('slow.integration.mirrors.postal-address service', function () {
     };
 
     before(function (done) {
-        app.start({
-            port: 1337,
-            disable: {
-                'cache-warmup': 1,
-                'product-module': 1
-            },
-            logging: {level: 'WARN'}
-        }, done);
+        if(testConfig.isLocal()){
+            return app.start(testConfig.appOverrides, done);
+        }
+        done();
     });
 
     after(function (done) {
-        app.stop(done);
+        if(testConfig.isLocal()){
+            return app.stop(done);
+        }
+        done();
     });
 
     describe('/data/postaladdress/', function () {
