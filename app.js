@@ -47,15 +47,21 @@ function main(config, callback) {
     app.use('/', index);
     app.use('/request', request);
 
-    app.use('/api/uidata/brandmatch', require('./routes/ui_data/brand-match'));
-    app.use('/api/uidata/recommendations', require('./routes/ui_data/recommendations'));
+    // ADMIN ROUTES
+    app.use('/api/admin/status/redis', require('./routes/admin/status-redis.js'))
 
-    app.use('/api/FindStore', require('./routes/find_store/find-store'));
-
+    // DATA ROUTES
     app.use('/api/data/shoppinglistgroup', require('./routes/data/shopping-list-group'));
     app.use('/api/data/vacancies', require('./routes/data/vacancies'));
     app.use('/api/data/synonyms', require('./routes/data/synonyms'));
     app.use('/api/data/postaladdress', require('./routes/data/postal-address'));
+
+    // UI_DATA ROUTES
+    app.use('/api/uidata/brandmatch', require('./routes/ui_data/brand-match'));
+    app.use('/api/uidata/recommendations', require('./routes/ui_data/recommendations'));
+
+    // FIND_STORE ROUTES
+    app.use('/api/FindStore', require('./routes/find_store/find-store'));
 
     // Catch 404 and forwarding to error handler
     app.use(function (req, res, next) {

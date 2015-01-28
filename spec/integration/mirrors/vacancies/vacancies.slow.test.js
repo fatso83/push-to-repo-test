@@ -61,7 +61,6 @@ describe('slow.integration.mirrors.shopping-list-group service', function () {
                 expect(vacancyItem).to.include.keys([
                     'applicationurl', 'commence', 'companyname', 'contactpersonname'
                 ]);
-                expect(vacancyItem).to.have.deep.property('companyname', 'KIWI');
                 return done(error);
             });
         });

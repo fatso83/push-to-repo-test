@@ -87,3 +87,6 @@ function getBasicAuthentication() {
 exports.parseFrameworkVersion = parseFrameworkVersion;
 exports.isMinimumRequiredVersion = isMinimumRequiredVersion;
 exports.basicAuthentication = getBasicAuthentication;
+exports.hasBasicToken = function(authorizationToken){
+    return !!(authorizationToken && typeof authorizationToken === 'string' && authorizationToken === basicToken);
+};

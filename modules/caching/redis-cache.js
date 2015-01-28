@@ -156,5 +156,14 @@ module.exports = {
         else {
             cache.apply(null, arguments);
         }
+    },
+    status: function () {
+        return {
+            address: cli.address,
+            connected: cli.connected,
+            commandQueueLength: cli.command_queue.length,
+            offlineQueueLength: cli.offline_queue.length,
+            serverInfo: cli.server_info
+        };
     }
 };
