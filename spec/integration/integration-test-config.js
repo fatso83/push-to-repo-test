@@ -1,13 +1,13 @@
 var LOCALHOST = 'http://localhost:1337/';
 var PROD = 'https://service-dk.norgesgruppen.no/';
 var PRE_PROD = 'https://preprod.service-dk.norgesgruppen.no/';
-var AZURE_DEV = "http://ng-azure-rest-api-dev.azurewebsites.net/";
-var AZURE_PRE_PROD = "http://ng-azure-rest-api-preprod.azurewebsites.net/";
-var AZURE_PROD = "http://ng-azure-rest-api-prod.azurewebsites.net/";
+var AZURE_DEV = "https://ng-azure-rest-api-dev.azurewebsites.net/";
+var AZURE_PRE_PROD = "https://ng-azure-rest-api-preprod.azurewebsites.net/";
+var AZURE_PROD = "https://ng-azure-rest-api-prod.azurewebsites.net/";
 
-var url = AZURE_DEV;
+var url = LOCALHOST;
 
-module.exports = {
+var testConfig = {
     URL: url,
     timeout: {
         HALF_MINUTE: 30 * 1000
@@ -25,3 +25,5 @@ module.exports = {
         return url === LOCALHOST;
     }
 };
+
+module.exports = testConfig;

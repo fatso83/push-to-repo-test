@@ -4,7 +4,7 @@ var app = require('../../../app');
 var utils = require('../../../modules/utils');
 var testConfig = require('../integration-test-config');
 
-describe('slow.integration.mirrors.brandmatch service', function () {
+describe('slow.integration.admin-dashboard service', function () {
 
     this.timeout(testConfig.timeout.HALF_MINUTE);
 
