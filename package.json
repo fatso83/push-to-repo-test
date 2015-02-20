@@ -1,13 +1,13 @@
 {
-  "name": "azure-push",
+  "name": "deploy-by-push",
   "version": "0.1.0",
-  "description": "A deploy script to ensure safer deployments to Azure. A fancy way of saying git push -f azure ;-)",
+  "description": "A deploy script for git transport deployments (Azure, Heroku, ...). A safer and fancier way of saying git push -f azure ;-)",
   "bin": {
-    "azure-push": "./bin/azure-push"
+    "deploy-by-push": "./deploy-by-push.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/fatso83/azure-push"
+    "url": "https://github.com/fatso83/deploy-by-push"
   },
   "keywords": [
     "azure",

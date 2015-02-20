@@ -1,32 +1,27 @@
-#ng-rest-deploy
-> Deployment script for the REST APIs for Norgesgruppen
+#deploy-by-push
+> Deployment script for git transport based deploys
+> Basically a fancier way of saying `git push -f remote-deploy-repo localBranch:remoteBranch`
 
 ## Installation
 
 ```
 npm install -g
 ```
+This will put a binary in your $PATH called `deploy-by-push`. When called it needs to have
+a file called `deploy.conf` in your current working directory. An example file is included.
 
 ## Intended usage
-From _any_ directory, you should be able to deploy by issuing
+From the directory you have `deploy.conf`, you should be able to deploy by issuing
 
 ```
-ng-rest-deploy --environment preproduction
+deploy-by-push --environment preproduction
 ```
 
-This will then check out the preproduction branch from GitHub into a temporary folder
+This will then check out the preproduction branch from your remote repo into a temporary folder
 and push the latest commit (HEAD) into the Azure instance for preproduction.
 
 ## Other options
 
 ```
-ng-rest-deploy --environment <ENV> [--force] [--local-repo] [commit hash]
-
-ENV             development | preproduction | production
-commit hash     the commit hash to use when pushing to Azure
-
-Options:
---local-repo    will use the current directory as the git repo to use
---force         will not prompt the user before deploying. Required for non-interactive shells
 ```
 
