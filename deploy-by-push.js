@@ -32,6 +32,7 @@ var colors = require('colors'),// loading the program changes String.prototype
     verbosity = 0,
     available_envs,
     environmentConfig,
+treeish,
     tmpDir;
 
 
@@ -83,7 +84,7 @@ function pushToRemoteRepo() {
         'push',
         '-f',
         environmentConfig.dst.repo,
-        environmentConfig.src.branch + ':' + environmentConfig.dst.branch
+        treeish + ':' + environmentConfig.dst.branch
     ], {stdio: 'inherit', cwd: tmpDir});
 
     return new Promise(function (resolve, reject) {
@@ -231,7 +232,7 @@ mktemp.createDir('.tmpXXXXXXX')
         }
     })
     .then(function () {
-        var treeish = program.commit || environmentConfig.src.branch;
+        treeish = program.commit || environmentConfig.src.branch;
         logger.info('Checking out ' + treeish);
         return checkout(treeish, {cwd: tmpDir});
     })
