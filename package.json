@@ -29,6 +29,7 @@
     "seraphim": "^0.1.0"
   },
   "devDependencies": {
+    "deploy-by-push" : "fatso83/deploy-by-push",
     "chai": "*",
     "expect.js": "^0.3.1",
     "mocha": "^1.21.4",
