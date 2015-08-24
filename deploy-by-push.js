@@ -12,6 +12,7 @@ var colors = require('colors'),// loading the program changes String.prototype
     winston = require('winston'),
     Promise = require('es6-promise').Promise,
     promisify = require('promisify-node'),
+    execSync = require('child_process').execSync,
     exec = promisify(require('child_process').exec),
     spawn = require('child_process').spawn,
     fse = promisify(require('fs-extra')),
@@ -167,7 +168,8 @@ function promptUserIfNecessary() {
 }
 
 
-loadConfig('./deploy.conf');
+var rootPathOfRepo = execSync('git rev-parse --show-toplevel').slice(0,-1);
+loadConfig(rootPathOfRepo + '/deploy.conf');
 available_envs = Object.keys(config.environment);
 
 /*

@@ -11,7 +11,7 @@ git push -f remote-deploy-repo localBranch:remoteBranch
 npm install -g
 ```
 This will put a binary in your $PATH called `deploy-by-push`. When called it needs to have
-a file called `deploy.conf` in your current working directory. An example file is included.
+a file called `deploy.conf` in the root directory of your git repo. An example file is included.
 
 ## Intended usage
 From the directory you have `deploy.conf`, you should be able to deploy by issuing
