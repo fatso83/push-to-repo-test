@@ -1,6 +1,9 @@
 #deploy-by-push
 > Deployment script for git transport based deploys. Basically a fancier way of 
-> saying `git push -f remote-deploy-repo localBranch:remoteBranch`
+> saying 
+```
+git push -f remote-deploy-repo localBranch:remoteBranch
+```
 
 ## Installation
 
