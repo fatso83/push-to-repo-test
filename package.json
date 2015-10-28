@@ -29,7 +29,7 @@
     "fs-extra": "^0.13.0",
     "lodash": "^3.1.0",
     "mktemp": "^0.3.5",
-    "nodegit": "^0.2.4",
+    "nodegit": "0.5.0",
     "promisify-node": "^0.1.5",
     "prompt": "^0.2.14",
     "winston": "^0.8.3"
